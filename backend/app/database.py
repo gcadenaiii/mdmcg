@@ -11,8 +11,10 @@ _url = get_settings().database_url
 _is_sqlite = _url.startswith("sqlite")
 _engine_kwargs: dict = {"echo": get_settings().debug, "pool_pre_ping": not _is_sqlite}
 if not _is_sqlite:
-    _engine_kwargs["pool_size"] = 5
-    _engine_kwargs["max_overflow"] = 10
+    _engine_kwargs["pool_size"] = 10
+    _engine_kwargs["max_overflow"] = 20
+    _engine_kwargs["pool_recycle"] = 1800
+    _engine_kwargs["pool_timeout"] = 30
 
 engine = create_async_engine(_url, **_engine_kwargs)
 
