@@ -1,0 +1,62 @@
+{
+    "_comment": "Template — copy this to config.json and set active_profile for your machine.",
+    "_usage": "cp config.example.json config.json  (then edit active_profile)",
+    "_profiles": "Available profiles: mock | bno055 | arduino | arduino_ble | teensy_esp32",
+    "_machines": {
+        "windows-dev": "use active_profile: mock",
+        "raspberry-pi-ble": "use active_profile: arduino_ble",
+        "raspberry-pi-wifi": "use active_profile: teensy_esp32"
+    },
+    "active_profile": "mock",
+    "profiles": {
+        "mock": {
+            "description": "Simulated sensor — Windows dev, no hardware required",
+            "sensor": {
+                "mode": "mock",
+                "sensor_type": "bno055",
+                "mock_movement_enabled": true,
+                "mock_noise_level": 0.1,
+                "mock_step_interval": 1.0
+            }
+        },
+        "bno055": {
+            "description": "Direct BNO055 sensor via I2C on Raspberry Pi",
+            "sensor": {
+                "mode": "real",
+                "sensor_type": "bno055"
+            }
+        },
+        "arduino": {
+            "description": "BNO055 via Arduino over USB serial",
+            "sensor": {
+                "mode": "real",
+                "sensor_type": "arduino",
+                "arduino_port": null,
+                "arduino_baud": 115200
+            }
+        },
+        "arduino_ble": {
+            "description": "BNO055 via ESP32 BLE bridge (esp32_ble_bridge.ino) — Raspberry Pi",
+            "sensor": {
+                "mode": "real",
+                "sensor_type": "arduino_ble",
+                "ble_device_name": "ESP32_BNO055",
+                "ble_device_address": null,
+                "ble_scan_timeout": 10.0
+            }
+        },
+        "teensy_esp32": {
+            "description": "BNO055 via Teensy 4.0 + ESP32 WiFi TCP bridge (esp32_bridge.ino)",
+            "sensor": {
+                "mode": "real",
+                "sensor_type": "teensy_esp32",
+                "esp32_host": "192.168.4.1",
+                "esp32_port": 5005
+            }
+        }
+    },
+    "log_directory": "applications/motion_tracking/logs",
+    "web_host": "0.0.0.0",
+    "web_port": 8000,
+    "sampling_rate": 20
+}

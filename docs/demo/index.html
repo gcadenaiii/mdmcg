@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motion Tracking - Debug & Demo Views</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <script>
+        // Suppress Tailwind CDN production warning - must run before Tailwind loads
+        (function () {
+            const originalWarn = console.warn;
+            console.warn = function (...args) {
+                const msg = args[0];
+                if (typeof msg === 'string' && msg.includes('cdn.tailwindcss.com')) {
+                    return;
+                }
+                originalWarn.apply(console, args);
+            };
+        })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Tab Navigation Styles */
+        .tab-navigation {
+            background: white;
+            border-bottom: 2px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-button {
+            padding: 1rem 2rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .tab-button:hover {
+            color: #374151;
+            background: #f9fafb;
+        }
+
+        .tab-button.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Design 2 Specific Styles */
+        .sensor-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .chart-container-v2 {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .orientation-cube {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+            perspective: 400px;
+            position: relative;
+        }
+
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border: 2px solid #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .front {
+            background: rgba(79, 70, 229, 0.8);
+            transform: rotateY(0deg) translateZ(60px);
+        }
+
+        .back {
+            background: rgba(139, 92, 246, 0.8);
+            transform: rotateY(180deg) translateZ(60px);
+        }
+
+        .right {
+            background: rgba(168, 85, 247, 0.8);
+            transform: rotateY(90deg) translateZ(60px);
+        }
+
+        .left {
+            background: rgba(196, 181, 253, 0.8);
+            transform: rotateY(-90deg) translateZ(60px);
+        }
+
+        .top {
+            background: rgba(124, 58, 237, 0.8);
+            transform: rotateX(90deg) translateZ(60px);
+        }
+
+        .bottom {
+            background: rgba(147, 51, 234, 0.8);
+            transform: rotateX(-90deg) translateZ(60px);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-connected {
+            background: #10b981;
+        }
+
+        .status-warning {
+            background: #f59e0b;
+            animation: pulse-warning 2s ease-in-out infinite;
+        }
+
+        .status-disconnected {
+            background: #ef4444;
+        }
+
+        @keyframes pulse-warning {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .acceleration-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .acceleration-fill {
+            height: 100%;
+            transition: width 0.2s ease-out;
+            border-radius: 4px;
+        }
+
+        .accel-x {
+            background: linear-gradient(90deg, #ef4444, #fca5a5);
+        }
+
+        .accel-y {
+            background: linear-gradient(90deg, #10b981, #86efac);
+        }
+
+        .accel-z {
+            background: linear-gradient(90deg, #3b82f6, #93c5fd);
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Connection Status Indicator */
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .connection-status.connected {
+            background: rgba(209, 250, 229, 0.95);
+            color: #065f46;
+        }
+
+        .connection-status.disconnected {
+            background: rgba(254, 226, 226, 0.95);
+            color: #991b1b;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-dot.green {
+            background: #10b981;
+        }
+
+        .status-dot.red {
+            background: #ef4444;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <div class="flex space-x-1">
+                    <button class="tab-button active" onclick="switchTab('design1')">
+                        Debug View
+                    </button>
+                    <button class="tab-button" onclick="switchTab('design2')">
+                        Demo View
+                    </button>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="../"
+                        class="text-gray-700 hover:text-blue-600 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path
+                                d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                        </svg>
+                        <span>Home</span>
+                    </a>
+                    <a href="config.html"
+                        class="text-gray-700 hover:text-blue-600 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        <span>Config</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debug View -->
+    <div id="design1" class="tab-content active">
+        <div class="container">
+            <div class="visualization">
+                <div class="three-d-views">
+                    <div class="view-container">
+                        <h3>Sensor Orientation</h3>
+                        <div id="orientation-view"></div>
+                    </div>
+                    <div class="view-container" style="position: relative;">
+                        <button onclick="resetDebugStepCounter()"
+                            style="position: absolute; top: 10px; right: 10px; padding: 4px 12px; font-size: 0.75em; font-weight: 600; color: white; background: #3498db; border: none; border-radius: 4px; cursor: pointer; transition: background 0.2s;"
+                            onmouseover="this.style.background='#2980b9'" onmouseout="this.style.background='#3498db'"
+                            title="Reset step counter">
+                            Reset
+                        </button>
+                        <h3>Step Counter <span id="step-info" style="font-weight:normal; font-size:0.8em;">(0 steps,
+                                0.00m)</span>
+                        </h3>
+                        <div id="step-view"></div>
+                        <div id="step-debug"
+                            style="position: absolute; top: 50px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-family: monospace;">
+                            State: <span id="step-state">WAITING</span>
+                        </div>
+                    </div>
+                    <div class="view-container">
+                        <h3>Movement Activity</h3>
+                        <div id="activity-view"></div>
+                    </div>
+                </div>
+                <div class="data-view">
+                    <div class="chart-container">
+                        <canvas id="orientation-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="acceleration-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="info-panel">
+                <h2>Sensor Data</h2>
+                <div class="data-grid">
+                    <div class="data-item">
+                        <h3>Position (m)</h3>
+                        <p>X: <span id="pos-x">0.00</span></p>
+                        <p>Y: <span id="pos-y">0.00</span></p>
+                        <p>Z: <span id="pos-z">0.00</span></p>
+                    </div>
+                    <div class="data-item">
+                        <h3>Orientation (°)</h3>
+                        <p>Heading: <span id="euler-x">0.00</span></p>
+                        <p>Roll: <span id="euler-y">0.00</span></p>
+                        <p>Pitch: <span id="euler-z">0.00</span></p>
+                    </div>
+                    <div class="data-item">
+                        <h3>Velocity (m/s)</h3>
+                        <p>X: <span id="vel-x">0.00</span></p>
+                        <p>Y: <span id="vel-y">0.00</span></p>
+                        <p>Z: <span id="vel-z">0.00</span></p>
+                    </div>
+                    <div class="data-item">
+                        <h3>Acceleration (m/s²)</h3>
+                        <p>X: <span id="acc-x">0.00</span></p>
+                        <p>Y: <span id="acc-y">0.00</span></p>
+                        <p>Z: <span id="acc-z">0.00</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo View -->
+    <div id="design2" class="tab-content">
+        <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Motion Tracking Interface</h1>
+                        <p class="text-sm text-gray-600">BNO055 IMU Sensor Visualization</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full">
+                            <span class="status-indicator" id="connectionStatus2"></span>
+                            <span class="text-sm font-semibold text-green-800" id="connectionText2">Connected</span>
+                        </div>
+                        <a href="ble.html"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+                            title="Manage Bluetooth connections">
+                            🔵 BLE
+                        </a>
+                        <button id="exportBtn2"
+                            class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            Export Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Status Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="sensor-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold mb-2">Sensor Status</h3>
+                            <p class="text-sm opacity-90" id="sensorStatus2">Connected - Streaming</p>
+                        </div>
+                        <div class="text-3xl">📡</div>
+                    </div>
+                </div>
+
+                <div class="sensor-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold mb-2">Data Rate</h3>
+                            <p class="text-2xl font-bold" id="dataRate2">0 Hz</p>
+                        </div>
+                        <div class="text-3xl">⚡</div>
+                    </div>
+                </div>
+
+                <div class="sensor-card relative">
+                    <button onclick="resetStepCounter()"
+                        class="absolute top-3 right-3 px-2 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors"
+                        title="Reset step counter">
+                        Reset
+                    </button>
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold mb-2">Step Count</h3>
+                            <p class="text-3xl font-bold tabular-nums" id="stepCount2">0</p>
+                        </div>
+                        <div class="text-3xl ml-3">👟</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Data Visualization -->
+            <div class="data-grid">
+                <!-- 3D Orientation -->
+                <div class="chart-container-v2">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">3D Orientation</h3>
+                    <div class="orientation-cube">
+                        <div class="cube" id="orientationCube2">
+                            <div class="cube-face front">FRONT</div>
+                            <div class="cube-face back">BACK</div>
+                            <div class="cube-face right">RIGHT</div>
+                            <div class="cube-face left">LEFT</div>
+                            <div class="cube-face top">TOP</div>
+                            <div class="cube-face bottom">BOTTOM</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div class="metric-label">Roll</div>
+                            <div class="metric-value text-lg" id="rollValue2">0°</div>
+                        </div>
+                        <div>
+                            <div class="metric-label">Pitch</div>
+                            <div class="metric-value text-lg" id="pitchValue2">0°</div>
+                        </div>
+                        <div>
+                            <div class="metric-label">Yaw</div>
+                            <div class="metric-value text-lg" id="yawValue2">0°</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acceleration Data -->
+                <div class="chart-container-v2">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Acceleration</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-red-600">X-Axis</span>
+                                <span class="text-sm font-mono" id="accelX2">0.00 m/s²</span>
+                            </div>
+                            <div class="acceleration-bar">
+                                <div class="acceleration-fill accel-x" id="accelXBar2" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-green-600">Y-Axis</span>
+                                <span class="text-sm font-mono" id="accelY2">0.00 m/s²</span>
+                            </div>
+                            <div class="acceleration-bar">
+                                <div class="acceleration-fill accel-y" id="accelYBar2" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-blue-600">Z-Axis</span>
+                                <span class="text-sm font-mono" id="accelZ2">0.00 m/s²</span>
+                            </div>
+                            <div class="acceleration-bar">
+                                <div class="acceleration-fill accel-z" id="accelZBar2" style="width: 50%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <div class="metric-label">Total Magnitude</div>
+                        <div class="metric-value text-xl" id="totalAccel2">0.00 m/s²</div>
+                    </div>
+                </div>
+
+                <!-- Gyroscope Data -->
+                <div class="chart-container-v2">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Angular Velocity</h3>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="text-center">
+                            <div class="metric-label">Roll Rate</div>
+                            <div class="metric-value text-lg" id="gyroX2">0.00°/s</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="metric-label">Pitch Rate</div>
+                            <div class="metric-value text-lg" id="gyroY2">0.00°/s</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="metric-label">Yaw Rate</div>
+                            <div class="metric-value text-lg" id="gyroZ2">0.00°/s</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Temperature & Calibration -->
+                <div class="chart-container-v2">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">System Status</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-600">Temperature</span>
+                            <span class="text-lg font-bold" id="temperature2">25°C</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-600">System Cal</span>
+                            <span class="text-lg font-bold text-green-600" id="sysCal2">3/3</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-600">Gyro Cal</span>
+                            <span class="text-lg font-bold text-green-600" id="gyroCal2">3/3</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-600">Accel Cal</span>
+                            <span class="text-lg font-bold text-green-600" id="accelCal2">3/3</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-600">Mag Cal</span>
+                            <span class="text-lg font-bold text-yellow-600" id="magCal2">2/3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Log -->
+                <div class="chart-container-v2 md:col-span-2">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Data Log</h3>
+                    <div class="bg-gray-50 rounded-lg p-4 h-48 overflow-y-auto font-mono text-sm text-gray-700"
+                        id="dataLog2">
+                        <div class="text-gray-500">Waiting for sensor data...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Load demo mode scripts FIRST to replace WebSocket constructor -->
+    <script src="demo.js"></script>
+    <script src="visualization-demo.js"></script>
+
+    <!-- Then load visualization scripts (they will use MockWebSocket) -->
+    <script src="visualization.js"></script>
+    <script src="visualization2.js"></script>
+    <script>
+        // Tab switching function
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Activate clicked button
+            event.target.classList.add('active');
+
+            // Store preference
+            localStorage.setItem('preferredDesign', tabName);
+        }
+
+        // Restore last selected tab
+        window.addEventListener('DOMContentLoaded', () => {
+            const preferred = localStorage.getItem('preferredDesign');
+            if (preferred && document.getElementById(preferred)) {
+                const buttons = document.querySelectorAll('.tab-button');
+                buttons.forEach((btn, idx) => {
+                    if ((preferred === 'design1' && idx === 0) || (preferred === 'design2' && idx === 1)) {
+                        btn.click();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

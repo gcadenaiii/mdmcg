@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Calibration - Motion Tracking</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .status-bar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .calibration-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .cal-meter {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .cal-meter.calibrated {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .cal-meter.partial {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .cal-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .cal-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .cal-status {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .orientation-guide {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .orientation-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .orientation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .orientation-card.completed {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 3px solid #10b981;
+        }
+
+        .orientation-card.completed::after {
+            content: "✓";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .orientation-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+            filter: grayscale(100%);
+            transition: filter 0.3s ease;
+        }
+
+        .orientation-card.completed .orientation-icon {
+            filter: grayscale(0%);
+        }
+
+        .orientation-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .orientation-desc {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .instructions {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .instructions li {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f9fafb;
+            border-radius: 8px;
+            display: flex;
+            align-items: start;
+            gap: 10px;
+        }
+
+        .instructions li::before {
+            content: "→";
+            color: #667eea;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .nav-link {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .nav-link:hover {
+            color: #5568d3;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+
+        .message.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 2px solid #f59e0b;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 2px solid #ef4444;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform-origin: 50% 50%;
+        }
+
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .connection-status.connected {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .connection-status.disconnected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-dot.green {
+            background: #10b981;
+        }
+
+        .status-dot.red {
+            background: #ef4444;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .figure-eight {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .figure-eight svg {
+            max-width: 300px;
+            height: auto;
+        }
+
+        /* 3D Orientation View */
+        .orientation-view-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .orientation-view-container h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #orientationCanvas {
+            width: 100%;
+            height: 300px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .view-info {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .view-info-item {
+            text-align: center;
+        }
+
+        .view-info-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .view-info-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 5px;
+        }
+
+        /* Responsive styles for mobile devices */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .calibration-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .cal-meter {
+                padding: 15px 10px;
+            }
+
+            .cal-label {
+                font-size: 10px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                hyphens: auto;
+            }
+
+            .cal-value {
+                font-size: 28px;
+            }
+
+            .cal-status {
+                font-size: 10px;
+            }
+
+            .orientation-guide {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .orientation-card {
+                padding: 15px;
+            }
+
+            .orientation-icon {
+                font-size: 48px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calibration-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .cal-meter {
+                padding: 12px 8px;
+            }
+
+            .cal-label {
+                font-size: 9px;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .cal-value {
+                font-size: 24px;
+            }
+
+            .orientation-guide {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Demo Mode Banner -->
+    <div
+        style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: #fef3c7; border-bottom: 2px solid #f59e0b; padding: 10px 20px; text-align: center; font-size: 14px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <strong style="color: #92400e;">🎬 Demo Mode:</strong>
+            <span style="color: #78350f;">This calibration page is for preview only. Cannot calibrate in demo
+                mode.</span>
+        </div>
+        <div style="display: flex; gap: 15px; align-items: center; white-space: nowrap;">
+            <a href="../" style="color: #0066cc; text-decoration: none; font-weight: 600;">← Back to Landing</a>
+            <a href="https://github.com/gcadenaiii/sensors_lab" target="_blank"
+                style="color: #0066cc; text-decoration: none; font-weight: 600;">Get Real App →</a>
+        </div>
+    </div>
+
+    <div class="container" style="margin-top: 60px;">
+        <div class="header">
+            <h1>
+                🧭 Sensor Calibration
+                <div style="margin-left: auto;">
+                    <span class="connection-status" id="connectionStatus">
+                        <span class="status-dot red"></span>
+                        Disconnected
+                    </span>
+                </div>
+            </h1>
+            <p class="subtitle">Follow the visual guide to calibrate your BNO055 sensor</p>
+        </div>
+
+        <div id="messageBox"></div>
+
+        <div class="status-bar">
+            <h3 style="margin-bottom: 15px; color: #333;">Calibration Progress</h3>
+            <div class="calibration-grid">
+                <div class="cal-meter" id="sysMeter">
+                    <div class="cal-label">System</div>
+                    <div class="cal-value" id="sysValue">0/3</div>
+                    <div class="cal-status">Not Calibrated</div>
+                </div>
+                <div class="cal-meter" id="gyroMeter">
+                    <div class="cal-label">Gyroscope</div>
+                    <div class="cal-value" id="gyroValue">0/3</div>
+                    <div class="cal-status">Not Calibrated</div>
+                </div>
+                <div class="cal-meter" id="accelMeter">
+                    <div class="cal-label">Accelerometer</div>
+                    <div class="cal-value" id="accelValue">0/3</div>
+                    <div class="cal-status">Not Calibrated</div>
+                </div>
+                <div class="cal-meter" id="magMeter">
+                    <div class="cal-label">Magnetometer</div>
+                    <div class="cal-value" id="magValue">0/3</div>
+                    <div class="cal-status">Not Calibrated</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3D Orientation View -->
+        <div class="orientation-view-container">
+            <h3>🎮 Live Sensor Orientation</h3>
+            <canvas id="orientationCanvas"></canvas>
+            <div class="view-info">
+                <div class="view-info-item">
+                    <div class="view-info-label">Roll</div>
+                    <div class="view-info-value" id="rollValue">0°</div>
+                </div>
+                <div class="view-info-item">
+                    <div class="view-info-label">Pitch</div>
+                    <div class="view-info-value" id="pitchValue">0°</div>
+                </div>
+                <div class="view-info-item">
+                    <div class="view-info-label">Yaw</div>
+                    <div class="view-info-value" id="yawValue">0°</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 Calibration Instructions</h3>
+            <ul>
+                <li><strong>Gyroscope:</strong> Place sensor flat and keep VERY still for 10-15 seconds (usually
+                    auto-calibrates)</li>
+                <li><strong>Accelerometer:</strong> Slowly move through all 6 orientations shown below. Hold each
+                    position for 2-3 seconds</li>
+                <li><strong>Magnetometer:</strong> Move sensor in figure-8 pattern, away from metal objects and
+                    electronics</li>
+                <li><strong>System:</strong> Auto-calibrates when other sensors reach 3/3</li>
+            </ul>
+        </div>
+
+        <div class="instructions">
+            <h3>🎯 Accelerometer Orientations</h3>
+            <p style="margin-bottom: 15px; color: #666;">Move the sensor through these 6 positions. Each completed
+                orientation will be marked with a checkmark.</p>
+
+            <div class="orientation-guide">
+                <div class="orientation-card" data-orientation="z-up">
+                    <div class="orientation-icon">📱</div>
+                    <div class="orientation-name">Flat (Z-Up)</div>
+                    <div class="orientation-desc">Flat on table</div>
+                </div>
+                <div class="orientation-card" data-orientation="z-down">
+                    <div class="orientation-icon">📲</div>
+                    <div class="orientation-name">Upside Down</div>
+                    <div class="orientation-desc">Z-axis down</div>
+                </div>
+                <div class="orientation-card" data-orientation="x-up">
+                    <div class="orientation-icon">📐</div>
+                    <div class="orientation-name">Right Side Up</div>
+                    <div class="orientation-desc">X-axis up</div>
+                </div>
+                <div class="orientation-card" data-orientation="x-down">
+                    <div class="orientation-icon">📏</div>
+                    <div class="orientation-name">Left Side Up</div>
+                    <div class="orientation-desc">X-axis down</div>
+                </div>
+                <div class="orientation-card" data-orientation="y-up">
+                    <div class="orientation-icon">📊</div>
+                    <div class="orientation-name">Front Up</div>
+                    <div class="orientation-desc">Y-axis up</div>
+                </div>
+                <div class="orientation-card" data-orientation="y-down">
+                    <div class="orientation-icon">📉</div>
+                    <div class="orientation-name">Back Up</div>
+                    <div class="orientation-desc">Y-axis down</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="figure-eight">
+            <h3 style="margin-bottom: 15px; color: #333;">🔄 Magnetometer Figure-8 Pattern</h3>
+            <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 50 50 Q 75 20, 100 50 Q 125 80, 150 50 Q 125 20, 100 50 Q 75 80, 50 50" fill="none"
+                    stroke="#667eea" stroke-width="3" stroke-dasharray="5,5">
+                    <animate attributeName="stroke-dashoffset" from="0" to="300" dur="3s" repeatCount="indefinite" />
+                </path>
+                <circle cx="50" cy="50" r="5" fill="#10b981" />
+                <text x="50" y="75" text-anchor="middle" font-size="12" fill="#666">Start</text>
+            </svg>
+            <p style="color: #666; font-size: 14px; margin-top: 10px;">Move sensor in continuous figure-8 motion,
+                keeping it level</p>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-success" id="saveBtn" onclick="saveCalibration()" disabled>💾 Save Calibration</button>
+            <button class="btn-secondary" onclick="window.location.href='index.html'">Cancel</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="#" class="nav-link">🔵 BLE Connection</a>
+            <span style="color: rgba(255,255,255,0.5);">|</span>
+            <a href="index.html" class="nav-link">📊 Dashboard</a>
+            <span style="color: rgba(255,255,255,0.5);">|</span>
+            <a href="config.html" class="nav-link">⚙️ Config</a>
+        </div>
+    </div>
+
+    <script>
+        // Three.js 3D Orientation View
+        let scene, camera, renderer, sensorBox;
+        let currentQuaternion = { w: 1, x: 0, y: 0, z: 0 };
+
+        function init3DView() {
+            const canvas = document.getElementById('orientationCanvas');
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x667eea);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera.position.set(5, 5, 5);
+            camera.lookAt(0, 0, 0);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+
+            // Create sensor box (IMU representation)
+            const geometry = new THREE.BoxGeometry(2, 0.5, 3);
+            const materials = [
+                new THREE.MeshPhongMaterial({ color: 0x3498db }), // right
+                new THREE.MeshPhongMaterial({ color: 0x3498db }), // left
+                new THREE.MeshPhongMaterial({ color: 0x2ecc71 }), // top - green for "up"
+                new THREE.MeshPhongMaterial({ color: 0xe74c3c }), // bottom - red
+                new THREE.MeshPhongMaterial({ color: 0xf39c12 }), // front - orange
+                new THREE.MeshPhongMaterial({ color: 0x9b59b6 })  // back
+            ];
+            sensorBox = new THREE.Mesh(geometry, materials);
+            scene.add(sensorBox);
+
+            // Add coordinate axes
+            const axesHelper = new THREE.AxesHelper(4);
+            scene.add(axesHelper);
+
+            // Grid
+            const gridHelper = new THREE.GridHelper(10, 10, 0xffffff, 0xffffff);
+            gridHelper.material.opacity = 0.2;
+            gridHelper.material.transparent = true;
+            scene.add(gridHelper);
+
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize);
+
+            // Start animation loop
+            animate();
+        }
+
+        function onWindowResize() {
+            const canvas = document.getElementById('orientationCanvas');
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Apply quaternion to sensor box
+            if (sensorBox && currentQuaternion) {
+                sensorBox.quaternion.set(
+                    currentQuaternion.x,
+                    currentQuaternion.y,
+                    currentQuaternion.z,
+                    currentQuaternion.w
+                );
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function updateOrientation(quaternion, euler) {
+            if (quaternion) {
+                currentQuaternion = quaternion;
+            }
+
+            // Update angle displays
+            if (euler) {
+                document.getElementById('rollValue').textContent = `${euler.roll.toFixed(1)}°`;
+                document.getElementById('pitchValue').textContent = `${euler.pitch.toFixed(1)}°`;
+                document.getElementById('yawValue').textContent = `${euler.yaw.toFixed(1)}°`;
+            }
+        }
+
+        let ws = null;
+        let isConnected = false;
+        let lastCalibration = { system: 0, gyroscope: 0, accelerometer: 0, magnetometer: 0 };
+        let orientationsCompleted = new Set();
+
+        function updateConnectionStatus(connected) {
+            isConnected = connected;
+            const statusEl = document.getElementById('connectionStatus');
+            const dot = statusEl.querySelector('.status-dot');
+
+            if (connected) {
+                statusEl.className = 'connection-status connected';
+                statusEl.innerHTML = '<span class="status-dot green"></span> Connected';
+            } else {
+                statusEl.className = 'connection-status disconnected';
+                statusEl.innerHTML = '<span class="status-dot red"></span> Disconnected';
+            }
+        }
+
+        function updateCalibrationMeter(id, value, max = 3) {
+            const meter = document.getElementById(id + 'Meter');
+            const valueEl = document.getElementById(id + 'Value');
+            const statusEl = meter.querySelector('.cal-status');
+
+            valueEl.textContent = `${value}/${max}`;
+
+            meter.classList.remove('calibrated', 'partial');
+
+            if (value === max) {
+                meter.classList.add('calibrated');
+                statusEl.textContent = '✓ Calibrated';
+            } else if (value > 0) {
+                meter.classList.add('partial');
+                statusEl.textContent = 'In Progress...';
+            } else {
+                statusEl.textContent = 'Not Calibrated';
+            }
+        }
+
+        function detectOrientation(accel) {
+            const threshold = 8.0; // m/s² (close to 9.8 for gravity)
+
+            if (Math.abs(accel.z - 9.8) < 2) return 'z-up';
+            if (Math.abs(accel.z + 9.8) < 2) return 'z-down';
+            if (Math.abs(accel.x - 9.8) < 2) return 'x-up';
+            if (Math.abs(accel.x + 9.8) < 2) return 'x-down';
+            if (Math.abs(accel.y - 9.8) < 2) return 'y-up';
+            if (Math.abs(accel.y + 9.8) < 2) return 'y-down';
+
+            return null;
+        }
+
+        function markOrientationCompleted(orientation) {
+            if (!orientation || orientationsCompleted.has(orientation)) return;
+
+            orientationsCompleted.add(orientation);
+            const card = document.querySelector(`[data-orientation="${orientation}"]`);
+            if (card) {
+                card.classList.add('completed');
+            }
+        }
+
+        function updateCalibrationDisplay(data) {
+            const cal = data.calibration;
+
+            updateCalibrationMeter('sys', cal.system);
+            updateCalibrationMeter('gyro', cal.gyro);
+            updateCalibrationMeter('accel', cal.accel);
+            updateCalibrationMeter('mag', cal.mag);
+
+            // Detect orientation from acceleration data
+            if (data.acceleration) {
+                const orientation = detectOrientation(data.acceleration);
+                if (orientation) {
+                    markOrientationCompleted(orientation);
+                }
+            }
+
+            // Check if fully calibrated
+            const fullyCalibrated = cal.system === 3 && cal.gyro === 3 && cal.accel === 3 && cal.mag === 3;
+            document.getElementById('saveBtn').disabled = !fullyCalibrated;
+
+            if (fullyCalibrated && (lastCalibration.system < 3 || lastCalibration.gyro < 3 || lastCalibration.accel < 3 || lastCalibration.mag < 3)) {
+                showMessage('success', '🎉 Calibration Complete! All sensors are fully calibrated. Click "Save Calibration" to store the values.');
+            }
+
+            lastCalibration = cal;
+        }
+
+        function showMessage(type, text) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.innerHTML = `<div class="message ${type}">${text}</div>`;
+
+            setTimeout(() => {
+                messageBox.innerHTML = '';
+            }, 5000);
+        }
+
+        async function saveCalibration() {
+            try {
+                const response = await fetch('/api/calibration/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(lastCalibration)
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    showMessage('success', '✓ Calibration saved successfully! It will be restored automatically on next connection.');
+                } else {
+                    showMessage('error', '✗ Failed to save calibration: ' + data.message);
+                }
+            } catch (error) {
+                showMessage('error', '✗ Error saving calibration: ' + error.message);
+            }
+        }
+
+        function connectWebSocket() {
+            ws = new WebSocket(`ws://${window.location.host}/ws`);
+
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                updateConnectionStatus(true);
+                showMessage('success', '✓ Connected to sensor. Begin calibration by following the instructions above.');
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    updateCalibrationDisplay(data);
+
+                    // Update 3D orientation view
+                    if (data.quaternion && data.euler) {
+                        updateOrientation(data.quaternion, data.euler);
+                    }
+                } catch (error) {
+                    console.error('Error parsing data:', error);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                updateConnectionStatus(false);
+                showMessage('error', '✗ Connection error. Make sure the sensor is connected.');
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket closed');
+                updateConnectionStatus(false);
+                showMessage('warning', '⚠ Connection closed. Attempting to reconnect...');
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            init3DView();
+            connectWebSocket();
+        });
+
+        // Cleanup
+        window.addEventListener('beforeunload', () => {
+            if (ws) {
+                ws.close();
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,43 @@
+# Python virtual environment
+imu/
+venv/
+env/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment variables
+.env
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDE/Editor temporary files
+.lgd-*
+
+# Application data and logs
+*.h5
+logs/
+*.log
+
+# WireGuard configs with private keys (keep .example files)
+config/wireguard/*.conf
+!config/wireguard/*.conf.example
+
+# Configuration - each machine has its own config.json (not tracked).
+# Copy config.example.json -> config.json and set active_profile for your machine.
+config.json

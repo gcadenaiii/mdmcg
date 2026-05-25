@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Real-time motion tracking and visualization with BNO055 IMU sensor. Professional-grade sensor lab with web interface, multiple transport protocols, and live 3D visualization.">
+    <meta name="keywords"
+        content="motion tracking, BNO055, IMU, sensor, accelerometer, gyroscope, Python, Arduino, ESP32, real-time visualization">
+    <meta name="author" content="George Cadena III">
+    <title>Sensors Lab - Professional Motion Tracking & Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            margin-bottom: 40px;
+            opacity: 0.95;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .badges {
+            margin: 30px 0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 20px;
+            background: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            color: #7f8c8d;
+            margin-bottom: 60px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid #e9ecef;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .feature-card p {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        /* Demo Section */
+        .demo-section {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .demo-preview {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .demo-preview img {
+            width: 100%;
+            display: block;
+        }
+
+        .demo-cta {
+            text-align: center;
+            padding: 40px;
+            background: white;
+        }
+
+        /* Sensor Profiles */
+        .profiles {
+            padding: 80px 20px;
+            background: white;
+        }
+
+        .profiles-table {
+            max-width: 1000px;
+            margin: 40px auto;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 0.5px;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        td {
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .profile-name {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        /* Getting Started */
+        .getting-started {
+            padding: 80px 20px;
+            background: #2c3e50;
+            color: white;
+        }
+
+        .getting-started .section-title {
+            color: white;
+        }
+
+        .getting-started .section-subtitle {
+            color: #bdc3c7;
+        }
+
+        .code-block {
+            background: #34495e;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px auto;
+            max-width: 700px;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            font-family: 'Courier New', Courier, monospace;
+            color: #ecf0f1;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .command {
+            color: #3498db;
+        }
+
+        .comment {
+            color: #95a5a6;
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a1a2e;
+            color: #ecf0f1;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .social-links {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .social-links a {
+            font-size: 1.5em;
+            transition: transform 0.2s;
+        }
+
+        .social-links a:hover {
+            transform: scale(1.2);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+
+            .hero p {
+                font-size: 1.1em;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>🎯 Sensors Lab</h1>
+        <p>Professional-grade motion tracking and visualization platform for BNO055 IMU sensors with real-time 3D
+            visualization, multiple transport protocols, and a beautiful web interface.</p>
+
+        <div class="badges">
+            <span class="badge">Python 3.7+</span>
+            <span class="badge">FastAPI + WebSocket</span>
+            <span class="badge">Three.js Visualization</span>
+            <span class="badge">Arduino / ESP32 Ready</span>
+            <span class="badge">Open Source</span>
+        </div>
+
+        <div class="cta-buttons">
+            <a href="demo/index.html" class="btn btn-primary">🚀 Try Live Demo</a>
+            <a href="https://github.com/gcadenaiii/sensors_lab" class="btn btn-secondary" target="_blank">⭐ View on
+                GitHub</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Powerful Features</h2>
+            <p class="section-subtitle">Everything you need for professional motion tracking and sensor data
+                visualization</p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Real-Time 3D Visualization</h3>
+                    <p>Beautiful Three.js-powered 3D visualization with live sensor orientation, acceleration vectors,
+                        and motion trails. See your sensor move in real-time at 20Hz.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📡</div>
+                    <h3>Multiple Transport Options</h3>
+                    <p>Connect via USB Serial, Bluetooth LE, or WiFi (ESP32). Switch between protocols without changing
+                        your application code.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3>Web-Based Configuration</h3>
+                    <p>Intuitive web interface for sensor calibration, configuration management, and real-time
+                        monitoring. No command-line required.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Data Logging & Analysis</h3>
+                    <p>Automatic HDF5 data logging with timestamp precision. Export and analyze your motion data with
+                        industry-standard tools.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🧪</div>
+                    <h3>Mock Mode for Development</h3>
+                    <p>Develop and test without hardware. Mock sensor generates realistic motion data with configurable
+                        noise and movement patterns.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>VPN Remote Access</h3>
+                    <p>Secure WireGuard VPN support for remote sensor access. Monitor and control sensors from anywhere
+                        in the world.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo-section">
+        <div class="container">
+            <h2 class="section-title">See It In Action</h2>
+            <p class="section-subtitle">Experience the real-time visualization with actual sensor data</p>
+
+            <div class="demo-preview">
+                <!-- Placeholder for screenshot -->
+                <div style="background: #f8f9fa; padding: 100px; text-align: center; color: #6c757d;">
+                    <p style="font-size: 1.2em;">📷 Screenshot placeholder</p>
+                    <p>3D visualization demo preview</p>
+                </div>
+            </div>
+
+            <div class="demo-cta">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">Ready to try it?</h3>
+                <a href="demo/index.html" class="btn btn-primary">Launch Interactive Demo →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sensor Profiles -->
+    <section class="profiles">
+        <div class="container">
+            <h2 class="section-title">Supported Hardware Profiles</h2>
+            <p class="section-subtitle">Flexible architecture supports multiple sensor configurations</p>
+
+            <div class="profiles-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Profile</th>
+                            <th>Hardware</th>
+                            <th>Connection</th>
+                            <th>Use Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="profile-name">mock</td>
+                            <td>No hardware</td>
+                            <td>Simulated</td>
+                            <td>Development & testing without hardware</td>
+                        </tr>
+                        <tr>
+                            <td class="profile-name">bno055</td>
+                            <td>BNO055 sensor</td>
+                            <td>I²C (Raspberry Pi GPIO)</td>
+                            <td>Direct sensor connection to Pi</td>
+                        </tr>
+                        <tr>
+                            <td class="profile-name">arduino</td>
+                            <td>Arduino + BNO055</td>
+                            <td>USB Serial</td>
+                            <td>Wired Arduino connection via USB</td>
+                        </tr>
+                        <tr>
+                            <td class="profile-name">arduino_ble</td>
+                            <td>Arduino Nano 33 BLE + BNO055</td>
+                            <td>Bluetooth Low Energy</td>
+                            <td>Wireless BLE streaming</td>
+                        </tr>
+                        <tr>
+                            <td class="profile-name">esp32_wifi</td>
+                            <td>ESP32 + BNO055</td>
+                            <td>WiFi (WebSocket)</td>
+                            <td>Network-based wireless streaming</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Getting Started -->
+    <section class="getting-started">
+        <div class="container">
+            <h2 class="section-title">Quick Start</h2>
+            <p class="section-subtitle">Get up and running in under 5 minutes</p>
+
+            <div class="code-block">
+                <pre><span class="comment"># Clone the repository</span>
+<span class="command">git clone</span> https://github.com/gcadenaiii/sensors_lab.git
+<span class="command">cd</span> sensors_lab
+
+<span class="comment"># Create virtual environment</span>
+<span class="command">python3 -m venv</span> .venv
+<span class="command">source</span> .venv/bin/activate
+
+<span class="comment"># Install dependencies</span>
+<span class="command">pip install</span> -r requirements.txt
+<span class="command">pip install</span> -e .
+
+<span class="comment"># Start web interface (mock mode - no hardware needed)</span>
+<span class="command">sensors-track --mode</span> web --profile mock
+
+<span class="comment"># Open browser to http://localhost:8000</span></pre>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="https://github.com/gcadenaiii/sensors_lab#installation" class="btn btn-primary"
+                    target="_blank">
+                    View Full Documentation →
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p><strong>Sensors Lab</strong> - Professional Motion Tracking Platform</p>
+        <p>Open source project by <a href="https://github.com/gcadenaiii" target="_blank">George Cadena III</a></p>
+
+        <div class="social-links">
+            <a href="https://github.com/gcadenaiii/sensors_lab" target="_blank" title="GitHub">⭐</a>
+            <a href="https://github.com/gcadenaiii/sensors_lab/issues" target="_blank" title="Issues">🐛</a>
+            <a href="https://github.com/gcadenaiii/sensors_lab/blob/main/LICENSE" target="_blank" title="License">📄</a>
+        </div>
+
+        <p style="margin-top: 20px; font-size: 0.9em; color: #95a5a6;">
+            © 2025 George Cadena III | Licensed under MIT
+        </p>
+    </footer>
+</body>
+
+</html>

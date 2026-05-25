@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensors Lab - Real-Time Motion Tracking</title>
+    <link rel="icon" type="image/svg+xml" href="demo/favicon.svg">
+    <script>
+        // Suppress Tailwind CDN production warning - must run before Tailwind loads
+        (function () {
+            const originalWarn = console.warn;
+            console.warn = function (...args) {
+                const msg = args[0];
+                if (typeof msg === 'string' && msg.includes('cdn.tailwindcss.com')) {
+                    return;
+                }
+                originalWarn.apply(console, args);
+            };
+        })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(59, 130, 246, 0.8);
+            }
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">🎯</span>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">Sensors Lab</h1>
+                        <p class="text-xs text-gray-500">Motion Tracking System</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#features"
+                        class="hidden md:block text-gray-700 hover:text-blue-600 font-medium transition-colors">
+                        Features
+                    </a>
+                    <a href="#about"
+                        class="hidden md:block text-gray-700 hover:text-blue-600 font-medium transition-colors">
+                        About
+                    </a>
+                    <a href="demo/config.html"
+                        class="hidden md:block text-gray-700 hover:text-blue-600 font-medium transition-colors">
+                        ⚙️ Config
+                    </a>
+                    <a href="demo/"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg">
+                        Live Demo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white pt-32 pb-20 px-4 mt-16">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                        Real-Time Motion Tracking
+                        <span class="block text-blue-200">Made Simple</span>
+                    </h2>
+                    <p class="text-xl text-blue-100 mb-8 leading-relaxed">
+                        Visualize sensor data in real-time with our advanced BNO055 IMU tracking system.
+                        Perfect for robotics, IoT projects, and motion analysis.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="demo/"
+                            class="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-50 transition-all shadow-xl hover:shadow-2xl inline-block text-center pulse-glow">
+                            Try Live Demo →
+                        </a>
+                        <a href="https://github.com/gcadenaiii/sensors_lab" target="_blank"
+                            class="border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-blue-600 transition-all inline-block text-center">
+                            View on GitHub
+                        </a>
+                    </div>
+                    <div class="mt-8 flex items-center space-x-6 text-sm">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                            <span>Live Streaming</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                            <span>20Hz Update Rate</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="float-animation">
+                        <div class="bg-white rounded-2xl shadow-2xl p-8">
+                            <div class="gradient-bg rounded-xl p-6 mb-4">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-white font-bold text-lg">Sensor Status</h3>
+                                    <span
+                                        class="bg-green-400 text-white px-3 py-1 rounded-full text-sm font-medium">Live</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-white">
+                                    <div>
+                                        <p class="text-sm opacity-90">Data Rate</p>
+                                        <p class="text-2xl font-bold">20 Hz</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm opacity-90">Steps</p>
+                                        <p class="text-2xl font-bold">247</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-600">System Cal</span>
+                                        <span class="text-green-600 font-bold">3/3</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-green-500 h-2 rounded-full" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-600">Gyroscope</span>
+                                        <span class="text-green-600 font-bold">3/3</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-green-500 h-2 rounded-full" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-600">Accelerometer</span>
+                                        <span class="text-yellow-600 font-bold">2/3</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-yellow-500 h-2 rounded-full" style="width: 66%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Powerful Features</h2>
+                <p class="text-xl text-gray-600">Everything you need for advanced motion tracking</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-8">
+                    <div class="w-14 h-14 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-3xl">🎯</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Real-Time 3D Visualization</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Watch your sensor orientation in stunning 3D with Three.js rendering at 60fps.
+                        Immediate visual feedback for all movements.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-8">
+                    <div class="w-14 h-14 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-3xl">👣</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Step Counter & Tracking</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Advanced state-machine based step detection with 3D path visualization.
+                        Track distance and movement patterns accurately.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-8">
+                    <div class="w-14 h-14 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-3xl">📊</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Live Data Charts</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Real-time graphs for acceleration, orientation, and velocity.
+                        Chart.js powered visualizations with smooth updates.
+                    </p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-8">
+                    <div class="w-14 h-14 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-3xl">🌐</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Remote Access</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        WebSocket streaming allows you to monitor sensors from any device on your network.
+                        Perfect for remote projects.
+                    </p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-8">
+                    <div class="w-14 h-14 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-3xl">💾</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Data Logging</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        HDF5 format storage for efficient data logging.
+                        Export to CSV for analysis in your favorite tools.
+                    </p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-8">
+                    <div class="w-14 h-14 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-3xl">🔧</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Persistent Calibration</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Automatic calibration save/restore.
+                        Color-coded status indicators make calibration monitoring easy.
+                    </p>
+                </div>
+
+                <!-- Feature 7 -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-8">
+                    <div class="w-14 h-14 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-3xl">🧭</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Visual Calibration Guide</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Interactive web-based calibration with visual orientation guides.
+                        Step-by-step instructions with real-time progress tracking.
+                    </p>
+                </div>
+
+                <!-- Feature 8 -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-8">
+                    <div class="w-14 h-14 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-3xl">🔵</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">BLE Support</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Wireless sensor connection via Bluetooth Low Energy.
+                        Arduino-based BLE implementation with device scanning.
+                    </p>
+                </div>
+
+                <!-- Feature 9 -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-8">
+                    <div class="w-14 h-14 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-3xl">⚙️</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Web Configuration</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Switch between sensor modes and profiles without restarting.
+                        Real-time config updates with instant reconnection.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Two Design Options Section -->
+    <section class="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Choose Your Interface</h2>
+                <p class="text-xl text-gray-300">Two beautiful designs, one powerful system</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Debug View -->
+                <div
+                    class="bg-gray-800 rounded-2xl overflow-hidden shadow-2xl border border-gray-700 hover:border-blue-500 transition-all">
+                    <div class="p-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-2xl font-bold">Debug View</h3>
+                            <span class="bg-purple-600 text-white px-3 py-1 rounded-full text-sm">Technical</span>
+                        </div>
+                        <p class="text-gray-300 mb-6">
+                            Dark theme with Three.js 3D visualizations. Perfect for developers and debugging
+                            with detailed views for orientation, steps, and raw sensor data.
+                        </p>
+                        <ul class="space-y-2 text-gray-400 mb-6">
+                            <li class="flex items-center">
+                                <span class="text-green-400 mr-2">✓</span>
+                                WebGL 3D rendering
+                            </li>
+                            <li class="flex items-center">
+                                <span class="text-green-400 mr-2">✓</span>
+                                3D walking path visualization
+                            </li>
+                            <li class="flex items-center">
+                                <span class="text-green-400 mr-2">✓</span>
+                                Chart.js graphs
+                            </li>
+                            <li class="flex items-center">
+                                <span class="text-green-400 mr-2">✓</span>
+                                Dark theme optimized
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-900 p-4 border-t border-gray-700">
+                        <div class="aspect-video bg-gray-700 rounded-lg flex items-center justify-center">
+                            <span class="text-4xl">🎮</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demo View -->
+                <div
+                    class="bg-gray-800 rounded-2xl overflow-hidden shadow-2xl border border-gray-700 hover:border-blue-500 transition-all">
+                    <div class="p-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-2xl font-bold">Demo View</h3>
+                            <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm">Presentation</span>
+                        </div>
+                        <p class="text-gray-300 mb-6">
+                            Modern light theme with Tailwind CSS. Perfect for presentations and demos with
+                            clean dashboard layout, status cards, and professional metrics display.
+                        </p>
+                        <ul class="space-y-2 text-gray-400 mb-6">
+                            <li class="flex items-center">
+                                <span class="text-green-400 mr-2">✓</span>
+                                CSS 3D transformations
+                            </li>
+                            <li class="flex items-center">
+                                <span class="text-green-400 mr-2">✓</span>
+                                Progress bar visualizations
+                            </li>
+                            <li class="flex items-center">
+                                <span class="text-green-400 mr-2">✓</span>
+                                CSV data export
+                            </li>
+                            <li class="flex items-center">
+                                <span class="text-green-400 mr-2">✓</span>
+                                Light theme optimized
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-900 p-4 border-t border-gray-700">
+                        <div class="aspect-video bg-gray-700 rounded-lg flex items-center justify-center">
+                            <span class="text-4xl">📊</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-12">
+                <a href="demo/"
+                    class="bg-white text-gray-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-all shadow-xl inline-block">
+                    Try Both Designs →
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack Section -->
+    <section class="py-20 px-4 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Built With Modern Tech</h2>
+                <p class="text-xl text-gray-600">Reliable, fast, and easy to extend</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="bg-blue-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl">🐍</span>
+                    </div>
+                    <h3 class="font-bold text-gray-900 mb-2">Python 3</h3>
+                    <p class="text-sm text-gray-600">Core Backend</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="bg-green-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl">⚡</span>
+                    </div>
+                    <h3 class="font-bold text-gray-900 mb-2">FastAPI</h3>
+                    <p class="text-sm text-gray-600">WebSocket Server</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="bg-purple-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl">🎨</span>
+                    </div>
+                    <h3 class="font-bold text-gray-900 mb-2">Three.js</h3>
+                    <p class="text-sm text-gray-600">3D Graphics</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="bg-yellow-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl">🎯</span>
+                    </div>
+                    <h3 class="font-bold text-gray-900 mb-2">BNO055</h3>
+                    <p class="text-sm text-gray-600">9-Axis IMU</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 px-4 bg-gray-50">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">About Sensors Lab</h2>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+                <p class="text-lg text-gray-700 leading-relaxed mb-6">
+                    Sensors Lab is a comprehensive Python-based motion tracking and sensor calibration toolkit
+                    designed for the BNO055 9-axis IMU sensor running on Raspberry Pi.
+                </p>
+                <p class="text-lg text-gray-700 leading-relaxed mb-6">
+                    The project follows <strong>Unix philosophy</strong> and <strong>separation of concerns</strong>,
+                    with each tool doing one thing well. From interactive calibration to real-time web visualization,
+                    every component is designed to be clear, explicit, and composable.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mt-8">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-blue-600 mb-2">20Hz</div>
+                        <p class="text-gray-600">Update Rate</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-blue-600 mb-2">9-Axis</div>
+                        <p class="text-gray-600">Sensor Fusion</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-blue-600 mb-2">Open</div>
+                        <p class="text-gray-600">Source</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="gradient-bg text-white py-20 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">Ready to Track Motion?</h2>
+            <p class="text-xl text-purple-100 mb-8">
+                Start visualizing your sensor data in real-time with our powerful web interface
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="demo/"
+                    class="bg-white text-purple-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-purple-50 transition-all shadow-xl inline-block">
+                    Launch Live Demo
+                </a>
+                <a href="demo/config.html"
+                    class="bg-purple-500 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-purple-600 transition-all shadow-xl inline-block">
+                    ⚙️ Configure & Calibrate
+                </a>
+                <a href="https://github.com/gcadenaiii/sensors_lab" target="_blank"
+                    class="border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-purple-600 transition-all inline-block">
+                    View Documentation
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold">🎯</span>
+                        </div>
+                        <h3 class="text-white font-bold">Sensors Lab</h3>
+                    </div>
+                    <p class="text-sm">
+                        Real-time motion tracking and visualization for BNO055 IMU sensors.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="demo/" class="hover:text-white transition-colors">Live Demo</a></li>
+                        <li><a href="demo/config.html" class="hover:text-white transition-colors">Configuration</a></li>
+                        <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="#about" class="hover:text-white transition-colors">About</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">Documentation</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="https://github.com/gcadenaiii/sensors_lab#readme" target="_blank"
+                                class="hover:text-white transition-colors">Setup Guide</a></li>
+                        <li><a href="https://github.com/gcadenaiii/sensors_lab/blob/main/docs/ARCHITECTURE.md"
+                                target="_blank" class="hover:text-white transition-colors">Architecture</a></li>
+                        <li><a href="https://github.com/gcadenaiii/sensors_lab/blob/main/docs/CALIBRATION.md"
+                                target="_blank" class="hover:text-white transition-colors">Calibration</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">Project</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="https://github.com/gcadenaiii/sensors_lab" target="_blank"
+                                class="hover:text-white transition-colors">GitHub</a></li>
+                        <li><a href="https://github.com/gcadenaiii/sensors_lab/issues" target="_blank"
+                                class="hover:text-white transition-colors">Issues</a></li>
+                        <li><a href="https://github.com/gcadenaiii/sensors_lab/blob/main/LICENSE" target="_blank"
+                                class="hover:text-white transition-colors">License</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 pt-8 text-center text-sm">
+                <p>&copy; 2025 Sensors Lab. Open source project by <a href="https://github.com/gcadenaiii"
+                        target="_blank" class="text-blue-400 hover:text-blue-300">@gcadenaiii</a></p>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinician Dashboard · RPM</title>
+  <link rel="stylesheet" href="/static/rpm.css">
+</head>
+<body>
+
+  <!-- ── Navigation ──────────────────────────────────────────── -->
+  <header class="rpm-header">
+    <span class="rpm-header__wordmark">RPM <span>/ Remote Patient Monitoring</span></span>
+    <nav class="rpm-header__breadcrumb">
+      <span class="current">Dashboard</span>
+    </nav>
+    <div class="rpm-header__right">
+      <a href="/admin/" class="rpm-nav-link">⚙ Admin</a>
+      <a href="/health"  class="rpm-nav-link">Health</a>
+      <span id="rpm-clock"></span>
+    </div>
+  </header>
+
+  <!-- ── Page header ─────────────────────────────────────────── -->
+  <div class="rpm-page-header">
+    <div class="rpm-page-header__inner">
+      <div>
+        <h1>Clinician Dashboard</h1>
+        <p>Real-time overview of all patients and monitoring devices</p>
+      </div>
+    </div>
+  </div>
+
+  <main class="rpm-main">
+
+    <!-- ── Summary stats ───────────────────────────────────────── -->
+    <div class="rpm-stats">
+      <div class="rpm-stat">
+        <div class="rpm-stat__value">{{ data.total_patients }}</div>
+        <div class="rpm-stat__label">Patients</div>
+      </div>
+      <div class="rpm-stat">
+        <div class="rpm-stat__value">{{ data.gateways | length }}</div>
+        <div class="rpm-stat__label">Gateways</div>
+      </div>
+      <div class="rpm-stat">
+        <div class="rpm-stat__value">{{ data.online_count }}</div>
+        <div class="rpm-stat__label">Online Now</div>
+      </div>
+      <div class="rpm-stat">
+        <div class="rpm-stat__value">{{ "{:,}".format(data.total_samples) }}</div>
+        <div class="rpm-stat__label">Total Samples</div>
+      </div>
+    </div>
+
+    <!-- ── Gateway / Patient cards ─────────────────────────────── -->
+    <section class="rpm-section">
+      <div class="rpm-section__header">
+        <h2 class="rpm-section__title">Monitoring Devices</h2>
+        <span class="rpm-section__count">{{ data.gateways | length }} gateway{{ 's' if data.gateways | length != 1 else '' }}</span>
+      </div>
+
+      {% if data.gateways %}
+      <div class="rpm-cards-grid">
+        {% for gw in data.gateways %}
+        {% set card_mod = 'online' if gw.is_online else 'offline' %}
+        <a class="rpm-gw-card rpm-gw-card--{{ card_mod }}"
+           href="/gateway/{{ gw.id }}">
+
+          <div class="rpm-gw-card__header">
+            <div>
+              <div class="rpm-gw-card__name">
+                {{ gw.patient_label or gw.label or 'Unnamed Device' }}
+              </div>
+              <div class="rpm-gw-card__sublabel">{{ gw.id[:8] }}…</div>
+            </div>
+            <span class="rpm-badge rpm-badge--{{ card_mod }}">
+              <span class="rpm-badge__dot"></span>
+              {{ 'Online' if gw.is_online else 'Offline' }}
+            </span>
+          </div>
+
+          <div class="rpm-gw-card__meta">
+            <div class="rpm-gw-card__meta-row">
+              <span class="rpm-gw-card__meta-label">Sensor</span>
+              {% if gw.ble_connected %}
+                <span class="rpm-badge rpm-badge--online" style="padding:2px 8px">
+                  <span class="rpm-badge__dot"></span> Connected
+                </span>
+              {% else %}
+                <span class="rpm-badge rpm-badge--offline" style="padding:2px 8px">
+                  <span class="rpm-badge__dot"></span> Disconnected
+                </span>
+              {% endif %}
+            </div>
+            <div class="rpm-gw-card__meta-row">
+              <span class="rpm-gw-card__meta-label">Last seen</span>
+              {% if gw.last_heartbeat %}
+                <span data-reltime="{{ gw.last_heartbeat }}">{{ gw.last_heartbeat[:19] if gw.last_heartbeat else '—' }}</span>
+              {% else %}
+                <span class="u-muted">Never</span>
+              {% endif %}
+            </div>
+            <div class="rpm-gw-card__meta-row">
+              <span class="rpm-gw-card__meta-label">Last sync</span>
+              {% if gw.last_sync %}
+                <span data-reltime="{{ gw.last_sync }}">{{ gw.last_sync[:19] if gw.last_sync else '—' }}</span>
+              {% else %}
+                <span class="u-muted">Never</span>
+              {% endif %}
+            </div>
+            {% if gw.pending_samples > 0 %}
+            <div class="rpm-gw-card__meta-row">
+              <span class="rpm-gw-card__meta-label">Pending</span>
+              <span class="rpm-badge rpm-badge--alert">{{ gw.pending_samples }} samples</span>
+            </div>
+            {% endif %}
+          </div>
+
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="rpm-empty">
+        <div class="rpm-empty__icon">📡</div>
+        <p>No gateways registered yet. Start a gateway device to see data here.</p>
+      </div>
+      {% endif %}
+    </section>
+
+    <!-- ── Recent Sessions ──────────────────────────────────────── -->
+    <section class="rpm-section">
+      <div class="rpm-section__header">
+        <h2 class="rpm-section__title">Recent Sessions</h2>
+        <span class="rpm-section__count">{{ data.recent_sessions | length }} shown</span>
+      </div>
+
+      {% if data.recent_sessions %}
+      <ul class="rpm-sessions-list">
+        {% for s in data.recent_sessions %}
+        <li class="rpm-session-item">
+          <div class="rpm-session-item__icon">🏃</div>
+          <div class="rpm-session-item__body">
+            <div class="rpm-session-item__title">
+              <a href="/gateway/{{ s.gateway_id }}">{{ s.gateway_id[:8] }}…</a>
+            </div>
+            <div class="rpm-session-item__subtitle">
+              {% if s.started_at %}
+                <span data-reltime="{{ s.started_at }}">{{ s.started_at[:16] }}</span>
+              {% else %}
+                —
+              {% endif %}
+              {% if s.ended_at %}
+                &rarr; {{ s.ended_at[11:16] if s.ended_at else '' }}
+              {% endif %}
+            </div>
+          </div>
+          <div class="rpm-session-item__stats">
+            <div>
+              <div class="rpm-session-item__stat-value">{{ "{:,}".format(s.sample_count) }}</div>
+              <div class="rpm-session-item__stat-label">Samples</div>
+            </div>
+            <div>
+              <div class="rpm-session-item__stat-value">{{ s.total_steps }}</div>
+              <div class="rpm-session-item__stat-label">Steps</div>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <div class="rpm-empty">
+        <div class="rpm-empty__icon">📋</div>
+        <p>No sessions recorded yet.</p>
+      </div>
+      {% endif %}
+    </section>
+
+  </main>
+
+  <footer class="rpm-footer">
+    <span>RPM PoC v0.1.0</span>
+    <span>·</span>
+    <a href="/health">Health Check</a>
+    <span>·</span>
+    <div class="rpm-refresh-bar">
+      <div class="rpm-refresh-bar__track">
+        <div class="rpm-refresh-bar__fill" id="rpm-refresh-fill"></div>
+      </div>
+      <span id="rpm-refresh-label">Refreshes in 30s</span>
+    </div>
+  </footer>
+
+  <script src="/static/rpm-components.js"></script>
+</body>
+</html>

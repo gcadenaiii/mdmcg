@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — RPM Provisioning</title>
+  <link rel="stylesheet" href="/static/rpm.css" />
+  <style>
+    .adm-flash {
+      background: #d1fae5;
+      border-left: 4px solid #10b981;
+      color: #065f46;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+    .adm-flash.warn {
+      background: #fef3c7;
+      border-left-color: var(--amber);
+      color: #92400e;
+    }
+
+    /* Inline add-patient form */
+    .adm-new-patient {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .adm-new-patient input[type="text"] {
+      flex: 1;
+      min-width: 180px;
+      padding: 0.55rem 0.85rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text-primary);
+      background: #fff;
+    }
+    .adm-new-patient input[type="text"]:focus {
+      outline: none;
+      border-color: var(--blue-700);
+      box-shadow: 0 0 0 3px rgba(26,95,155,0.15);
+    }
+    .adm-new-patient button {
+      padding: 0.55rem 1.25rem;
+      background: var(--blue-700);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .adm-new-patient button:hover { background: var(--blue-900); }
+
+    /* Status dot */
+    .adm-dot {
+      display: inline-block;
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .adm-dot.online    { background: #10b981; }
+    .adm-dot.offline   { background: #d1d5db; }
+    .adm-dot.ble       { background: #6366f1; }
+
+    /* Action links in tables */
+    .adm-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--radius-md);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .adm-action.edit     { background: var(--blue-50);  color: var(--blue-700); border: 1px solid var(--blue-300); }
+    .adm-action.patient  { background: #f0fdf4; color: #065f46; border: 1px solid #6ee7b7; }
+    .adm-action.edit:hover    { background: var(--blue-100); }
+    .adm-action.patient:hover { background: #dcfce7; }
+
+    /* Section headings */
+    .adm-section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      gap: 1rem;
+    }
+    .adm-section-head h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--blue-900);
+      margin: 0;
+    }
+    .adm-count {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .adm-unassigned { color: var(--text-secondary); font-style: italic; }
+  </style>
+</head>
+<body>
+
+<header class="rpm-header">
+  <a href="/" class="rpm-header-brand">RPM Admin</a>
+  <nav class="rpm-header-nav">
+    <a href="/" class="rpm-nav-link">Dashboard</a>
+    <a href="/admin/" class="rpm-nav-link active">Admin</a>
+  </nav>
+  <div class="rpm-header-clock" id="rpm-clock"></div>
+</header>
+
+<main class="rpm-main">
+
+  <!-- Flash -->
+  {% if flash %}
+  <div class="adm-flash {% if 'required' in flash or 'error' in flash %}warn{% endif %}">
+    {{ flash | replace('+', ' ') }}
+  </div>
+  {% endif %}
+
+  <!-- Stats bar -->
+  <div class="rpm-stats" style="margin-bottom:2rem">
+    <div class="rpm-stat-card">
+      <div class="rpm-stat-value">{{ gateways | length }}</div>
+      <div class="rpm-stat-label">Total Gateways</div>
+    </div>
+    <div class="rpm-stat-card">
+      <div class="rpm-stat-value">{{ online_count }}</div>
+      <div class="rpm-stat-label">Online Now</div>
+    </div>
+    <div class="rpm-stat-card">
+      <div class="rpm-stat-value">{{ patients | length }}</div>
+      <div class="rpm-stat-label">Patients</div>
+    </div>
+    <div class="rpm-stat-card">
+      <div class="rpm-stat-value">{{ gateways | selectattr('ble_connected') | list | length }}</div>
+      <div class="rpm-stat-label">BLE Connected</div>
+    </div>
+  </div>
+
+  <!-- Gateways section -->
+  <div class="rpm-panel" style="margin-bottom:2rem">
+    <div class="adm-section-head">
+      <h2>Gateways</h2>
+      <span class="adm-count">{{ gateways | length }} registered</span>
+    </div>
+
+    {% if gateways %}
+    <div class="rpm-table-wrap">
+      <table class="rpm-table">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Gateway ID</th>
+            <th>Label</th>
+            <th>Patient</th>
+            <th>Location</th>
+            <th>Last Seen</th>
+            <th>Sessions</th>
+            <th>Steps</th>
+            <th>BLE</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for g in gateways %}
+          <tr>
+            <td>
+              <span class="adm-dot {% if g.is_online %}online{% else %}offline{% endif %}"
+                    title="{{ 'Online' if g.is_online else 'Offline' }}"></span>
+            </td>
+            <td style="font-family:monospace;font-size:0.82rem">{{ g.id[:8] }}…</td>
+            <td style="font-weight:600">{{ g.label or '—' }}</td>
+            <td>
+              {% if g.patient %}
+                <a href="/patient/{{ g.patient.id }}" class="adm-action patient">
+                  {{ g.patient.label }}
+                </a>
+              {% else %}
+                <span class="adm-unassigned">Unassigned</span>
+              {% endif %}
+            </td>
+            <td>{{ g.location or '—' }}</td>
+            <td data-reltime="{{ g.last_heartbeat.isoformat() if g.last_heartbeat else '' }}">
+              {{ 'Never' if not g.last_heartbeat else '—' }}
+            </td>
+            <td style="text-align:right">{{ g.session_count }}</td>
+            <td style="text-align:right">{{ "{:,}".format(g.total_steps) }}</td>
+            <td style="text-align:center">
+              {% if g.ble_connected %}
+              <span class="adm-dot ble" title="BLE connected"></span>
+              {% else %}
+              —
+              {% endif %}
+            </td>
+            <td>
+              <a href="/admin/gateway/{{ g.id }}" class="adm-action edit">Edit</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p style="color:var(--text-secondary);font-size:0.95rem">
+      No gateways have registered yet. Gateways auto-register on first heartbeat.
+    </p>
+    {% endif %}
+  </div>
+
+  <!-- Patients section -->
+  <div class="rpm-panel">
+    <div class="adm-section-head">
+      <h2>Patients</h2>
+      <span class="adm-count">{{ patients | length }} enrolled</span>
+    </div>
+
+    <!-- Add patient form -->
+    <form method="POST" action="/admin/patients/new" class="adm-new-patient">
+      <label for="patient-label" style="font-size:0.9rem;font-weight:600;color:var(--text-secondary);white-space:nowrap">
+        New patient name
+      </label>
+      <input type="text" id="patient-label" name="label"
+             placeholder="e.g. John Smith" required maxlength="120" />
+      <button type="submit">Add Patient</button>
+    </form>
+
+    {% if patients %}
+    <div class="rpm-table-wrap">
+      <table class="rpm-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Notes</th>
+            <th>Created</th>
+            <th>Gateways</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in patients %}
+          {% set p_gws = gateways | selectattr('patient', 'defined') | selectattr('patient') | selectattr('patient.id', 'equalto', p.id) | list %}
+          <tr>
+            <td style="font-weight:600">{{ p.label }}</td>
+            <td style="color:var(--text-secondary);font-size:0.9rem">{{ p.notes or '—' }}</td>
+            <td style="color:var(--text-secondary);font-size:0.9rem">
+              {{ p.created_at.strftime('%b %d, %Y') if p.created_at else '—' }}
+            </td>
+            <td>{{ p_gws | length }}</td>
+            <td>
+              <a href="/patient/{{ p.id }}" class="adm-action patient">View</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p style="color:var(--text-secondary);font-size:0.95rem;margin-top:0.5rem">
+      No patients yet. Add one above.
+    </p>
+    {% endif %}
+  </div>
+
+</main>
+
+<script src="/static/rpm-components.js"></script>
+</body>
+</html>

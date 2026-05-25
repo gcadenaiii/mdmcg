@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ patient.label }} — RPM</title>
+  <link rel="stylesheet" href="/static/rpm.css" />
+  <style>
+    /* Patient-view overrides — large-print friendly */
+    body { background: var(--blue-50); }
+
+    .pv-hero {
+      background: var(--blue-900);
+      color: #fff;
+      padding: 2rem 2rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .pv-hero-name {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .pv-hero-sub {
+      font-size: 1rem;
+      opacity: 0.75;
+      margin-top: 0.25rem;
+    }
+
+    /* Status pill */
+    .pv-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.1rem;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .pv-status.connected    { background: #d1fae5; color: #065f46; }
+    .pv-status.disconnected { background: #fee2e2; color: #991b1b; }
+    .pv-status .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .pv-status.connected .dot    { background: #10b981; }
+    .pv-status.disconnected .dot { background: #ef4444; }
+
+    /* Step ring section */
+    .pv-ring-section {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 2rem;
+      text-align: center;
+      margin: 1.5rem auto;
+      max-width: 480px;
+    }
+    .pv-ring-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--blue-700);
+      margin-bottom: 0.75rem;
+    }
+    .pv-ring-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pv-ring-wrap svg { display: block; }
+    .pv-ring-center {
+      position: absolute;
+      text-align: center;
+      pointer-events: none;
+    }
+    .pv-ring-steps {
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 700;
+      color: var(--blue-900);
+      line-height: 1;
+    }
+    .pv-ring-of {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+    .pv-goal-note {
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: var(--text-secondary);
+    }
+    .pv-goal-done {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #059669;
+      margin-top: 0.5rem;
+    }
+
+    /* Stats row */
+    .pv-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 0 auto 1.5rem;
+      max-width: 800px;
+    }
+    .pv-stat {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .pv-stat-val {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 700;
+      color: var(--blue-900);
+    }
+    .pv-stat-lbl {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    /* Device status card */
+    .pv-device-card {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 1.5rem 2rem;
+      margin: 0 auto 1.5rem;
+      max-width: 800px;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      border-left: 5px solid var(--blue-300);
+    }
+    .pv-device-card.alert { border-left-color: var(--amber); }
+    .pv-device-title {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+    }
+
+    /* Session list */
+    .pv-sessions {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 1.5rem 2rem;
+      margin: 0 auto 2rem;
+      max-width: 800px;
+    }
+    .pv-sessions-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--blue-900);
+      margin-bottom: 1rem;
+    }
+    .pv-session-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 1rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .pv-session-row:last-child { border-bottom: none; }
+    .pv-session-date { color: var(--text-secondary); font-size: 0.95rem; }
+    .pv-session-steps {
+      font-weight: 700;
+      color: var(--blue-700);
+      min-width: 90px;
+      text-align: right;
+    }
+
+    .pv-content {
+      padding: 0 1.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .pv-hero { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="pv-hero">
+  <div>
+    <div class="pv-hero-name">{{ patient.label }}</div>
+    <div class="pv-hero-sub">Patient Health Summary</div>
+  </div>
+  {% if is_online %}
+  <span class="pv-status connected">
+    <span class="dot"></span>Device Connected
+  </span>
+  {% else %}
+  <span class="pv-status disconnected">
+    <span class="dot"></span>Device Offline
+  </span>
+  {% endif %}
+</header>
+
+<div class="pv-content">
+
+  <!-- Today's step ring -->
+  <div class="pv-ring-section">
+    <div class="pv-ring-label">Today's Activity</div>
+    <div class="pv-ring-wrap">
+      <svg viewBox="0 0 120 120" width="200" height="200" aria-hidden="true">
+        <!-- Background track -->
+        <circle cx="60" cy="60" r="52" fill="none"
+                stroke="#E2E8F0" stroke-width="12" />
+        <!-- Progress arc (rotated so 0% is at top) -->
+        <circle cx="60" cy="60" r="52" fill="none"
+                stroke="{{ '#10b981' if today_steps >= daily_goal else '#1A5F9B' }}"
+                stroke-width="12"
+                stroke-linecap="round"
+                stroke-dasharray="{{ ring_filled }} 327"
+                transform="rotate(-90 60 60)" />
+      </svg>
+      <div class="pv-ring-center">
+        <div class="pv-ring-steps">{{ "{:,}".format(today_steps) }}</div>
+        <div class="pv-ring-of">steps today</div>
+      </div>
+    </div>
+
+    {% if today_steps >= daily_goal %}
+    <p class="pv-goal-done">&#10003; Daily goal reached!</p>
+    {% else %}
+    <p class="pv-goal-note">
+      Goal: <strong>{{ "{:,}".format(daily_goal) }}</strong> steps &nbsp;&mdash;&nbsp;
+      {{ "{:,}".format([daily_goal - today_steps, 0]|max) }} to go
+    </p>
+    {% endif %}
+  </div>
+
+  <!-- Quick stats -->
+  <div class="pv-stats">
+    <div class="pv-stat">
+      <div class="pv-stat-val">{{ "{:,}".format(total_steps) }}</div>
+      <div class="pv-stat-lbl">Total Steps</div>
+    </div>
+    <div class="pv-stat">
+      <div class="pv-stat-val">{{ session_count }}</div>
+      <div class="pv-stat-lbl">Sessions Recorded</div>
+    </div>
+    <div class="pv-stat">
+      <div class="pv-stat-val">{{ "{:,}".format(total_samples) }}</div>
+      <div class="pv-stat-lbl">Sensor Readings</div>
+    </div>
+    {% if last_session %}
+    <div class="pv-stat">
+      <div class="pv-stat-val" data-reltime="{{ last_session.started_at.isoformat() }}">—</div>
+      <div class="pv-stat-lbl">Last Activity</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Plain-English device status -->
+  {% if gateways %}
+    {% set gw = gateways[0] %}
+    {% if is_online and ble_connected %}
+    <div class="pv-device-card">
+      <div class="pv-device-title">Device Status</div>
+      Your health tracker is connected and recording&nbsp;data.
+    </div>
+    {% elif is_online and not ble_connected %}
+    <div class="pv-device-card alert">
+      <div class="pv-device-title">Device Status</div>
+      Your gateway is on, but the sensor isn&rsquo;t connected yet. Make sure the wearable device is nearby and powered on.
+    </div>
+    {% else %}
+    <div class="pv-device-card alert">
+      <div class="pv-device-title">Device Status</div>
+      Your health tracker is not connected right now. Please ask your nurse or caregiver for help.
+    </div>
+    {% endif %}
+  {% else %}
+  <div class="pv-device-card alert">
+    <div class="pv-device-title">Device Status</div>
+    No monitoring device has been assigned to your account yet. Please contact the care team.
+  </div>
+  {% endif %}
+
+  <!-- Recent sessions -->
+  {% if recent_sessions %}
+  <div class="pv-sessions">
+    <div class="pv-sessions-title">Recent Activity</div>
+    {% for s in recent_sessions %}
+    <div class="pv-session-row">
+      <span class="pv-session-date" data-reltime="{{ s.started_at.isoformat() }}">{{ s.started_at.strftime('%b %-d, %Y &nbsp;%-I:%M %p') }}</span>
+      <span>{{ s.sample_count or 0 }} readings</span>
+      <span class="pv-session-steps">{{ "{:,}".format(s.total_steps or 0) }} steps</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div><!-- /pv-content -->
+
+<script src="/static/rpm-components.js"></script>
+</body>
+</html>

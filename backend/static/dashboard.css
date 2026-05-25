@@ -1,0 +1,163 @@
+/* RPM Dashboard — minimal clinician-friendly styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f6fa;
+    color: #2c3e50;
+    line-height: 1.5;
+}
+
+header {
+    background: #2c3e50;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+header h1 {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+header h1 a {
+    color: white;
+    text-decoration: none;
+}
+
+header .subtitle {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+main {
+    max-width: 1200px;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+}
+
+/* Summary cards */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.card-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.card-label {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    margin-top: 0.3rem;
+}
+
+/* Tables */
+.table-section {
+    background: white;
+    border-radius: 8px;
+    padding: 1.2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+}
+
+.table-section h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    color: #2c3e50;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+th {
+    text-align: left;
+    padding: 0.5rem 0.7rem;
+    border-bottom: 2px solid #ecf0f1;
+    color: #7f8c8d;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+td {
+    padding: 0.5rem 0.7rem;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+tr:hover td {
+    background: #f8f9fa;
+}
+
+a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Status indicators */
+.status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+}
+
+.status-dot.online {
+    background: #2ecc71;
+    box-shadow: 0 0 4px #2ecc71;
+}
+
+.status-dot.offline {
+    background: #95a5a6;
+}
+
+.empty {
+    color: #95a5a6;
+    font-style: italic;
+    padding: 1rem 0;
+}
+
+/* Chart */
+#chart-container {
+    margin-bottom: 1rem;
+    max-height: 250px;
+}
+
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    color: #95a5a6;
+    font-size: 0.8rem;
+}
+
+footer a {
+    color: #7f8c8d;
+}

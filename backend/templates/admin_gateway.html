@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ gateway.label or gateway.id }} — Admin</title>
+  <link rel="stylesheet" href="/static/rpm.css" />
+  <style>
+    /* Edit form panel */
+    .agw-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .agw-field label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.4rem;
+    }
+    .agw-field input[type="text"],
+    .agw-field select {
+      width: 100%;
+      padding: 0.6rem 0.85rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text-primary);
+      background: #fff;
+      box-sizing: border-box;
+    }
+    .agw-field input:focus,
+    .agw-field select:focus {
+      outline: none;
+      border-color: var(--blue-700);
+      box-shadow: 0 0 0 3px rgba(26,95,155,0.15);
+    }
+    .agw-save {
+      padding: 0.65rem 1.75rem;
+      background: var(--blue-700);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+    }
+    .agw-save:hover { background: var(--blue-900); }
+
+    /* Flash message */
+    .agw-flash {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #d1fae5;
+      border-left: 4px solid #10b981;
+      color: #065f46;
+      padding: 0.7rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+    .agw-flash.warn {
+      background: #fef3c7;
+      border-left-color: var(--amber);
+      color: #92400e;
+    }
+
+    /* Status indicator */
+    .agw-online-dot {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      margin-right: 0.4rem;
+      vertical-align: middle;
+    }
+    .agw-online-dot.on  { background: #10b981; }
+    .agw-online-dot.off { background: #d1d5db; }
+
+    /* Gateway ID chip */
+    .agw-id-chip {
+      font-family: monospace;
+      font-size: 0.82rem;
+      background: var(--blue-50);
+      color: var(--blue-700);
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--blue-200);
+    }
+
+    /* Live debug button */
+    .agw-debug-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1.1rem;
+      background: #fff;
+      border: 1.5px solid var(--blue-300);
+      color: var(--blue-700);
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .agw-debug-btn:hover { background: var(--blue-50); }
+
+    /* Info tiles (static device info) */
+    .agw-info-tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .agw-tile {
+      background: var(--blue-50);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+    }
+    .agw-tile-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+    .agw-tile-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+
+<header class="rpm-header">
+  <a href="/" class="rpm-header-brand">RPM Admin</a>
+  <nav class="rpm-header-nav">
+    <a href="/" class="rpm-nav-link">Dashboard</a>
+    <a href="/admin/" class="rpm-nav-link">Admin</a>
+  </nav>
+  <a href="/admin/gateway/{{ gateway.id }}/live" class="agw-debug-btn">
+    &#9654; Live Debug
+  </a>
+</header>
+
+<main class="rpm-main">
+
+  <!-- Breadcrumb -->
+  <nav style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:1.25rem">
+    <a href="/admin/" style="color:var(--blue-700);text-decoration:none">Admin</a>
+    &rsaquo;
+    Gateway
+    <span class="agw-id-chip">{{ gateway.id[:8] }}&hellip;</span>
+  </nav>
+
+  <!-- Flash -->
+  {% if flash %}
+  <div class="agw-flash {% if flash == 'saved' %}{% else %}warn{% endif %}">
+    {% if flash == 'saved' %}
+    &#10003; Changes saved successfully.
+    {% else %}
+    {{ flash | replace('+', ' ') }}
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Page title + status -->
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem">
+    <div>
+      <h1 style="margin:0;font-size:1.5rem;font-weight:700;color:var(--blue-900)">
+        <span class="agw-online-dot {% if is_online %}on{% else %}off{% endif %}"></span>
+        {{ gateway.label or 'Unnamed Gateway' }}
+      </h1>
+      <div style="font-size:0.88rem;color:var(--text-secondary);margin-top:0.25rem">
+        Last heartbeat:
+        {% if gateway.last_heartbeat %}
+        <span data-reltime="{{ gateway.last_heartbeat.isoformat() }}">—</span>
+        {% else %}
+        Never
+        {% endif %}
+        &nbsp;&bull;&nbsp;
+        Software: {{ gateway.software_version or 'unknown' }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats tiles (read-only) -->
+  <div class="agw-info-tiles">
+    <div class="agw-tile">
+      <div class="agw-tile-label">Sessions</div>
+      <div class="agw-tile-value">{{ total_sessions }}</div>
+    </div>
+    <div class="agw-tile">
+      <div class="agw-tile-label">Total Steps</div>
+      <div class="agw-tile-value">{{ "{:,}".format(total_steps) }}</div>
+    </div>
+    <div class="agw-tile">
+      <div class="agw-tile-label">Sensor Readings</div>
+      <div class="agw-tile-value">{{ "{:,}".format(total_samples) }}</div>
+    </div>
+    <div class="agw-tile">
+      <div class="agw-tile-label">BLE Sensor</div>
+      <div class="agw-tile-value" style="color:{% if gateway.ble_connected %}#059669{% else %}#9ca3af{% endif %}">
+        {{ 'Connected' if gateway.ble_connected else 'Disconnected' }}
+      </div>
+    </div>
+    <div class="agw-tile">
+      <div class="agw-tile-label">Pending Samples</div>
+      <div class="agw-tile-value">{{ gateway.pending_samples or 0 }}</div>
+    </div>
+    <div class="agw-tile">
+      <div class="agw-tile-label">Last Sync</div>
+      <div class="agw-tile-value">
+        {% if gateway.last_sync %}
+        <span data-reltime="{{ gateway.last_sync.isoformat() }}">—</span>
+        {% else %}
+        Never
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit form -->
+  <div class="rpm-panel" style="margin-bottom:2rem">
+    <h2 style="font-size:1rem;font-weight:700;color:var(--blue-900);margin:0 0 1.25rem">
+      Edit Gateway
+    </h2>
+    <form method="POST" action="/admin/gateway/{{ gateway.id }}">
+      <div class="agw-form-grid">
+        <div class="agw-field">
+          <label for="agw-label">Display Label</label>
+          <input type="text" id="agw-label" name="label"
+                 value="{{ gateway.label or '' }}"
+                 placeholder="e.g. Room 204 Gateway"
+                 maxlength="120" />
+        </div>
+        <div class="agw-field">
+          <label for="agw-location">Location</label>
+          <input type="text" id="agw-location" name="location"
+                 value="{{ gateway.location or '' }}"
+                 placeholder="e.g. Room 204, Building A"
+                 maxlength="200" />
+        </div>
+        <div class="agw-field">
+          <label for="agw-patient">Assigned Patient</label>
+          <select id="agw-patient" name="patient_id">
+            <option value="">— Unassigned —</option>
+            {% for p in all_patients %}
+            <option value="{{ p.id }}"
+              {% if patient and patient.id == p.id %}selected{% endif %}>
+              {{ p.label }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="agw-save">Save Changes</button>
+      {% if patient %}
+      &nbsp;&nbsp;
+      <a href="/patient/{{ patient.id }}" style="font-size:0.9rem;color:var(--blue-700)">
+        View patient dashboard &rarr;
+      </a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- Device info (read-only) -->
+  <div class="rpm-panel" style="margin-bottom:2rem">
+    <h2 style="font-size:1rem;font-weight:700;color:var(--blue-900);margin:0 0 1rem">
+      Device Details
+    </h2>
+    <div class="rpm-info-grid">
+      <div class="rpm-info-card">
+        <div class="rpm-info-label">Gateway ID</div>
+        <div class="rpm-info-value" style="font-family:monospace;font-size:0.9rem">{{ gateway.id }}</div>
+      </div>
+      {% if gateway.device_id %}
+      <div class="rpm-info-card">
+        <div class="rpm-info-label">Device ID</div>
+        <div class="rpm-info-value" style="font-family:monospace;font-size:0.9rem">{{ gateway.device_id }}</div>
+      </div>
+      {% endif %}
+      <div class="rpm-info-card">
+        <div class="rpm-info-label">Software Version</div>
+        <div class="rpm-info-value">{{ gateway.software_version or 'unknown' }}</div>
+      </div>
+      <div class="rpm-info-card">
+        <div class="rpm-info-label">Online Status</div>
+        <div class="rpm-info-value">{{ 'Online' if is_online else 'Offline' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session history -->
+  <div class="rpm-panel">
+    <h2 style="font-size:1rem;font-weight:700;color:var(--blue-900);margin:0 0 1rem">
+      Session History
+      <span style="font-weight:400;font-size:0.85rem;color:var(--text-secondary);margin-left:0.5rem">
+        (most recent {{ sessions | length }})
+      </span>
+    </h2>
+
+    {% if sessions %}
+    <div class="rpm-table-wrap">
+      <table class="rpm-table">
+        <thead>
+          <tr>
+            <th>Started</th>
+            <th>Ended</th>
+            <th style="text-align:right">Samples</th>
+            <th style="text-align:right">Steps</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in sessions %}
+          {% if s.started_at and s.ended_at %}
+          {% set dur_sec = (s.ended_at - s.started_at).total_seconds() | int %}
+          {% set dur_min = (dur_sec // 60) %}
+          {% set dur_str = (dur_min ~ ' min') if dur_min < 60 else ((dur_min // 60) ~ 'h ' ~ (dur_min % 60) ~ 'm') %}
+          {% else %}
+          {% set dur_str = '—' %}
+          {% endif %}
+          <tr>
+            <td data-reltime="{{ s.started_at.isoformat() if s.started_at else '' }}">
+              {{ s.started_at.strftime('%b %d %H:%M') if s.started_at else '—' }}
+            </td>
+            <td style="color:var(--text-secondary)">
+              {{ s.ended_at.strftime('%H:%M') if s.ended_at else 'Active' }}
+            </td>
+            <td style="text-align:right">{{ s.sample_count or 0 }}</td>
+            <td style="text-align:right;font-weight:600">{{ s.total_steps or 0 }}</td>
+            <td style="color:var(--text-secondary)">{{ dur_str }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p style="color:var(--text-secondary);font-size:0.95rem">No sessions recorded yet.</p>
+    {% endif %}
+  </div>
+
+</main>
+
+<script src="/static/rpm-components.js"></script>
+</body>
+</html>

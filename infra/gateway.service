@@ -1,0 +1,53 @@
+# RPM Gateway Service — systemd unit file
+# Install on the Raspberry Pi:
+#
+#   sudo cp gateway.service /etc/systemd/system/rpm-gateway.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable rpm-gateway
+#   sudo systemctl start rpm-gateway
+#   sudo journalctl -u rpm-gateway -f
+#
+# Edit Environment lines or use an EnvironmentFile for secrets.
+
+[Unit]
+Description=RPM Gateway — BLE sensor ingest and cloud sync
+After=network-online.target bluetooth.target
+Wants=network-online.target bluetooth.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/dev/sensors_lab-clean
+
+# Python virtual environment
+ExecStart=/home/pi/dev/sensors_lab-clean/.venv/bin/python -m gateway
+
+# Environment — override these as needed
+Environment=RPM_BACKEND_URL=https://your-lightsail-ip:8080
+Environment=RPM_API_KEY=your-api-key-here
+Environment=RPM_BLE_DEVICE_NAME=ESP32_BNO055
+Environment=RPM_LOG_LEVEL=INFO
+# Alternatively use an env file:
+# EnvironmentFile=/home/pi/.rpm_gateway.env
+
+# Restart policy: always restart on failure with a delay
+Restart=always
+RestartSec=10
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=rpm-gateway
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/pi/.rpm_gateway.db /home/pi/.rpm_gateway_id
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

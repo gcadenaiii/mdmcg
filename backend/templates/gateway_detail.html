@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gateway {{ gateway.id[:8] }} · RPM</title>
+  <link rel="stylesheet" href="/static/rpm.css">
+</head>
+<body>
+
+  <!-- ── Navigation ──────────────────────────────────────────── -->
+  <header class="rpm-header">
+    <span class="rpm-header__wordmark">RPM <span>/ Remote Patient Monitoring</span></span>
+    <nav class="rpm-header__breadcrumb">
+      <a href="/">Dashboard</a>
+      <span class="sep">›</span>
+      <span class="current">
+        {{ patient.label if patient else (gateway.label or gateway.id[:8] + '…') }}
+      </span>
+    </nav>
+    <div class="rpm-header__right">
+      <a href="/admin/gateway/{{ gateway.id }}/live" class="rpm-live-btn">
+        Live Debug
+      </a>
+      <a href="/admin/" class="rpm-nav-link">⚙ Admin</a>
+      <span id="rpm-clock"></span>
+    </div>
+  </header>
+
+  <!-- ── Page header ─────────────────────────────────────────── -->
+  <div class="rpm-page-header">
+    <div class="rpm-page-header__inner">
+      <div style="flex:1">
+        <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+          <h1>{{ patient.label if patient else (gateway.label or 'Gateway') }}</h1>
+          <span class="rpm-badge rpm-badge--{{ 'online' if gateway.is_online else 'offline' }}">
+            <span class="rpm-badge__dot"></span>
+            {{ 'Online' if gateway.is_online else 'Offline' }}
+          </span>
+        </div>
+        <p>
+          Gateway
+          <span class="u-mono">{{ gateway.id }}</span>
+          {% if gateway.location %} · {{ gateway.location }}{% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <main class="rpm-main">
+
+    <!-- ── Identity cards ──────────────────────────────────────── -->
+    <div class="rpm-info-grid" style="margin-bottom:var(--space-4)">
+      <div class="rpm-info-card">
+        <div class="rpm-info-card__label">Patient</div>
+        <div class="rpm-info-card__value">{{ patient.label if patient else '—' }}</div>
+      </div>
+      <div class="rpm-info-card">
+        <div class="rpm-info-card__label">Label</div>
+        <div class="rpm-info-card__value {{ 'rpm-info-card__value--muted' if not gateway.label }}">
+          {{ gateway.label or 'Not set' }}
+        </div>
+      </div>
+      <div class="rpm-info-card">
+        <div class="rpm-info-card__label">Software</div>
+        <div class="rpm-info-card__value {{ 'rpm-info-card__value--muted' if not gateway.software_version }}">
+          {{ gateway.software_version or '—' }}
+        </div>
+      </div>
+      <div class="rpm-info-card">
+        <div class="rpm-info-card__label">Gateway ID</div>
+        <div class="rpm-info-card__value rpm-info-card__value--mono">{{ gateway.id }}</div>
+      </div>
+    </div>
+
+    <!-- ── Status cards ────────────────────────────────────────── -->
+    <div class="rpm-info-grid" style="margin-bottom:var(--space-8)">
+      <div class="rpm-info-card">
+        <div class="rpm-info-card__label">Sensor (BLE)</div>
+        <div class="rpm-info-card__value">
+          <span class="rpm-badge rpm-badge--{{ 'online' if gateway.ble_connected else 'offline' }}">
+            <span class="rpm-badge__dot"></span>
+            {{ 'Connected' if gateway.ble_connected else 'Disconnected' }}
+          </span>
+        </div>
+      </div>
+      <div class="rpm-info-card">
+        <div class="rpm-info-card__label">Last Heartbeat</div>
+        <div class="rpm-info-card__value" style="font-size:var(--text-base)">
+          {% if gateway.last_heartbeat %}
+            <span data-reltime="{{ gateway.last_heartbeat.isoformat() }}">
+              {{ gateway.last_heartbeat.strftime('%Y-%m-%d %H:%M:%S') }}
+            </span>
+          {% else %}—{% endif %}
+        </div>
+      </div>
+      <div class="rpm-info-card">
+        <div class="rpm-info-card__label">Last Sync</div>
+        <div class="rpm-info-card__value" style="font-size:var(--text-base)">
+          {% if gateway.last_sync %}
+            <span data-reltime="{{ gateway.last_sync.isoformat() }}">
+              {{ gateway.last_sync.strftime('%Y-%m-%d %H:%M:%S') }}
+            </span>
+          {% else %}—{% endif %}
+        </div>
+      </div>
+      <div class="rpm-info-card">
+        <div class="rpm-info-card__label">Pending Samples</div>
+        <div class="rpm-info-card__value {{ 'rpm-info-card__value--muted' if (gateway.pending_samples or 0) == 0 }}">
+          {% if gateway.pending_samples and gateway.pending_samples > 0 %}
+            <span class="rpm-badge rpm-badge--alert">{{ gateway.pending_samples }}</span>
+          {% else %}
+            0
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Sessions ────────────────────────────────────────────── -->
+    <section class="rpm-section">
+      <div class="rpm-section__header">
+        <h2 class="rpm-section__title">Sessions</h2>
+        <span class="rpm-section__count">{{ sessions | length }} recorded</span>
+      </div>
+
+      {% if sessions %}
+      <div class="rpm-panel">
+        <div class="rpm-panel__body rpm-panel__body--flush">
+          <div class="rpm-table-wrap">
+            <table class="rpm-table">
+              <thead>
+                <tr>
+                  <th>Session ID</th>
+                  <th>Started</th>
+                  <th>Ended</th>
+                  <th>Samples</th>
+                  <th>Steps</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for s in sessions %}
+                <tr>
+                  <td class="rpm-table__id">{{ s.id[:8] }}…</td>
+                  <td>
+                    {% if s.started_at %}
+                      <span data-reltime="{{ s.started_at.isoformat() }}">
+                        {{ s.started_at.strftime('%Y-%m-%d %H:%M') }}
+                      </span>
+                    {% else %}—{% endif %}
+                  </td>
+                  <td>
+                    {% if s.ended_at %}
+                      {{ s.ended_at.strftime('%H:%M:%S') }}
+                    {% else %}<span class="rpm-badge rpm-badge--info">Active</span>{% endif %}
+                  </td>
+                  <td class="rpm-table__num">{{ "{:,}".format(s.sample_count or 0) }}</td>
+                  <td class="rpm-table__num">{{ s.total_steps or 0 }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="rpm-empty">
+        <div class="rpm-empty__icon">📋</div>
+        <p>No sessions recorded for this gateway yet.</p>
+      </div>
+      {% endif %}
+    </section>
+
+    <!-- ── Recent Samples ───────────────────────────────────────── -->
+    <section class="rpm-section">
+      <div class="rpm-section__header">
+        <h2 class="rpm-section__title">Recent Samples</h2>
+        <span class="rpm-section__count">last {{ samples | length }}</span>
+      </div>
+
+      {% if samples %}
+      <div class="rpm-panel">
+        <!-- Acceleration chart -->
+        <div class="rpm-chart-wrap">
+          <canvas id="accelChart" height="140"></canvas>
+        </div>
+
+        <!-- Sample table (first 20) -->
+        <div class="rpm-panel__body rpm-panel__body--flush">
+          <div class="rpm-table-wrap">
+            <table class="rpm-table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Euler H / R / P</th>
+                  <th>Lin. Accel X/Y/Z</th>
+                  <th>Steps</th>
+                  <th>Cal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for s in samples[:20] %}
+                <tr>
+                  <td class="u-mono" style="white-space:nowrap">{{ s.timestamp.strftime('%H:%M:%S') }}</td>
+                  <td class="u-muted u-mono">
+                    {{ "%.1f / %.1f / %.1f" | format(s.euler_x or 0, s.euler_y or 0, s.euler_z or 0) }}
+                  </td>
+                  <td class="u-muted u-mono">
+                    {{ "%.2f / %.2f / %.2f" | format(s.linear_accel_x or 0, s.linear_accel_y or 0, s.linear_accel_z or 0) }}
+                  </td>
+                  <td class="rpm-table__num">{{ s.step_count }}</td>
+                  <td class="u-mono u-muted" style="white-space:nowrap">
+                    {{ s.cal_system }}/{{ s.cal_gyro }}/{{ s.cal_accel }}/{{ s.cal_mag }}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="rpm-empty">
+        <div class="rpm-empty__icon">📈</div>
+        <p>No samples received yet. Ensure the gateway is online and the sensor is connected.</p>
+      </div>
+      {% endif %}
+    </section>
+
+    <!-- ── Sync Events (collapsible — developer detail) ─────────── -->
+    {% if sync_events %}
+    <details class="rpm-details">
+      <summary>
+        Sync Events
+        <span class="rpm-section__count" style="font-weight:400;margin-left:auto;margin-right:var(--space-3)">
+          last {{ sync_events | length }}
+        </span>
+      </summary>
+      <div class="rpm-details__body">
+        <div class="rpm-table-wrap">
+          <table class="rpm-table">
+            <thead>
+              <tr>
+                <th>Batch #</th>
+                <th>Received</th>
+                <th>Accepted</th>
+                <th>Duplicate</th>
+                <th>Highest Seq</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in sync_events %}
+              <tr>
+                <td class="rpm-table__num">{{ e.batch_sequence }}</td>
+                <td class="rpm-table__num">{{ e.samples_received }}</td>
+                <td class="rpm-table__num">{{ e.samples_accepted }}</td>
+                <td class="u-muted">{{ e.samples_duplicate }}</td>
+                <td class="u-mono u-muted">{{ e.highest_sequence }}</td>
+                <td class="u-mono u-muted" style="white-space:nowrap">
+                  {{ e.received_at.strftime('%Y-%m-%d %H:%M:%S') if e.received_at else '—' }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+    {% endif %}
+
+  </main>
+
+  <footer class="rpm-footer">
+    <a href="/">← Dashboard</a>
+    <span>·</span>
+    <span>RPM PoC v0.1.0</span>
+    <span>·</span>
+    <a href="/health">Health</a>
+    <span>·</span>
+    <div class="rpm-refresh-bar">
+      <div class="rpm-refresh-bar__track">
+        <div class="rpm-refresh-bar__fill" id="rpm-refresh-fill"></div>
+      </div>
+      <span id="rpm-refresh-label">Refreshes in 30s</span>
+    </div>
+  </footer>
+
+  {% if samples %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script>
+    const samples = [
+      {% for s in samples | reverse %}
+      { t: "{{ s.timestamp.strftime('%H:%M:%S') }}",
+        x: {{ s.linear_accel_x or 0 }},
+        y: {{ s.linear_accel_y or 0 }},
+        z: {{ s.linear_accel_z or 0 }} },
+      {% endfor %}
+    ];
+    new Chart(document.getElementById('accelChart'), {
+      type: 'line',
+      data: {
+        labels: samples.map(s => s.t),
+        datasets: [
+          { label: 'X', data: samples.map(s => s.x),
+            borderColor: '#2E86C1', borderWidth: 1.5, pointRadius: 0, tension: 0.3 },
+          { label: 'Y', data: samples.map(s => s.y),
+            borderColor: '#16A34A', borderWidth: 1.5, pointRadius: 0, tension: 0.3 },
+          { label: 'Z', data: samples.map(s => s.z),
+            borderColor: '#D97706', borderWidth: 1.5, pointRadius: 0, tension: 0.3 },
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title:  { display: true, text: 'Linear Acceleration (m/s²)',
+                    color: '#334155', font: { size: 13, weight: '600' } },
+          legend: { labels: { color: '#64748B', boxWidth: 12 } }
+        },
+        scales: {
+          x: { display: true, ticks: { maxTicksLimit: 10, color: '#94A3B8' },
+               grid: { color: '#F1F5F9' } },
+          y: { display: true, ticks: { color: '#94A3B8' },
+               grid: { color: '#F1F5F9' } }
+        }
+      }
+    });
+  </script>
+  {% endif %}
+
+  <script src="/static/rpm-components.js"></script>
+</body>
+</html>

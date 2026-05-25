@@ -1,0 +1,46 @@
+# RPM PoC — Docker Compose
+# Runs the backend API + PostgreSQL for local development or single-VM deployment.
+#
+# Usage:
+#   cp .env.example .env   # edit secrets
+#   docker compose up -d
+#   docker compose logs -f backend
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-rpm}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rpm_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-rpm}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      # Bind to localhost only — do not expose PostgreSQL to the public internet
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rpm}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql+asyncpg://${POSTGRES_USER:-rpm}:${POSTGRES_PASSWORD:-rpm_dev_password}@db:5432/${POSTGRES_DB:-rpm}"
+      DATABASE_URL_SYNC: "postgresql://${POSTGRES_USER:-rpm}:${POSTGRES_PASSWORD:-rpm_dev_password}@db:5432/${POSTGRES_DB:-rpm}"
+      RPM_API_KEY: ${RPM_API_KEY:-dev-api-key-change-me}
+      RPM_DEBUG: ${RPM_DEBUG:-false}
+      RPM_ALLOWED_ORIGINS: ${RPM_ALLOWED_ORIGINS:-*}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+
+volumes:
+  pgdata:
