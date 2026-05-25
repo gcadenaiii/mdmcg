@@ -46,7 +46,7 @@ SyslogIdentifier=rpm-gateway
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=/home/pi/.rpm_gateway.db /home/pi/.rpm_gateway_id
+ReadWritePaths=/home/pi/
 PrivateTmp=true
 
 [Install]
