@@ -13,6 +13,8 @@
 Description=RPM Gateway — BLE sensor ingest and cloud sync
 After=network-online.target bluetooth.target
 Wants=network-online.target bluetooth.target
+StartLimitBurst=5
+StartLimitIntervalSec=60
 
 [Service]
 Type=simple
@@ -34,8 +36,6 @@ Environment=RPM_LOG_LEVEL=INFO
 # Restart policy: always restart on failure with a delay
 Restart=always
 RestartSec=10
-StartLimitBurst=5
-StartLimitIntervalSec=60
 
 # Logging
 StandardOutput=journal
