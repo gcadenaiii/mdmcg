@@ -20,18 +20,14 @@ StartLimitIntervalSec=60
 Type=simple
 User=pi
 Group=pi
-WorkingDirectory=/home/pi/dev/sensors_lab-clean
+WorkingDirectory=/home/pi/mdmcg
 
 # Python virtual environment
-ExecStart=/home/pi/dev/sensors_lab-clean/.venv/bin/python -m gateway
+ExecStart=/home/pi/mdmcg/.venv/bin/python -m gateway
 
-# Environment — override these as needed
-Environment=RPM_BACKEND_URL=https://your-lightsail-ip:8080
-Environment=RPM_API_KEY=your-api-key-here
-Environment=RPM_BLE_DEVICE_NAME=ESP32_BNO055
-Environment=RPM_LOG_LEVEL=INFO
-# Alternatively use an env file:
-# EnvironmentFile=/home/pi/.rpm_gateway.env
+# Secrets and config — stored in env file, never committed to git
+# Copy infra/.rpm_gateway.env.example -> /home/pi/.rpm_gateway.env and fill in values
+EnvironmentFile=/home/pi/.rpm_gateway.env
 
 # Restart policy: always restart on failure with a delay
 Restart=always
