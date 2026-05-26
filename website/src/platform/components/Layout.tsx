@@ -1,5 +1,4 @@
 import { Link, useLocation } from "react-router";
-import logoUrl from "../../imports/Logo_-_Primary_Lockup.png";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -19,10 +18,20 @@ export default function Layout({ children }: LayoutProps) {
         className="flex items-center justify-between px-6 py-3 shadow-sm"
         style={{ background: "var(--card)", borderBottom: "1px solid var(--border)" }}
       >
-        {/* Left: logo + platform label */}
-        <div className="flex items-center gap-4">
-          <a href="/" className="flex items-center gap-2">
-            <img src={logoUrl} alt="MDMCG" className="h-8 w-auto" />
+        {/* Left: wordmark + platform badge */}
+        <div className="flex items-center gap-3">
+          <a
+            href="/"
+            className="text-2xl tracking-tight"
+            style={{
+              fontFamily: "Hind, sans-serif",
+              fontWeight: 300,
+              letterSpacing: "-0.03em",
+              color: "var(--foreground)",
+              textDecoration: "none",
+            }}
+          >
+            mdmcg
           </a>
           <span
             className="text-xs font-semibold uppercase tracking-widest px-2 py-0.5 rounded"
