@@ -37,6 +37,7 @@ app = FastAPI(
     title="RPM Backend",
     version="0.1.0",
     lifespan=lifespan,
+    root_path=get_settings().root_path,
 )
 
 # CORS

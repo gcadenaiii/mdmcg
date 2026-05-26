@@ -39,6 +39,7 @@ services:
       RPM_API_KEY: ${RPM_API_KEY:-dev-api-key-change-me}
       RPM_DEBUG: ${RPM_DEBUG:-false}
       RPM_ALLOWED_ORIGINS: ${RPM_ALLOWED_ORIGINS:-*}
+      RPM_ROOT_PATH: ${RPM_ROOT_PATH:-/platform}
     ports:
       - "${BACKEND_PORT:-8080}:8080"
 

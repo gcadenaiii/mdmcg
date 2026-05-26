@@ -18,10 +18,11 @@ class Settings(BaseSettings):
     # Auth — env var: RPM_API_KEY
     api_key: str = Field("dev-api-key-change-me", validation_alias="RPM_API_KEY")
 
-    # App — env vars: RPM_DEBUG, RPM_ALLOWED_ORIGINS
+    # App — env vars: RPM_DEBUG, RPM_ALLOWED_ORIGINS, RPM_ROOT_PATH
     app_name: str = "RPM Backend"
     debug: bool = Field(False, validation_alias="RPM_DEBUG")
     allowed_origins: str = Field("*", validation_alias="RPM_ALLOWED_ORIGINS")
+    root_path: str = Field("", validation_alias="RPM_ROOT_PATH")
 
 
 @lru_cache
