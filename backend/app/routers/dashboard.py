@@ -100,6 +100,185 @@ async def dashboard_data(db: AsyncSession = Depends(get_db)):
     return await _get_dashboard_data(db)
 
 
+@router.get("/api/gateway/{gateway_id}")
+async def gateway_detail_api(
+    gateway_id: str, db: AsyncSession = Depends(get_db)
+):
+    from fastapi import HTTPException
+    gw = await db.get(Gateway, gateway_id)
+    if not gw:
+        raise HTTPException(status_code=404, detail="Gateway not found")
+
+    now = datetime.now(timezone.utc)
+    is_online = bool(gw.last_heartbeat and (now - gw.last_heartbeat) < ONLINE_THRESHOLD)
+    patient = await db.get(Patient, gw.patient_id) if gw.patient_id else None
+
+    result = await db.execute(
+        select(SensorSession)
+        .where(SensorSession.gateway_id == gateway_id)
+        .order_by(desc(SensorSession.created_at))
+        .limit(20)
+    )
+    sessions = result.scalars().all()
+
+    result = await db.execute(
+        select(SensorSample)
+        .where(SensorSample.gateway_id == gateway_id)
+        .order_by(desc(SensorSample.timestamp))
+        .limit(100)
+    )
+    samples = result.scalars().all()
+
+    result = await db.execute(
+        select(SyncEvent)
+        .where(SyncEvent.gateway_id == gateway_id)
+        .order_by(desc(SyncEvent.received_at))
+        .limit(20)
+    )
+    sync_events = result.scalars().all()
+
+    return {
+        "gateway": {
+            "id": gw.id,
+            "label": gw.label,
+            "patient_id": gw.patient_id,
+            "patient_label": patient.label if patient else None,
+            "is_online": is_online,
+            "ble_connected": gw.ble_connected,
+            "last_heartbeat": gw.last_heartbeat.isoformat() if gw.last_heartbeat else None,
+            "last_sync": gw.last_sync.isoformat() if gw.last_sync else None,
+            "pending_samples": gw.pending_samples or 0,
+            "software_version": getattr(gw, "software_version", None),
+        },
+        "patient": {
+            "id": patient.id,
+            "label": patient.label,
+            "notes": getattr(patient, "notes", None),
+            "created_at": patient.created_at.isoformat() if patient.created_at else None,
+        } if patient else None,
+        "sessions": [
+            {
+                "id": s.id,
+                "gateway_id": s.gateway_id,
+                "started_at": s.started_at.isoformat() if s.started_at else None,
+                "ended_at": s.ended_at.isoformat() if s.ended_at else None,
+                "sample_count": s.sample_count or 0,
+                "total_steps": s.total_steps or 0,
+            }
+            for s in sessions
+        ],
+        "samples": [
+            {
+                "timestamp": s.timestamp.isoformat(),
+                "euler": {"x": s.euler_x, "y": s.euler_y, "z": s.euler_z},
+                "linear_acceleration": {
+                    "x": s.linear_accel_x, "y": s.linear_accel_y, "z": s.linear_accel_z
+                },
+                "step_count": s.step_count,
+                "calibration": {
+                    "system": s.cal_system, "gyroscope": s.cal_gyro,
+                    "accelerometer": s.cal_accel, "magnetometer": s.cal_mag,
+                },
+            }
+            for s in samples
+        ],
+        "sync_events": [
+            {
+                "id": e.id,
+                "gateway_id": e.gateway_id,
+                "received_at": e.received_at.isoformat(),
+                "batch_sequence": e.batch_sequence,
+                "samples_accepted": e.samples_accepted or 0,
+                "success": e.success,
+                "error_message": e.error_message,
+            }
+            for e in sync_events
+        ],
+    }
+
+
+@router.get("/api/patient/{patient_id}")
+async def patient_detail_api(
+    patient_id: str, db: AsyncSession = Depends(get_db)
+):
+    from fastapi import HTTPException
+    patient = await db.get(Patient, patient_id)
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found")
+
+    now = datetime.now(timezone.utc)
+
+    result = await db.execute(
+        select(Gateway).where(Gateway.patient_id == patient_id).order_by(Gateway.created_at)
+    )
+    gateways_raw = result.scalars().all()
+    gateway_ids = [gw.id for gw in gateways_raw]
+
+    is_online = any(
+        gw.last_heartbeat and (now - gw.last_heartbeat) < ONLINE_THRESHOLD
+        for gw in gateways_raw
+    )
+    ble_connected = any(gw.ble_connected for gw in gateways_raw)
+
+    total_steps = 0
+    total_samples = 0
+    sessions_raw = []
+    if gateway_ids:
+        row = (await db.execute(
+            select(func.sum(SensorSession.total_steps), func.sum(SensorSession.sample_count))
+            .where(SensorSession.gateway_id.in_(gateway_ids))
+        )).one()
+        total_steps = row[0] or 0
+        total_samples = row[1] or 0
+
+        result = await db.execute(
+            select(SensorSession)
+            .where(SensorSession.gateway_id.in_(gateway_ids))
+            .order_by(desc(SensorSession.started_at))
+            .limit(20)
+        )
+        sessions_raw = result.scalars().all()
+
+    return {
+        "patient": {
+            "id": patient.id,
+            "label": patient.label,
+            "notes": getattr(patient, "notes", None),
+            "created_at": patient.created_at.isoformat() if patient.created_at else None,
+        },
+        "gateways": [
+            {
+                "id": gw.id,
+                "label": gw.label,
+                "patient_id": gw.patient_id,
+                "patient_label": patient.label,
+                "is_online": bool(gw.last_heartbeat and (now - gw.last_heartbeat) < ONLINE_THRESHOLD),
+                "ble_connected": gw.ble_connected,
+                "last_heartbeat": gw.last_heartbeat.isoformat() if gw.last_heartbeat else None,
+                "last_sync": gw.last_sync.isoformat() if gw.last_sync else None,
+                "pending_samples": gw.pending_samples or 0,
+                "software_version": getattr(gw, "software_version", None),
+            }
+            for gw in gateways_raw
+        ],
+        "sessions": [
+            {
+                "id": s.id,
+                "gateway_id": s.gateway_id,
+                "started_at": s.started_at.isoformat() if s.started_at else None,
+                "ended_at": s.ended_at.isoformat() if s.ended_at else None,
+                "sample_count": s.sample_count or 0,
+                "total_steps": s.total_steps or 0,
+            }
+            for s in sessions_raw
+        ],
+        "is_online": is_online,
+        "ble_connected": ble_connected,
+        "total_samples": total_samples,
+        "total_steps": total_steps,
+    }
+
+
 @router.get("/api/gateway/{gateway_id}/samples")
 async def gateway_samples(
     gateway_id: str,
