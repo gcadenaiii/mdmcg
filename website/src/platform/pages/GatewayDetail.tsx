@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import Layout from "../components/Layout";
 import { api, GatewayDetail } from "../api/client";
 
@@ -140,6 +150,37 @@ export default function GatewayDetailPage() {
           ▶ Open Live View
         </Link>
       </div>
+
+      {/* Orientation chart */}
+      {samples.length > 1 && (() => {
+        const chartData = [...samples].reverse().map((s) => ({
+          time: new Date(s.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+          "X": parseFloat(s.euler.x.toFixed(1)),
+          "Y": parseFloat(s.euler.y.toFixed(1)),
+          "Z": parseFloat(s.euler.z.toFixed(1)),
+        }));
+        return (
+          <div className="mb-10">
+            <h2 className="text-lg font-semibold mb-4" style={{ color: "var(--foreground)" }}>
+              Euler Orientation
+            </h2>
+            <div className="rounded-xl p-5 shadow-sm" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+              <ResponsiveContainer width="100%" height={240}>
+                <LineChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="time" tick={{ fontSize: 11 }} stroke="var(--border)" interval="preserveStartEnd" />
+                  <YAxis tick={{ fontSize: 11 }} stroke="var(--border)" unit="°" width={44} />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="X" stroke="#0E7C86" dot={false} strokeWidth={1.5} />
+                  <Line type="monotone" dataKey="Y" stroke="#6B7280" dot={false} strokeWidth={1.5} />
+                  <Line type="monotone" dataKey="Z" stroke="#d4183d" dot={false} strokeWidth={1.5} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Recent samples */}
       <div className="mb-10">

@@ -1148,6 +1148,8 @@ export default function App() {
                   src={farshidImage}
                   alt="Farshid Roumi"
                   className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-accent/10"
+                  loading="lazy"
+                  decoding="async"
                 />
               </motion.div>
               <h3 className="text-2xl mb-2 font-light text-center">Farshid Roumi</h3>
@@ -1178,6 +1180,8 @@ export default function App() {
                   src={georgeImage}
                   alt="George Cadena"
                   className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-accent/10"
+                  loading="lazy"
+                  decoding="async"
                 />
               </motion.div>
               <h3 className="text-2xl mb-2 font-light text-center">George Cadena</h3>
@@ -1208,6 +1212,8 @@ export default function App() {
                   src={mahshidImage}
                   alt="Mahshid Roumi"
                   className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-accent/10"
+                  loading="lazy"
+                  decoding="async"
                 />
               </motion.div>
               <h3 className="text-2xl mb-2 font-light text-center">Mahshid Roumi</h3>

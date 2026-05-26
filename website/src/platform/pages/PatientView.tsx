@@ -1,4 +1,13 @@
 import { useEffect, useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { useParams, Link } from "react-router";
 import Layout from "../components/Layout";
 import { api, PatientDetail } from "../api/client";
@@ -149,6 +158,34 @@ export default function PatientView() {
           )}
         </div>
       </div>
+
+      {/* Steps chart */}
+      {sessions.length > 0 && (() => {
+        const chartData = [...sessions].reverse().map((s, i) => ({
+          date: s.started_at
+            ? new Date(s.started_at).toLocaleDateString([], { month: "short", day: "numeric" })
+            : `#${i + 1}`,
+          Steps: s.total_steps,
+        }));
+        return (
+          <div className="mb-10">
+            <h2 className="text-lg font-semibold mb-4" style={{ color: "var(--foreground)" }}>
+              Steps per Session
+            </h2>
+            <div className="rounded-xl p-5 shadow-sm" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="var(--border)" />
+                  <YAxis tick={{ fontSize: 11 }} stroke="var(--border)" width={44} />
+                  <Tooltip />
+                  <Bar dataKey="Steps" fill="#0E7C86" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Sessions */}
       <div>
