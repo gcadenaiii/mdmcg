@@ -1,6 +1,6 @@
 
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router";
 import App from "./app/App.tsx";
 import Dashboard from "./platform/pages/Dashboard.tsx";
 import GatewayDetail from "./platform/pages/GatewayDetail.tsx";

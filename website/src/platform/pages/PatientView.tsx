@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link } from "react-router";
 import Layout from "../components/Layout";
 import { api, PatientDetail } from "../api/client";
 
