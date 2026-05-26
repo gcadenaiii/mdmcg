@@ -262,9 +262,9 @@ export default function App() {
                 transition={{ delay: 0.2, duration: 0.8 }}
                 className="inline-block px-4 py-1.5 bg-accent/10 text-accent rounded-full text-xs tracking-wider mb-8"
               >
-                REVOLUTIONIZING CARDIAC MONITORING
+                THE FIRST WEARABLE MCG
               </motion.div>
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl mb-6 leading-[0.95] font-light tracking-tight">
+              <h1 className="text-5xl sm:text-6xl lg:text-8xl mb-6 leading-[0.95] font-light tracking-tight">
                 Your heart,
                 <br />
                 <span className="text-accent">
