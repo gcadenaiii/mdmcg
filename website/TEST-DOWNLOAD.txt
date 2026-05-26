@@ -1,0 +1,5 @@
+This is a test file to verify your download process works.
+
+If you can see and download this file, you can download the full MDMCG package the same way!
+
+File location: /workspaces/default/code/TEST-DOWNLOAD.txt

@@ -41,3 +41,7 @@ config/wireguard/*.conf
 # Configuration - each machine has its own config.json (not tracked).
 # Copy config.example.json -> config.json and set active_profile for your machine.
 config.json
+
+# Website build artifacts
+website/node_modules/
+website/dist/

@@ -1,0 +1,74 @@
+Revise the existing MDMCG website (a React single-page site for a heart-monitoring wearable). Keep the current visual style — lowercase "mdmcg" wordmark, teal #0E7C86 accent, near-black #0A0E14 ink, white and soft-grey backgrounds, light-weight oversized headlines, generous whitespace, calm "Apple of health wearables" tone. This is a refinement, not a redesign.
+Goal of this revision: The current site explains what the device is but never explains why it wins. Add that. Two things are missing: the science of why magnetic sensing beats electrical sensing, and the personalized AI story. Every selling point must be skimmable and readable on mobile — short headlines, tight supporting lines, no dense paragraphs.
+
+GLOBAL CONSISTENCY RULES (apply across the whole site):
+
+Device dimensions are 86mm × 54mm × 5mm — keep this exact and consistent everywhere it appears.
+Refer to the sensing hardware as "a multi-sensor MCG array" — do not state a specific channel count.
+Do not invent quotes, testimonials, or pilot results anywhere.
+Keep all performance figures clearly framed as published research or as illustrative — never as proven claims about this device.
+The existing site already has a corrected hero (no testimonial), updated line icons, a Founders section, and mobile optimization in place — preserve all of these; do not revert them.
+
+
+NEW PAGE ORDER:
+Hero → Lifestyle → The Gap (with category map) → How It Works → The MCG Advantage (new) → Your Personal Heart Model (new) → Clinical Applications → Honest by Design → 1-in-3 Impact → Founders → Partner CTA → Footer.
+(The Founders section already exists, placed before the Partner CTA — keep it where it is; the two new sections go earlier, after How It Works.)
+
+SECTION — THE GAP (revise existing):
+Keep the three-column comparison. Add a compact category map below it: a 2×2 quadrant, axis X = "Daily wearability", axis Y = "Signal quality / closeness to the heart". Plot four points — Wrist wearables (high wearability, low signal), ECG patches (high signal, low wearability, adhesive), Hospital MCG systems (high signal, not wearable — point-of-care carts), MDMCG (top-right, alone). Caption: "Everyone else makes you choose. We don't."
+Add one short line above the map: Hospital-grade MCG exists. Daily-wear MCG does not — until now.
+Visual to generate: a clean minimal 2×2 quadrant chart, teal MDMCG dot enlarged and glowing in the top-right corner, the other three dots in muted grey.
+
+SECTION — HOW IT WORKS (revise existing):
+Keep the two existing panels. Ensure the dimension line reads 86mm × 54mm × 5mm. Use "multi-sensor MCG array" — no channel count.
+
+NEW SECTION — THE MCG ADVANTAGE (place after How It Works)
+Eyebrow: WHY MAGNETIC, NOT ELECTRICAL
+Headline: The signal that skin can't blur.
+Intro line (one sentence): Electrical heart signals get distorted by skin, muscle and fat on the way out. Magnetic fields pass straight through.
+Three short cards (headline + one tight line each):
+
+Undistorted by the body — Magnetic signals are not weakened by tissue, skin, or chest-wall thickness.
+No contact required — Magnetic sensing needs no electrodes and tolerates a moving body — which is exactly why it can live in a shirt.
+Higher resolution — A multi-sensor MCG array captures finer spatial detail than electrical leads.
+Closing line (accent): Most cardiac sensors get worse when worn all day. MCG is the one that doesn't.
+Visual to generate: a simple side-by-side diagram — left, a wavy distorted "electrical" line passing through layered tissue and arriving degraded; right, a clean "magnetic" line passing straight through unaffected. Minimal, teal, lots of whitespace.
+
+
+NEW SECTION — YOUR PERSONAL HEART MODEL (place after The MCG Advantage)
+Eyebrow: INTELLIGENCE BUILT FOR ONE PERSON — YOU
+Headline: A heart model that learns you.
+Intro line: Every heart has its own rhythm. MDMCG builds a private model of yours — then watches for what changes.
+Three short cards (headline + one tight line each):
+
+Learns your baseline — Your model is trained on your heart, not a population average.
+Notices change early — It flags meaningful deviation from your norm — research on personalized cardiac models has surfaced warning signs days before a hospital visit.
+Works both ways — It catches early signs of decline, and confirms when recovery is trending the right way.
+Visual to generate: a calm line-chart showing a soft teal "personal baseline" band, with the live signal gently deviating outside it at one point, marked by a small teal dot. Label the band "your baseline" — keep all numbers off or clearly illustrative.
+
+HEALTH SCORE block (inside or directly after this section):
+Headline: The most honest Health Score starts with the cleanest signal.
+Copy (two short lines): Wrist scores estimate your heart from the wrist — far from the source, through motion and skin. MDMCG listens over the heart. A cleaner signal in means a Health Score you can actually trust.
+Accent line: Better math can't fix a blurry signal. We started with a better signal.
+Visual to generate: a simple comparison — a faint, noisy waveform labeled "wrist (optical, distant)" beside a crisp, clean waveform labeled "MDMCG (over-heart)". Minimal and elegant.
+
+SECTION — CLINICAL APPLICATIONS (revise existing):
+Keep the featured "Post-Surgery & Cardiac Rehab" block as-is. Replace the three secondary application cards with this tightened copy — short headline plus one crisp line each, using the existing teal line icons (no emojis):
+
+Remote Patient Monitoring — Reusable hardware for chronic and acute programs — less friction, better compliance.
+Metabolic & Weight-Loss Recovery — Track cardiovascular trends through GLP-1 therapy and post-bariatric recovery.
+Athletic Training & Recovery — Chest-centered recovery and training-load data — not wrist approximations.
+Section intro line (keep short): Clinical care doesn't end at discharge. MDMCG covers the weeks in between.
+
+
+SECTION — HONEST BY DESIGN (revise existing):
+Keep it. Add one short line: AI models are validated against ECG ground truth, not just the sensor — the same discipline, applied to the software.
+
+MOBILE (already optimized — preserve):
+The site is already mobile-optimized; keep that intact. Ensure the two NEW sections and the revised Clinical Applications cards match the same standard: card headlines large, supporting text one or two short lines, cards stack vertically with comfortable spacing, no paragraph longer than ~25 words. The new and revised sections must be fully scannable on a phone from headlines and one-liners alone.
+
+FOOTER — add a minimal references block:
+Below the existing regulatory and market-context lines, add a small, low-contrast, collapsible "Science references" line listing numbered sources: MCG signal advantages and contactless sensing (peer-reviewed cardiology literature); personalized wearable models and early-warning lead time (heart-failure monitoring studies); CDC heart disease facts; CMS Remote Patient Monitoring; FDA General Wellness guidance. Keep it visually quiet — it should reassure clinical readers without cluttering the page. Do not put citations in the body sections.
+
+TONE: Confident, spare, declarative. Short sentences. The thread tying the whole site together: we are the only ones combining heart-grade magnetic signal with true all-day wearability and a personal AI model — everyone else forces a compromise we removed.
+DELIVERABLE: The updated React site, responsive desktop and mobile, all new and revised sections matching one consistent component and color system.
