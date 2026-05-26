@@ -1155,8 +1155,9 @@ export default function App() {
                 <span className="text-sm text-foreground/50 font-light">Co-Founder</span>
               </div>
               <div className="text-sm text-foreground/70 font-light leading-relaxed text-center space-y-2">
-                <p>42+ published patents. EB1-A recognition for Extraordinary Ability in Science & Engineering.</p>
-                <p>National Academy of Engineering Frontiers selectee (2023) — one of 81 early-career engineers nationwide.</p>
+                <p>Founder & CEO of Parthian Energy, developing next-generation energy-storage systems for electric vehicles.</p>
+                <p>Ph.D. in Mechanical Engineering from Caltech; 40+ published patents in science and engineering.</p>
+                <p>Former Principal Investigator leading research on next-generation advanced battery technology.</p>
               </div>
             </motion.div>
 
@@ -1184,8 +1185,9 @@ export default function App() {
                 <span className="text-sm text-foreground/50 font-light">Co-Founder</span>
               </div>
               <div className="text-sm text-foreground/70 font-light leading-relaxed text-center space-y-2">
-                <p>Inventor of wearable multi-lead ECG patch (US-D972736-S). M.S. Electrical Engineering.</p>
-                <p>Led FDA audit and ISO 13485 certification. 15+ years in regulated medical device development.</p>
+                <p>Engineering leader with 15+ years taking products from concept to market across software, hardware, and regulated medical devices.</p>
+                <p>Inventor of a wearable multi-lead ECG patch (US-D972736-S); led the company through FDA audit and ISO 13485 certification.</p>
+                <p>Director at ShotSpotter, leading end-to-end delivery of weapons-detection systems for multi-lane commercial deployment. M.S. Electrical Engineering, Caltech.</p>
               </div>
             </motion.div>
 
@@ -1213,8 +1215,9 @@ export default function App() {
                 <span className="text-sm text-foreground/50 font-light">Co-Founder</span>
               </div>
               <div className="text-sm text-foreground/70 font-light leading-relaxed text-center space-y-2">
-                <p>Co-founder & VP Product Development at Parthian Energy (~20 patents). Ph.D. in Electrical & Computer Engineering from UC Irvine.</p>
-                <p>10+ years commercializing deep-tech energy storage systems and translating research into market-ready products.</p>
+                <p>Co-Founder & VP of Product Development at Parthian Energy, leading deep-tech energy-storage product development.</p>
+                <p>Ph.D. in Electrical & Computer Engineering from UC Irvine; 10+ years commercializing research into market-ready products.</p>
+                <p>Former Postdoctoral Scholar at Caltech.</p>
               </div>
             </motion.div>
           </div>
