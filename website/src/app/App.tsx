@@ -1158,8 +1158,9 @@ export default function App() {
               </div>
               <div className="text-sm text-foreground/70 font-light leading-relaxed text-center space-y-2">
                 <p>Founder & CEO of Parthian Energy, developing next-generation energy-storage systems for electric vehicles.</p>
-                <p>Ph.D. in Mechanical Engineering from Caltech; 40+ published patents in science and engineering.</p>
-                <p>Former Principal Investigator leading research on next-generation advanced battery technology.</p>
+                <p>Ph.D. in Mechanical Engineering from Caltech; inventor of 42 published patents in science and engineering.</p>
+                <p>Former Principal Investigator at Caltech and four-time recipient of the Caltech Innovation Initiative award.</p>
+                <p>National Academy of Engineering Frontiers of Engineering selectee, 2023 — one of 81 early-career engineers nationwide.</p>
               </div>
             </motion.div>
 
