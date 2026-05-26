@@ -33,4 +33,19 @@ export default defineConfig({
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
+
+  // Dev server: proxy /platform/api/* and /platform/ws/* to local FastAPI
+  server: {
+    proxy: {
+      '/platform/api': {
+        target: 'http://localhost:8080',
+        rewrite: (p) => p.replace(/^\/platform/, ''),
+      },
+      '/platform/ws': {
+        target: 'ws://localhost:8080',
+        ws: true,
+        rewrite: (p) => p.replace(/^\/platform/, ''),
+      },
+    },
+  },
 })
