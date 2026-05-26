@@ -201,7 +201,7 @@ export default function GatewayDetailPage() {
           <table className="w-full text-sm">
             <thead style={{ background: "var(--secondary)" }}>
               <tr>
-                {["Time", "Batch", "Samples", "Status"].map((h) => (
+                {["Time", "Batch", "Received", "Accepted", "Dupes"].map((h) => (
                   <th key={h} className="text-left px-4 py-3 font-medium" style={{ color: "var(--muted-foreground)" }}>
                     {h}
                   </th>
@@ -224,18 +224,13 @@ export default function GatewayDetailPage() {
                     #{e.batch_sequence}
                   </td>
                   <td className="px-4 py-2" style={{ color: "var(--muted-foreground)" }}>
+                    {e.samples_received}
+                  </td>
+                  <td className="px-4 py-2" style={{ color: "var(--muted-foreground)" }}>
                     {e.samples_accepted}
                   </td>
-                  <td className="px-4 py-2">
-                    <span
-                      className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                      style={{
-                        background: e.success ? "rgba(14,124,134,0.12)" : "rgba(212,24,61,0.12)",
-                        color: e.success ? "var(--accent)" : "var(--destructive)",
-                      }}
-                    >
-                      {e.success ? "OK" : "Failed"}
-                    </span>
+                  <td className="px-4 py-2" style={{ color: "var(--muted-foreground)" }}>
+                    {e.samples_duplicate}
                   </td>
                 </tr>
               ))}

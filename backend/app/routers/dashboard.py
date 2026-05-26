@@ -188,9 +188,9 @@ async def gateway_detail_api(
                 "gateway_id": e.gateway_id,
                 "received_at": e.received_at.isoformat(),
                 "batch_sequence": e.batch_sequence,
+                "samples_received": e.samples_received or 0,
                 "samples_accepted": e.samples_accepted or 0,
-                "success": e.success,
-                "error_message": e.error_message,
+                "samples_duplicate": e.samples_duplicate or 0,
             }
             for e in sync_events
         ],

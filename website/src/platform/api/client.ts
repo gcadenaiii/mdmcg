@@ -50,9 +50,9 @@ export interface SyncEvent {
   gateway_id: string;
   received_at: string;
   batch_sequence: number;
+  samples_received: number;
   samples_accepted: number;
-  success: boolean;
-  error_message: string | null;
+  samples_duplicate: number;
 }
 
 export interface Sample {
