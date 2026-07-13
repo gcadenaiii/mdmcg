@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#05080c">
+<title>Parthian Energy — See inside the cell</title>
+<meta name="description" content="EMIS images a battery cell's internal current density — finding the latent defects that cause recalls, before any voltage or temperature signal. Validated with Idaho National Laboratory.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05080c; --ink:#f4f2ec; --ink-2:#d3dae2; --ink-3:#8f9aa6;
+  --amber:#e0a32f; --amber-2:#C0721B; --line:rgba(174,184,196,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Newsreader',serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.mono{font-family:'IBM Plex Mono',monospace}
+a{color:inherit}
+
+/* persistent field canvas */
+#field{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+#fieldFallback{position:fixed;inset:0;z-index:0;display:none;
+  background:radial-gradient(40% 60% at 16% 50%,rgba(63,174,142,.5),transparent 60%),
+             radial-gradient(40% 60% at 84% 50%,rgba(63,174,142,.5),transparent 60%),
+             radial-gradient(30% 40% at 72% 64%,rgba(192,69,27,.55),transparent 60%),#05080c}
+
+/* scroll-snap stations */
+main{position:relative;z-index:1}
+.station{min-height:100svh;display:flex;align-items:center;padding:0 8vw;scroll-snap-align:start;position:relative;isolation:isolate}
+.station::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(100deg, rgba(5,8,12,.92) 0%, rgba(5,8,12,.82) 30%, rgba(5,8,12,.45) 50%, rgba(5,8,12,0) 70%)}
+@media(max-width:760px){.station::before{background:linear-gradient(180deg, rgba(5,8,12,.5) 0%, rgba(5,8,12,.86) 45%, rgba(5,8,12,.86) 100%)}}
+@media(max-width:760px){.station{padding:0 28px}}
+.snap{scroll-snap-type:y proximity}
+
+/* overlay text — Basic restraint, big type, lots of air */
+.kicker{font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:28px;opacity:0;transform:translateY(14px)}
+.big{font-size:clamp(36px,6.4vw,86px);line-height:1.02;letter-spacing:-.02em;font-weight:400;max-width:16ch;opacity:0;transform:translateY(22px)}
+.big em{font-style:italic;color:#9fc3ea}
+.big .amber{color:var(--amber)}
+.sub{font-size:clamp(17px,1.7vw,21px);line-height:1.5;color:var(--ink-2);max-width:46ch;margin-top:28px;opacity:0;transform:translateY(18px)}
+.holder{max-width:1100px;position:relative;z-index:1}
+/* reveal-in */
+.r{transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1)}
+.in .kicker,.in .big,.in .sub,.in .r{opacity:1;transform:none}
+.in .big{transition-delay:.08s}.in .sub{transition-delay:.18s}
+
+/* fixed top bar — minimal */
+.bar{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:center;
+  padding:22px 8vw;mix-blend-mode:difference}
+@media(max-width:760px){.bar{padding:18px 24px}}
+.brand{font-size:19px;letter-spacing:-.01em;display:flex;align-items:center;gap:11px;color:#fff;text-decoration:none}
+.brand svg{width:26px;height:26px}
+.bar-cta{font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.08em;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.6);padding:9px 16px;border-radius:2px}
+
+/* scroll progress depth meter */
+.depth{position:fixed;left:8vw;bottom:28px;z-index:10;font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.1em;color:var(--ink-3);display:flex;align-items:center;gap:12px;mix-blend-mode:difference}
+@media(max-width:760px){.depth{left:24px}}
+.depth .track{width:120px;height:2px;background:rgba(174,184,196,.25);position:relative}
+.depth .fill{position:absolute;left:0;top:0;height:100%;background:var(--amber);width:0%}
+.scrollcue{position:fixed;right:8vw;bottom:28px;z-index:10;font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.1em;color:var(--ink-3);mix-blend-mode:difference;transition:opacity .5s}
+@media(max-width:760px){.scrollcue{display:none}}
+
+/* the verdict chip that rides the field */
+.verdict{position:fixed;top:50%;right:8vw;transform:translateY(-50%);z-index:5;pointer-events:none;opacity:0;transition:opacity .8s}
+.verdict.show{opacity:1}
+@media(max-width:900px){.verdict{right:24px;top:auto;bottom:96px;transform:none}}
+.vcard{background:rgba(8,12,18,.72);backdrop-filter:blur(10px);border:1px solid rgba(174,184,196,.22);
+  border-radius:6px;padding:18px 22px;min-width:230px;box-shadow:0 24px 50px -28px rgba(0,0,0,.7)}
+.verdict .vrow{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:8px 0}
+.verdict .vrow+.vrow{border-top:1px solid rgba(174,184,196,.14)}
+.verdict .vk{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.verdict .vv{font-family:'IBM Plex Mono';font-size:14px;letter-spacing:.02em}
+.verdict .vv.pass{color:#5fd0a0}.verdict .vv.fail{color:#e0863f}
+.verdict .vemis{opacity:0;max-height:0;padding:0;overflow:hidden;transition:opacity .5s,max-height .5s,padding .5s;border-top:0!important}
+.verdict.revealed .vemis{opacity:1;max-height:60px;padding:8px 0;border-top:1px solid rgba(174,184,196,.14)!important}
+
+/* interaction station: pointer hint */
+.hint{font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.06em;color:var(--ink-2);margin-top:30px;opacity:0;transition:opacity .8s}
+.in .hint{opacity:.85;transition-delay:.4s}
+.hint.gone{opacity:0!important}
+.touch-only{display:none}
+@media (hover:none) and (pointer:coarse){.ptr-only{display:none}.touch-only{display:inline}}
+
+/* proof station: real data plates */
+.plates{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:36px;max-width:760px;opacity:0;transform:translateY(22px)}
+.in .plates{opacity:1;transform:none;transition:opacity 1s .2s,transform 1s .2s}
+.plate{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:4px;padding:8px}
+.plate img{width:100%;border-radius:2px;display:block}
+.plate .pl{font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:10px 6px 4px;display:flex;align-items:center;gap:7px}
+.plate .pl.ok{color:#5fd0a0}.plate .pl.bad{color:#e0863f}
+.plate .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* CTA buttons */
+.cta-row{display:flex;gap:14px;margin-top:40px;flex-wrap:wrap;opacity:0;transform:translateY(18px)}
+.in .cta-row{opacity:1;transform:none;transition:opacity 1s .3s,transform 1s .3s}
+.btn{font-family:'IBM Plex Mono';font-size:13px;letter-spacing:.04em;text-decoration:none;padding:15px 26px;border-radius:2px;display:inline-flex;align-items:center;gap:9px;transition:transform .2s,background .2s}
+.btn-primary{background:var(--amber);color:#1a1206;font-weight:500}
+.btn-primary:hover{transform:translateY(-2px);background:#f0b441}
+.btn-ghost{border:1px solid rgba(174,184,196,.4);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--ink)}
+
+/* deferred content drawer (Basic: defer the explanation) */
+.more-band{position:relative;z-index:1;background:#080c12;border-top:1px solid var(--line)}
+.more-inner{max-width:1080px;margin:0 auto;padding:90px 8vw}
+.more-inner h2{font-size:clamp(26px,3vw,40px);letter-spacing:-.01em;margin-bottom:16px;max-width:20ch}
+.more-lead{font-size:18px;color:var(--ink-2);line-height:1.55;max-width:60ch;margin-bottom:40px}
+.deck{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:5px;overflow:hidden}
+@media(max-width:820px){.deck{grid-template-columns:1fr}}
+.card{background:#080c12;padding:30px 28px}
+.home-fork{margin-top:48px;padding-top:40px;border-top:1px solid var(--line)}
+.hf-q{font-family:'Newsreader',serif;font-size:21px;color:var(--ink);margin-bottom:22px;max-width:40ch}
+.hf-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:820px){.hf-row{grid-template-columns:1fr}}
+.hf-btn{display:block;text-decoration:none;background:#0b1118;border:1px solid var(--line);border-radius:5px;padding:22px 24px;transition:border-color .2s,transform .2s,background .2s}
+.hf-btn:hover{border-color:var(--amber);transform:translateY(-2px);background:#0e141c}
+.hf-btn .hf-k{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:9px}
+.hf-btn .hf-t{font-family:'Newsreader',serif;font-size:20px;color:var(--ink);display:block;line-height:1.15;letter-spacing:-.01em}
+.hf-btn .hf-d{font-size:13.5px;color:var(--ink-2);margin-top:9px;line-height:1.45;display:block}
+.card .ck{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:12px}
+.card h3{font-size:20px;margin-bottom:8px}
+.card p{font-size:14.5px;color:var(--ink-2);line-height:1.55}
+.card .link{font-family:'IBM Plex Mono';font-size:12px;color:var(--amber);text-decoration:none;display:inline-block;margin-top:14px;border:none;background:none;cursor:pointer;padding:0}
+
+/* expandable rows for full detail (defer, don't delete) */
+.rows{margin-top:14px;border-top:1px solid var(--line)}
+details.row{border-bottom:1px solid var(--line)}
+details.row summary{cursor:pointer;list-style:none;padding:22px 4px;display:flex;justify-content:space-between;align-items:center;font-size:19px}
+details.row summary::-webkit-details-marker{display:none}
+details.row summary .q{font-family:'IBM Plex Mono';font-size:12px;color:var(--amber);transition:transform .3s}
+details.row[open] summary .q{transform:rotate(45deg)}
+details.row .body{padding:0 4px 26px;color:var(--ink-2);font-size:15.5px;line-height:1.6;max-width:72ch}
+details.row .body p{margin-bottom:12px}
+details.row .body b{color:var(--ink);font-weight:500}
+
+/* comparison table inside drawer */
+.ctable{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+.ctable th,.ctable td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line);color:var(--ink-2)}
+.ctable thead th{font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.ctable th[scope=row]{color:var(--ink)}
+.ctable .us{color:var(--amber)}
+.ctable .yes{color:#5fd0a0}.ctable .no{color:#e0863f}
+
+footer{position:relative;z-index:1;background:#05080c;border-top:1px solid var(--line);padding:60px 8vw 50px;
+  font-family:'IBM Plex Mono';font-size:12.5px;color:var(--ink-3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px}
+footer a,footer button{color:var(--ink-3);text-decoration:none;background:none;border:none;font:inherit;cursor:pointer}
+footer a:hover,footer button:hover{color:var(--ink)}
+
+/* record modal (carry over the deferral) */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(5,8,12,.7);backdrop-filter:blur(8px);display:flex;align-items:flex-start;justify-content:center;padding:48px 20px;overflow-y:auto}
+.ov[hidden]{display:none}
+.modal{position:relative;background:#0b1016;border:1px solid var(--line);border-radius:6px;max-width:860px;width:100%;margin:auto;padding:46px 48px 54px}
+@media(max-width:640px){.modal{padding:34px 24px}}
+.modal .x{position:absolute;top:16px;right:18px;width:38px;height:38px;border:1px solid var(--line);background:none;border-radius:50%;color:var(--ink-2);font-size:22px;cursor:pointer}
+.modal h2{font-size:30px;margin-bottom:6px}
+.modal .tl{display:grid;grid-template-columns:88px 1fr;gap:20px;padding:18px 0;border-bottom:1px solid var(--line)}
+.modal .tl .yr{font-size:26px;color:var(--amber)}
+.modal .tl p{font-size:15px;color:var(--ink-2);line-height:1.5}
+.modal .tl p b{color:var(--ink)}
+.modal .pat{font-family:'IBM Plex Mono';font-size:12px;color:var(--ink-3)}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .snap{scroll-snap-type:none}
+  .kicker,.big,.sub,.r,.plates,.cta-row,.hint{opacity:1!important;transform:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<canvas id="field" aria-hidden="true"></canvas>
+<div id="fieldFallback" aria-hidden="true"></div>
+
+<header class="bar">
+  <a class="brand" href="#top">
+    <svg viewBox="0 0 32 32" fill="none"><path d="M16 28 C8.8 28 4 23 4 16.6 C4 9.6 9.4 4.6 16.4 4.6 C23.4 4.6 28 9.8 28 16.2" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M16 23.4 C11.6 23.4 8.8 20.4 8.8 16.5 C8.8 12.4 12 9.4 16.3 9.4 C20.6 9.4 23.3 12.4 23.4 16" stroke="#9fb6d8" stroke-width="1.5" stroke-linecap="round"/><circle cx="22.6" cy="21.4" r="2.7" fill="#e0a32f"/></svg>
+    Parthian Energy
+  </a>
+  <a class="bar-cta" href="site.html#start">Send us your cells</a>
+</header>
+
+<div class="verdict" id="verdict" aria-hidden="true">
+  <div class="vcard">
+    <div class="vrow"><span class="vk">Voltage test</span><span class="vv pass" id="vVolt">PASS</span></div>
+    <div class="vrow vemis" id="vEmisRow"><span class="vk">EMIS</span><span class="vv fail" id="vEmis">PLATING &mdash; ADVANCED</span></div>
+  </div>
+</div>
+
+<main class="snap" id="main">
+
+  <section class="station" id="top">
+    <div class="holder">
+      <div class="kicker r">Current-density imaging &middot; EMIS</div>
+      <h1 class="big r">You're scrapping good cells to be safe.<br>We show you which are <span class="amber">actually</span> bad.</h1>
+      <p class="sub r">Every fast test on the line waits for damage to surface as voltage, gas, or geometry. EMIS sees the current density itself &mdash; where recall-class defects appear first.</p>
+    </div>
+  </section>
+
+  <section class="station" id="descend">
+    <div class="holder">
+      <div class="kicker r">Scroll into the cell</div>
+      <h2 class="big r">A healthy cell carries its current <em>uniformly</em>.</h2>
+      <p class="sub r">Two tabs, two balanced lobes, a quiet field. This is what "good" looks like from the inside &mdash; something no voltage reading can show you.</p>
+    </div>
+  </section>
+
+  <section class="station" id="break">
+    <div class="holder">
+      <div class="kicker r">Twelve fast-charge cycles later</div>
+      <h2 class="big r">Now one of these cells is <span class="amber">quietly failing</span>.</h2>
+      <p class="sub r">Lithium plating has begun inside. The cell still passes every voltage and temperature check on the line &mdash; the damage is real, and completely invisible to every fast test.</p>
+    </div>
+  </section>
+
+  <section class="station" id="signature">
+    <div class="holder">
+      <div class="kicker r">Interactive &middot; hunt the defect</div>
+      <h2 class="big r">Can you find it?<br><em>Neither could the factory.</em></h2>
+      <p class="sub r">Sweep the lens across the cell. Outside it, everything looks healthy &mdash; the way it looks to every other instrument. Only EMIS resolves what's hiding underneath.</p>
+      <p class="hint" id="hint">&#9669;&nbsp; <span class="ptr-only">move your cursor</span><span class="touch-only">drag your finger</span> across the field</p>
+    </div>
+  </section>
+
+  <section class="station" id="cta">
+    <div class="holder">
+      <div class="kicker r">The standard is what compounds</div>
+      <h2 class="big r">Anyone can build an instrument.<br>We're building the <span class="amber">reference</span>.</h2>
+      <p class="sub r">Every cell EMIS images sharpens a model trained on real commercial-cell signatures &mdash; the layer the industry calibrates against. The instrument is the wedge; the data is the moat.</p>
+      <div class="cta-row" id="start">
+        <a class="btn btn-primary" href="site.html#start">Send us your cells &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- DEFERRED DETAIL (Basic: the explanation lives here, not in the scroll) -->
+
+
+<section class="more-band" id="detail">
+  <div class="more-inner">
+    <h2>The short version, for people who need the long version.</h2>
+    <p class="more-lead">EMIS &mdash; Electrochemical Magnetic Induction Spectroscopy &mdash; drives a small AC current through a cell and reads the magnetic field just above its surface. From that field it reconstructs the current density <em>inside</em>, where latent defects live. Everything below is here when you want it; nothing above needed it.</p>
+
+    <div class="deck">
+      <div class="card">
+        <div class="ck">What it is</div>
+        <h3>EMIS08S01</h3>
+        <p>An 8-channel current-density mapper plus EIS. Non-contact, chemistry- and format-agnostic, 200&nbsp;mAh to 100&nbsp;Ah. Output: a 2D field map resolving to a machine-readable defect read.</p>
+        <p class="mono" style="color:var(--ink-3);font-size:12px;margin-top:12px">From US$&nbsp;9,975 / 6-mo rental</p>
+      </div>
+      <div class="card">
+        <div class="ck">Why it's different</div>
+        <h3>A third signal</h3>
+        <p>Self-discharge, ultrasound, and X-ray each wait for damage to become voltage, gas, or geometry. EMIS images the current density directly &mdash; earlier, and including the recall-class faults the others miss.</p>
+        <button class="link" data-open-table>Compare the methods &rarr;</button>
+      </div>
+      <div class="card">
+        <div class="ck">Why it holds</div>
+        <h3>The record</h3>
+        <p>Invented at Caltech in 2013, exclusively licensed, issued-and-pending across US/EU/JP/KR/CN. Lithium-plating detection independently validated with Idaho National Laboratory.</p>
+        <button class="link" data-open-record>Patents &amp; references &rarr;</button>
+      </div>
+    </div>
+
+    <div class="rows" id="tableRows">
+      <details class="row">
+        <summary>How EMIS compares to every other inline method <span class="q">+</span></summary>
+        <div class="body">
+          <table class="ctable">
+            <thead><tr><th></th><th>Self-discharge</th><th>Ultrasound</th><th>X-ray / CT</th><th class="us">EMIS</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Signal</th><td>Self-discharge</td><td>Acoustic</td><td>Geometry</td><td class="us">Current density</td></tr>
+              <tr><th scope="row">Images function</th><td class="no">Bulk only</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td></tr>
+              <tr><th scope="row">Catches plating</th><td class="no">No</td><td class="no">Late</td><td class="no">No</td><td class="yes">Yes &mdash; validated</td></tr>
+              <tr><th scope="row">Before electrolyte</th><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+              <tr><th scope="row">No relaxation</th><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+      <details class="row">
+        <summary>What it costs to scrap good cells &mdash; and what EMIS recovers <span class="q">+</span></summary>
+        <div class="body">
+          <p>Large-cell scrap runs about <b>$10/kWh</b> &mdash; double small-cell cost, because manufacturers raise thresholds to cover what they can't measure. EMIS targets <b>$5/kWh</b> by resolving the uncertainty, restoring small-cell economics. On a 5&nbsp;GWh line that's roughly <b>$25M/year</b> in recoverable scrap value, against a software fee comparable to existing QC.</p>
+        </div>
+      </details>
+      <details class="row">
+        <summary>From lab to line &mdash; where you start <span class="q">+</span></summary>
+        <div class="body">
+          <p><b>Research &amp; national labs (today).</b> The EMIS08S01 delivers 2D current-density maps to trained scientists; paid joint-validation builds the dataset.</p>
+          <p><b>Pilot QC (next).</b> An auxiliary screening station beside ACIR, proving scrap reduction on a real line.</p>
+          <p><b>Inline at scale (the prize).</b> EMIS riding the existing ACIR station &mdash; same electronics, ~10s, no added line time &mdash; as cell capacity grows toward ~4,700&nbsp;GWh by 2030.</p>
+        </div>
+      </details>
+      <details class="row">
+        <summary>Who's behind it <span class="q">+</span></summary>
+        <div class="body">
+          <p><b>Farshid Roumi, PhD</b> &mdash; Founder/CEO. Caltech PhD, inventor on 23+ patents, recognized by the U.S. government for Extraordinary Ability in Science.</p>
+          <p><b>Michelle Mahshid Roumi, PhD</b> &mdash; Co-founder/VP/PI. ML and signal processing; her neutrino-detector hardware has run autonomously in Antarctica since 2013.</p>
+          <p><b>Advisors</b> include Rachid Yazami (co-inventor of the graphite anode; Draper Prize laureate) and Mehdi Hatamian (NAE member; former Broadcom SVP).</p>
+        </div>
+      </details>
+    </div>
+    <div class="home-fork">
+      <div class="hf-q">Going deeper? Tell us where you sit — we'll take you to what matters.</div>
+      <div class="hf-row">
+        <a class="hf-btn" href="site.html#labs">
+          <span class="hf-k">Research &amp; development</span>
+          <span class="hf-t">I run a battery lab</span>
+          <span class="hf-d">Plating, fast-charge design, failure mechanisms &rarr; the instrument</span>
+        </a>
+        <a class="hf-btn" href="site.html#start">
+          <span class="hf-k">Manufacturing</span>
+          <span class="hf-t">I own cell quality control</span>
+          <span class="hf-d">Scrap, latent defects, recall exposure &rarr; run a validation</span>
+        </a>
+        <a class="hf-btn" href="site.html#proof">
+          <span class="hf-k">Capital</span>
+          <span class="hf-t">I'm evaluating the company</span>
+          <span class="hf-d">Proof, the moat, the patent record &rarr; due diligence</span>
+        </a>
+      </div>
+    </div>
+    <div style="margin-top:36px;padding-top:34px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px">
+      <p style="color:var(--ink-2);font-size:16px;max-width:48ch;margin:0">Or see the full technical case &mdash; measured INL data, the method, specifications, and the patent record.</p>
+      <a class="btn btn-primary" href="site.html#proof" style="flex:none">Full due-diligence site &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>Parthian Energy &middot; Pasadena, California<br>froumi@parthiannrg.com</div>
+  <div>US 9,658,292 &middot; 10,903,668 &middot; 10,955,483 &middot; 11,073,564<br><a href="site.html#refs">The record &mdash; priority &amp; references &rarr;</a></div>
+  <div>&copy; 2026 Parthian Energy, Inc.<br>Invented at Caltech, 2013</div>
+</footer>
+
+<!-- record modal -->
+<div class="ov" id="recOv" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="recT" tabindex="-1">
+    <button class="x" id="recX" aria-label="Close">&times;</button>
+    <span class="kicker" style="opacity:1;transform:none" id="recT">The record</span>
+    <h2 style="margin-top:10px">Current-density imaging is a contested field. Our claim is a dated record.</h2>
+    <p class="more-lead" style="margin:14px 0 24px">Invented at Caltech in 2013, exclusively licensed to Parthian worldwide.</p>
+    <div class="tl"><div class="yr">2013</div><p><b>EMIS invented at Caltech</b> &mdash; imaging a cell's interior through the magnetic field of its own current.</p></div>
+    <div class="tl"><div class="yr">2014</div><p><b>Foundational patent filed.</b> <span class="pat">US 9,658,292 family</span></p></div>
+    <div class="tl"><div class="yr">2017</div><p><b>First patent granted.</b> <span class="pat">US 9,658,292</span></p></div>
+    <div class="tl"><div class="yr">2021</div><p><b>Core family issues.</b> <span class="pat">US 10,903,668 &middot; 10,955,483 &middot; 11,073,564 &middot; intl. pending EU/JP/KR/CN</span></p></div>
+    <div class="tl"><div class="yr">2024</div><p><b>Lithium-plating detection validated with Idaho National Laboratory</b> on 11&nbsp;Ah commercial cells.</p></div>
+    <div class="tl"><div class="yr">2025</div><p><b>Four defect classes demonstrated; DOE Phase IIB Go/No-Go passed</b> (9 of 10 cells correctly resolved).</p></div>
+    <p class="pat" style="margin-top:24px">Supported by U.S. DOE SBIR (I&middot;II&middot;IIB) and the State of California (CalSEED). Partners: LG Energy Solution, NREL, LBNL. Full validation data available to qualified partners under NDA.</p>
+  </div>
+</div>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cv=document.getElementById('field');
+const gl=cv.getContext('webgl2',{antialias:false,premultipliedAlpha:false});
+if(!gl){ document.getElementById('fieldFallback').style.display='block'; cv.style.display='none'; }
+else { initField(); }
+
+function initField(){
+const VS=`#version 300 es
+in vec2 p;out vec2 uv;void main(){uv=p*0.5+0.5;gl_Position=vec4(p,0.,1.);}`;
+const FS=`#version 300 es
+precision highp float;in vec2 uv;out vec4 o;
+uniform float uDepth,uTime,uAspect,uHasPtr,uReveal,uSuppress;uniform vec2 uPtr;
+float lobe(vec2 q,vec2 c,vec2 s,float a){vec2 d=q-c;return a*exp(-(d.x*d.x/s.x+d.y*d.y/s.y));}
+vec3 ramp(float t){t=clamp(t,0.,1.);
+ vec3 c0=vec3(0.04,0.07,0.13),c1=vec3(0.106,0.227,0.420),c2=vec3(0.169,0.435,0.608),
+ c3=vec3(0.247,0.682,0.557),c4=vec3(0.804,0.823,0.306),c5=vec3(0.878,0.639,0.184),c6=vec3(0.753,0.271,0.106);
+ if(t<0.15)return mix(c0,c1,t/0.15); if(t<0.35)return mix(c1,c2,(t-0.15)/0.20);
+ if(t<0.55)return mix(c2,c3,(t-0.35)/0.20); if(t<0.72)return mix(c3,c4,(t-0.55)/0.17);
+ if(t<0.87)return mix(c4,c5,(t-0.72)/0.15); return mix(c5,c6,(t-0.87)/0.13);}
+float baseField(vec2 q){float v=0.0;
+ v+=lobe(q,vec2(0.16,0.5),vec2(0.018,0.075),0.62);
+ v+=lobe(q,vec2(0.84,0.5),vec2(0.018,0.075),0.62);
+ v+=lobe(q,vec2(0.5,0.5),vec2(0.11,0.05),0.22); return v;}
+float defectField(vec2 q,float depth,float time){
+ // FIXED advanced plating signature, lower-right — what the lens reveals
+ float v=0.0;
+ v+=lobe(q,vec2(0.72,0.30),vec2(0.012,0.012),0.95);
+ v+=lobe(q,vec2(0.72,0.30),vec2(0.035,0.035),0.34);
+ return v;}
+float full(vec2 q,float depth,float time){
+ float br=1.0+0.02*sin(time*0.7);
+ return baseField(q)*br + defectField(q,depth,time);}
+vec3 shade(float v){float c=smoothstep(0.0,0.05,abs(fract(v*14.0)-0.5));return ramp(v)*mix(0.8,1.0,c);}
+void main(){vec2 q=uv;
+ float br=1.0+0.02*sin(uTime*0.7);
+ float base=baseField(q)*br;
+ float defect=defectField(q,uDepth,uTime);
+ // uSuppress=1 (signature station): defect hidden by default, only shown inside the lens.
+ // uSuppress=0 (narrative stations): defect baked into the field as the story.
+ // descent stays healthy everywhere; defect is revealed ONLY by the lens (handled below)
+ float v = base;
+ vec3 col=shade(v);
+ if(uHasPtr>0.5){vec2 d=uv-uPtr; d.y/=uAspect; float dist=length(d);
+   float lens=smoothstep(uReveal,uReveal*0.6,dist);
+   vec3 lensCol = shade(base + defect);   // full defect, only inside the lens
+   col = mix(col, lensCol, lens);         // outside stays healthy everywhere
+   float ring=smoothstep(0.005,0.0,abs(dist-uReveal)); col=mix(col,vec3(1.0,0.85,0.4),ring*0.5);}
+ float vig=1.0-0.5*pow(distance(uv,vec2(0.5))*1.3,2.2); col*=clamp(vig,0.32,1.0);
+ o=vec4(col,1.0);}`;
+function sh(t,s){const x=gl.createShader(t);gl.shaderSource(x,s);gl.compileShader(x);return x;}
+const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));
+gl.linkProgram(pr);gl.useProgram(pr);
+const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+const lp=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(lp);gl.vertexAttribPointer(lp,2,gl.FLOAT,false,0,0);
+const U={};['uDepth','uTime','uAspect','uHasPtr','uReveal','uPtr','uSuppress'].forEach(n=>U[n]=gl.getUniformLocation(pr,n));
+let asp=1,depthTarget=0,depth=0,hasPtr=0,ptr=[0.5,0.5];
+function resize(){const dpr=Math.min(devicePixelRatio||1,2);cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;
+ asp=cv.width/cv.height;gl.viewport(0,0,cv.width,cv.height);}
+resize();addEventListener('resize',resize,{passive:true});
+const fillEl=document.getElementById('depthFill');
+const verdict=document.getElementById('verdict');
+function onScroll(){const max=document.documentElement.scrollHeight-innerHeight;
+ const p=Math.min(1,Math.max(0,scrollY/max));
+ // depth now only drives a subtle living motion + the progress meter — NOT the defect
+ depthTarget=p;
+ if(fillEl)fillEl.style.width=(p*100)+'%';
+}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+// pointer reveal active only on the signature station
+const sig=document.getElementById('signature'),hint=document.getElementById('hint');
+let sigVisible=false, userEngaged=false, lastMove=0, found=false;
+new IntersectionObserver(es=>{sigVisible=es[0].isIntersecting;
+  verdict.classList.toggle('show',sigVisible);
+  if(!sigVisible){userEngaged=false;}
+},{threshold:0.4}).observe(sig);
+const DEFECT=[0.72,0.30]; // matches the shader defect center (uv space, y-up)
+function checkFound(){
+  // distance from lens center to the defect, in aspect-corrected uv
+  const dx=ptr[0]-DEFECT[0], dy=(ptr[1]-DEFECT[1])/asp;
+  const dist=Math.hypot(dx,dy);
+  const findR = matchMedia("(pointer:coarse)").matches ? 0.30 : 0.20;
+  if(dist < findR && sigVisible){            // lens overlaps the defect
+    if(!found){found=true; verdict.classList.add('revealed');}
+  }
+}
+function setPtr(cx,cy){if(!sigVisible)return; hasPtr=1; userEngaged=true; lastMove=performance.now();
+ ptr=[cx/innerWidth, 1-cy/innerHeight]; if(hint)hint.classList.add('gone'); checkFound();}
+addEventListener('pointermove',e=>{ if(e.pointerType==='touch')return; setPtr(e.clientX,e.clientY); },{passive:true});
+// touch: dragging a finger moves the lens
+sig.addEventListener('touchmove',e=>{const t=e.touches[0]; if(t)setPtr(t.clientX,t.clientY);},{passive:true});
+sig.addEventListener('touchstart',e=>{const t=e.touches[0]; if(t)setPtr(t.clientX,t.clientY);},{passive:true});
+let t0=performance.now();
+function frame(t){depth+=(depthTarget-depth)*0.08;
+ const time=reduce?0:(t-t0)/1000;
+ // lens reveal is active ONLY on the signature station
+ const suppress = sigVisible?1.0:0.0;
+ // auto-sweep: on signature, if user hasn't engaged, drift the lens over a HEALTHY area
+ // (left side) to show the lens exists — without ever spoiling the defect on the right.
+ let aHasPtr = sigVisible?hasPtr:0, ap=ptr;
+ if(sigVisible && !reduce && !userEngaged){
+   const cx=0.26+0.10*Math.sin(time*0.5), cy=0.52+0.10*Math.cos(time*0.4);
+   ap=[cx,cy]; aHasPtr=1;
+ }
+ gl.uniform1f(U.uDepth,depth);gl.uniform1f(U.uTime,time);
+ gl.uniform1f(U.uAspect,asp);gl.uniform1f(U.uHasPtr,aHasPtr);gl.uniform1f(U.uReveal,0.2);
+ gl.uniform1f(U.uSuppress,suppress);
+ gl.uniform2f(U.uPtr,ap[0],ap[1]);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+}
+
+// station reveal-in
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');}),{threshold:0.35});
+document.querySelectorAll('.station').forEach(s=>io.observe(s));
+// hide scroll cue after first scroll
+addEventListener('scroll',()=>{const c=document.querySelector('.scrollcue');if(c&&scrollY>200)c.style.opacity='0';},{passive:true,once:false});
+
+// record modal + table open
+
+// record modal + table open
+const ov=document.getElementById('recOv'),modal=ov.querySelector('.modal');let lastF=null;
+function openRec(){lastF=document.activeElement;ov.hidden=false;document.body.style.overflow='hidden';modal.focus();document.addEventListener('keydown',recKey);}
+function closeRec(){ov.hidden=true;document.body.style.overflow='';document.removeEventListener('keydown',recKey);if(lastF)lastF.focus();}
+function recKey(e){if(e.key==='Escape')closeRec();
+ if(e.key==='Tab'){const f=modal.querySelectorAll('button,a[href],[tabindex]:not([tabindex="-1"])');if(!f.length)return;
+ const a=f[0],b=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();b.focus();}else if(!e.shiftKey&&document.activeElement===b){e.preventDefault();a.focus();}}}
+document.querySelectorAll('[data-open-record]').forEach(b=>b.addEventListener('click',openRec));
+document.getElementById('recX').addEventListener('click',closeRec);
+ov.addEventListener('click',e=>{if(e.target===ov)closeRec();});
+document.querySelectorAll('[data-open-table]').forEach(b=>b.addEventListener('click',()=>{
+ const d=document.querySelector('#tableRows details');if(!d)return;d.open=true;
+ d.scrollIntoView({behavior:'smooth',block:'center'});d.querySelector('summary').focus();}));
+
+</script>
+
+
+
+
+
+<div class="depth" aria-hidden="true"><span>DEPTH</span><span class="track"><span class="fill" id="depthFill"></span></span></div>
+<div class="scrollcue" aria-hidden="true">scroll to descend &darr;</div>
+
+</body>
+</html>

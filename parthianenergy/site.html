@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F4F2EC">
+<link rel="canonical" href="https://parthianenergy.com/">
+<meta property="og:url" content="https://parthianenergy.com/">
+<meta property="og:image" content="https://parthianenergy.com/assets/og-parthian-inl-maps.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:title" content="Parthian Energy — Current-Density Imaging for Battery Quality Control">
+<meta property="og:description" content="EMIS images a cell's internal current density — finding the latent defects that cause recalls, validated with Idaho National Laboratory.">
+<meta property="og:type" content="website">
+<title>Parthian Energy — Current-Density Imaging for Battery Quality Control</title>
+<meta name="description" content="Parthian's EMIS images the internal current-density of a battery cell, catching the latent defects that cause recalls earlier than self-discharge or ultrasound physically can.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Product","name":"EMIS08S01 Inhomogeneity Mapper","brand":{"@type":"Organization","name":"Parthian Energy"},"description":"Non-contact current-density imaging instrument for battery cells. Maps spatial inhomogeneity of internal resistance to detect torn tabs, weld defects, internal short circuits, and lithium plating.","category":"Battery test equipment","offers":{"@type":"Offer","priceCurrency":"USD","price":"9975","description":"6-month rental"}}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4F2EC;        /* warm off-white, never pure white */
+    --paper-2:#ECE9E0;      /* slightly deeper panel */
+    --ink:#16202E;          /* near-black slate ink */
+    --ink-2:#3C4A5A;        /* secondary text */
+    --ink-3:#5A6678;        /* tertiary / captions — AA on paper */
+    --rule:#D4CFC2;         /* hairline rules on paper */
+    --blue:#173A6B;         /* clinical instrument blue (deep, cool) */
+    --blue-2:#2C5D9B;       /* brighter blue for links/hovers */
+    --amber:#C0721B;         /* warm signal accent (graphics, dark bg) */
+    --amber-ink:#9D5A0E;     /* amber for small text on paper — AA */
+    --cm0:#1b3a6b;--cm1:#2b6f9b;--cm2:#3fae8e;--cm3:#cdd24e;--cm4:#e0a32f;--cm5:#c0451b; /* single-source colormap */
+    --slate:#10171F;        /* dark sections */
+    --slate-2:#1B2530;
+    --slate-line:#2C3A48;
+    --paper-on-dark:#E7E3D8;
+    --maxw:1180px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Archivo',sans-serif;
+    font-size:18px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+  /* subtle paper grain */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.025;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+  @media(max-width:640px){.wrap{padding:0 20px}}
+
+  /* ---------- TYPE ---------- */
+  h1,h2,h3{font-family:'Newsreader',serif;font-weight:400;letter-spacing:-.01em;line-height:1.08;text-wrap:balance}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;
+    letter-spacing:.22em;text-transform:uppercase;color:var(--amber-ink);
+    display:inline-block;margin-bottom:22px;
+  }
+  .eyebrow.on-dark{color:var(--amber)}
+  .mono{font-family:'IBM Plex Mono',monospace}
+  .serif-em{font-style:italic;color:var(--blue)}
+
+  /* ---------- NAV ---------- */
+  .arrival{position:fixed;top:84px;left:50%;transform:translateX(-50%) translateY(-12px);z-index:120;
+    display:flex;align-items:center;gap:11px;background:#101820;color:#eef0e9;
+    border:1px solid rgba(174,184,196,.22);border-radius:40px;padding:11px 22px;
+    font-family:'IBM Plex Mono';font-size:12.5px;letter-spacing:.02em;
+    box-shadow:0 18px 44px -20px rgba(0,0,0,.55);opacity:0;
+    transition:opacity .7s ease,transform .7s ease;pointer-events:none}
+  .arrival.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .arrival .arr-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);flex:none;
+    box-shadow:0 0 0 0 rgba(224,163,47,.5);animation:arrPulse 2s ease-out infinite}
+  @keyframes arrPulse{0%{box-shadow:0 0 0 0 rgba(224,163,47,.45)}100%{box-shadow:0 0 0 12px rgba(224,163,47,0)}}
+  @media(max-width:600px){.arrival{font-size:11px;padding:9px 16px;top:74px;max-width:90vw}}
+  @media (prefers-reduced-motion: reduce){.arrival{transition:opacity .3s}.arrival .arr-dot{animation:none}}
+  nav[aria-label="Primary"]{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    background:rgba(244,242,236,.82);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--rule);
+  }
+  nav[aria-label="Primary"] .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+  .brand{display:flex;align-items:center;gap:11px;font-family:'Newsreader',serif;font-size:21px;letter-spacing:-.01em;color:var(--ink);text-decoration:none}
+  .brand .mark{width:26px;height:26px;flex:none}
+  .nav-links{display:flex;align-items:center;gap:34px}
+  .nav-links a{font-size:14px;color:var(--ink-2);text-decoration:none;transition:color .2s}
+  .nav-links a:hover{color:var(--blue)}
+  .nav-cta{
+    font-family:'Archivo';font-size:14px;font-weight:500;
+    border:1px solid var(--ink);color:var(--ink);
+    padding:9px 18px;border-radius:2px;background:transparent;cursor:pointer;
+    transition:all .2s;text-decoration:none;
+  }
+  .nav-cta:hover{background:var(--ink);color:var(--paper)}
+  .menu-btn{display:none;background:transparent;border:1px solid var(--rule);border-radius:2px;padding:9px 11px;cursor:pointer;color:var(--ink)}
+  .menu-btn svg{display:block}
+  @media(max-width:760px){
+    .menu-btn{display:block}
+    .nav-links{position:absolute;top:68px;left:0;right:0;background:var(--paper);border-bottom:1px solid var(--rule);
+      flex-direction:column;align-items:stretch;gap:0;padding:6px 20px 18px;display:none;box-shadow:0 18px 30px -18px rgba(16,23,31,.25)}
+    .nav-links.open{display:flex}
+    .nav-links a{padding:12px 0;font-size:16px;border-bottom:1px solid var(--rule)}
+    .nav-links a.nav-cta{border:1px solid var(--ink);margin-top:14px;text-align:center;padding:12px}
+  }
+
+  /* ---------- BUTTONS ---------- */
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;cursor:pointer;
+    font-family:'Archivo';font-size:16px;font-weight:500;
+    padding:15px 26px;border-radius:2px;border:1px solid transparent;
+    text-decoration:none;transition:all .22s;
+  }
+  .btn-primary{background:var(--blue);color:#fff}
+  .btn-primary:hover{background:var(--blue-2)}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+  .btn-ghost:hover{border-color:var(--ink)}
+  .btn .arr{transition:transform .22s}
+  .btn:hover .arr{transform:translateX(4px)}
+
+  /* ---------- SECTIONS ---------- */
+  section{position:relative;z-index:2}
+  .sec{padding:120px 0}
+  .sec-tight{padding:92px 0}
+  @media(max-width:760px){.sec{padding:78px 0}.sec-tight{padding:60px 0}}
+  .sec.dark{background:var(--slate);color:var(--paper-on-dark)}
+  .sec.panel{background:var(--paper-2)}
+  .sec.dark h2,.sec.dark h3{color:#fff}
+  .lead{font-size:21px;line-height:1.6;color:var(--ink-2);max-width:62ch}
+  .sec.dark .lead{color:#AEB8C4}
+  .rule-top{border-top:1px solid var(--rule)}
+
+  /* thin heatmap strip used as a section divider motif */
+  .heat-strip{height:6px;width:100%;border:none;display:block;
+    background:linear-gradient(90deg,var(--cm0) 0%,var(--cm1) 22%,var(--cm2) 44%,var(--cm3) 64%,var(--cm4) 80%,var(--cm5) 100%);
+    opacity:.9}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:148px 0 96px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+  @media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:44px}.hero{padding:120px 0 64px}}
+  h1.hero-h{font-size:clamp(40px,5.4vw,68px);letter-spacing:-.02em}
+  .hero-sub{margin:28px 0 36px;font-size:20px;line-height:1.55;color:var(--ink-2);max-width:54ch}
+  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
+  .hero-meta{margin-top:40px;display:flex;gap:30px;flex-wrap:wrap;border-top:1px solid var(--rule);padding-top:24px}
+  .hero-meta div{font-size:13px;color:var(--ink-3);line-height:1.4}
+  .hero-meta b{display:block;font-family:'IBM Plex Mono';font-size:15px;color:var(--ink);font-weight:500;margin-bottom:2px}
+
+  /* heatmap figure card */
+  .fig{background:var(--slate);border-radius:4px;padding:22px;box-shadow:0 28px 60px -28px rgba(16,23,31,.5)}
+  .fig-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .fig-title{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8d99a6}
+  .fig-status{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.1em;display:flex;align-items:center;gap:7px}
+  .dot{width:7px;height:7px;border-radius:50%}
+  .twin{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .cellbox{background:#0a0f15;border-radius:3px;padding:12px 12px 10px}
+  .cellbox canvas{width:100%;height:auto;display:block;border-radius:2px}
+  .cellbox .cap{margin-top:9px;display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.04em;color:#9aa6b2}
+  .verdict-ok{color:#5fd0a0}
+  .verdict-bad{color:#e0863f}
+  .scalebar{height:7px;border-radius:2px;margin-top:14px;
+    background:linear-gradient(90deg,var(--cm0),var(--cm1),var(--cm2),var(--cm3),var(--cm4),var(--cm5))}
+  .scalelabels{display:flex;justify-content:space-between;font-family:'IBM Plex Mono';font-size:11px;color:#8d99a6;margin-top:5px;letter-spacing:.05em}
+
+  /* ---------- STATS ---------- */
+  .prob-evidence{margin-top:8px}
+  .prob-opportunity{margin-top:36px}
+  .pe-label{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .pe-label::before{content:"";width:22px;height:1px;background:var(--ink-3)}
+  .pe-label.good{color:var(--blue)}
+  .pe-label.good::before{background:var(--blue)}
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--rule)}
+  @media(max-width:760px){.stat-row{grid-template-columns:1fr}}
+  .stat{padding:38px 34px 34px;border-right:1px solid var(--rule)}
+  .stat:last-child{border-right:none}
+  @media(max-width:760px){.stat{border-right:none;border-bottom:1px solid var(--rule)}}
+  .stat .num{font-family:'Newsreader',serif;font-size:54px;line-height:1;color:var(--blue);letter-spacing:-.02em}
+  .stat .lbl{margin:14px 0 8px;font-weight:600;font-size:16px;color:var(--ink)}
+  .stat .src{font-size:13.5px;color:var(--ink-3);line-height:1.5}
+
+  /* ---------- BLIND SPOT rows ---------- */
+  .modal-rows{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+  .mrow{display:grid;grid-template-columns:230px 1fr;gap:40px;padding:30px 0;border-bottom:1px solid var(--rule);align-items:start}
+  @media(max-width:760px){.mrow{grid-template-columns:1fr;gap:8px;padding:24px 0}}
+  .mrow .tag{font-family:'Archivo';font-weight:600;font-size:19px}
+  .mrow .tag .sub{display:block;font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-top:6px;font-weight:400}
+  .mrow p{color:var(--ink-2);font-size:17px;line-height:1.6}
+  .mrow.win .tag{color:var(--blue)}
+  .mrow.win p strong{color:var(--ink);background:linear-gradient(transparent 62%, rgba(192,114,27,.22) 62%)}
+  .mrow .blind{font-family:'IBM Plex Mono';font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#b04b22}
+  .mrow .seen{font-family:'IBM Plex Mono';font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#2F6B4A}
+
+  /* ---------- TABLE ---------- */
+  .ctable{width:100%;border-collapse:collapse;font-size:15.5px;background:var(--paper)}
+  .ctable th,.ctable td{text-align:left;padding:17px 18px;border-bottom:1px solid var(--rule);vertical-align:middle}
+  .ctable thead th{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+  .ctable thead th.us{color:var(--blue)}
+  .ctable tbody th{font-weight:500;color:var(--ink);font-family:'Archivo'}
+  .ctable .col-us{background:rgba(23,58,107,.05);border-left:1px solid rgba(23,58,107,.18);border-right:1px solid rgba(23,58,107,.18)}
+  .ctable tbody tr:last-child td,.ctable tbody tr:last-child th{border-bottom:none}
+  .yes{color:#2e7d52;font-weight:600}
+  .no{color:#a23a2a}
+  .partial{color:var(--ink-3)}
+  .tbl-scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+  .col-us-head{background:rgba(23,58,107,.07)}
+
+  /* ---------- HOW IT WORKS ---------- */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;counter-reset:s;border-top:1px solid var(--rule)}
+  @media(max-width:760px){.steps{grid-template-columns:1fr}}
+  .step{padding:36px 30px 34px;border-right:1px solid var(--rule)}
+  .step:last-child{border-right:none}
+  @media(max-width:760px){.step{border-right:none;border-bottom:1px solid var(--rule)}}
+  .step .ix{font-family:'IBM Plex Mono';font-size:13px;color:var(--amber-ink);letter-spacing:.1em}
+  .step h3{font-size:23px;margin:16px 0 12px}
+  .step p{font-size:16px;color:var(--ink-2);line-height:1.55}
+  .step svg{margin-top:20px;width:100%;height:88px}
+
+  /* ---------- CLAIMS ---------- */
+  .claims{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  @media(max-width:860px){.claims{grid-template-columns:1fr}}
+  .claim{background:var(--paper);border:1px solid var(--rule);border-top:3px solid var(--blue);border-radius:3px;padding:32px 28px;display:flex;flex-direction:column}
+  .claim h3{font-size:27px;margin-bottom:4px}
+  .claim .ck{font-family:'IBM Plex Mono';font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-ink);margin-bottom:14px}
+  .claim>p{color:var(--ink-2);font-size:16px;margin-bottom:20px}
+  .claim ul{list-style:none;margin-top:auto;display:flex;flex-direction:column;gap:11px}
+  .claim li{position:relative;padding-left:22px;font-size:14.5px;color:var(--ink-2);line-height:1.45}
+  .claim li::before{content:"";position:absolute;left:0;top:9px;width:9px;height:9px;border:1.5px solid var(--blue);border-radius:50%}
+  .claim li.key::before{background:var(--amber);border-color:var(--amber)}
+  .claim li.key{color:var(--ink)}
+
+  /* ---------- PROOF ---------- */
+  .proof-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:60px;align-items:start}
+  @media(max-width:860px){.proof-grid{grid-template-columns:1fr;gap:40px}}
+  .pf{padding:22px 0;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:46px 1fr;gap:18px}
+  .pf:first-child{border-top:1px solid var(--rule)}
+  .pf .n{font-family:'IBM Plex Mono';font-size:13px;color:var(--amber-ink);padding-top:4px}
+  .pf h3{font-size:19px;font-family:'Archivo';font-weight:600;margin-bottom:5px}
+  .pf p{font-size:15.5px;color:var(--ink-2);line-height:1.55}
+  .logos{display:flex;flex-direction:column;gap:0;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+  .logos .lh{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);padding:16px 22px;border-bottom:1px solid var(--rule);background:var(--paper-2)}
+  .logos .lg{padding:18px 22px;border-bottom:1px solid var(--rule);font-size:16px;color:var(--ink)}
+  .logos .lg:last-child{border-bottom:none}
+  .logos .lg span{display:block;font-size:12.5px;color:var(--ink-3);margin-top:2px}
+
+  /* ---------- ROADMAP ---------- */
+  .road{display:flex;flex-direction:column;gap:0;position:relative;margin-top:8px}
+  .rstep{display:grid;grid-template-columns:120px 1fr;gap:34px;padding:30px 0;border-top:1px solid var(--slate-line)}
+  .rstep:last-child{border-bottom:1px solid var(--slate-line)}
+  @media(max-width:760px){.rstep{grid-template-columns:1fr;gap:10px}}
+  .rstep .when{font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+  .rstep.now .when{color:var(--amber)}
+  .rstep .when .pin{display:block;font-family:'Newsreader',serif;font-size:40px;color:#3a4a5a;margin-bottom:6px;line-height:1}
+  .rstep.now .when .pin{color:#fff}
+  .rstep h3{font-size:25px;margin-bottom:10px}
+  .rstep p{color:#AEB8C4;font-size:16.5px;line-height:1.6;max-width:64ch}
+  .rstep .note{color:#7f8b97;font-size:14px;margin-top:10px}
+  .rstep.now{background:linear-gradient(90deg,rgba(192,114,27,.06),transparent 60%)}
+
+  /* ---------- OFFER ---------- */
+  .offer-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:40px 0 44px}
+  @media(max-width:760px){.offer-grid{grid-template-columns:1fr}}
+  .offer{background:var(--paper);border:1px solid var(--rule);border-radius:3px;padding:30px;text-align:left}
+  .offer .ot{font-family:'IBM Plex Mono';font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-ink);margin-bottom:12px}
+  .offer h3{font-size:22px;margin-bottom:12px}
+  .offer p{font-size:15.5px;color:var(--ink-2);line-height:1.55}
+  .offer .price{margin-top:16px;font-family:'IBM Plex Mono';font-size:14px;color:var(--ink);border-top:1px solid var(--rule);padding-top:14px}
+
+  /* ---------- CONTACT ---------- */
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+  @media(max-width:760px){.contact-grid{grid-template-columns:1fr;gap:40px}}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:520px){.form-row{grid-template-columns:1fr}}
+  label{display:block;font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:0 0 7px}
+  input,textarea,select{width:100%;font-family:'Archivo';font-size:16px;color:var(--ink);background:var(--paper);
+    border:1px solid var(--rule);border-radius:2px;padding:12px 14px;margin-bottom:18px;transition:border-color .2s}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue)}
+  textarea{resize:vertical;min-height:110px}
+  .who li{font-size:16px;color:var(--ink-2);padding:13px 0;border-bottom:1px solid var(--rule);display:flex;gap:12px;align-items:baseline;list-style:none}
+  .who li:first-child{border-top:1px solid var(--rule)}
+  .who li b{font-family:'IBM Plex Mono';font-size:12px;color:var(--amber-ink)}
+
+  /* ---------- FOOTER ---------- */
+  footer{background:var(--slate);color:#8d99a6;padding:52px 0 40px;position:relative;z-index:2}
+  .foot-grid{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:24px}
+  footer .brand{color:#fff}
+  footer .tag{font-size:14px;max-width:40ch;line-height:1.5;margin-top:10px}
+  footer .fmeta{font-family:'IBM Plex Mono';font-size:12px;color:#5f6b77;text-align:right}
+
+  /* reveal on scroll */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  .section-head{max-width:74ch;margin-bottom:48px}
+  .section-head h2{font-size:clamp(30px,3.6vw,44px)}
+  .section-head p{margin-top:18px}
+
+
+  /* horizontal spec strip (compact, replaces big spec table) */
+  .spec-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin-top:44px}
+  @media(max-width:760px){.spec-strip{grid-template-columns:1fr 1fr}}
+  .spec-strip div{padding:18px 20px;border-right:1px solid var(--rule)}
+  .spec-strip div:last-child{border-right:none}
+  @media(max-width:760px){.spec-strip div{border-bottom:1px solid var(--rule)}}
+  .spec-strip span{display:block;font-size:12px;color:var(--ink-3);margin-bottom:5px}
+  .spec-strip b{font-family:'IBM Plex Mono';font-weight:500;font-size:16px;color:var(--ink)}
+
+  /* ---------- IMAGE FIGURES ---------- */
+  figure{margin:0}
+  .figcap{font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.04em;color:var(--ink-3);margin-top:12px;line-height:1.5}
+  .figcap b{color:var(--ink-2);font-weight:500}
+  .photo{border-radius:4px;overflow:hidden;background:var(--slate);box-shadow:0 24px 50px -28px rgba(16,23,31,.45)}
+  .photo img{width:100%;height:auto;display:block}
+  .photo.on-paper{background:var(--paper-2);border:1px solid var(--rule);box-shadow:none}
+
+  /* instrument showcase (two-up: real photo + spec list) */
+  .showcase{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+  @media(max-width:880px){.showcase{grid-template-columns:1fr;gap:36px}}
+  .spec-list{list-style:none;border-top:1px solid var(--rule);margin-top:20px}
+  .spec-list li{display:flex;justify-content:space-between;gap:20px;padding:13px 0;border-bottom:1px solid var(--rule);font-size:15px}
+  .spec-list li span:first-child{color:var(--ink-2)}
+  .spec-list li span:last-child{font-family:'IBM Plex Mono';font-size:13.5px;color:var(--ink);text-align:right}
+
+  /* real-data heatmap pair on the how/proof side */
+  .realmaps{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .realmaps figure .photo{background:#1a1f26}
+  .realmaps .tagline{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-top:10px;display:flex;align-items:center;gap:7px}
+  .realmaps .ok{color:#2e7d52}.realmaps .bad{color:#b04b22}
+
+  /* ---------- TIMELINE (priority) ---------- */
+  .timeline{border-top:1px solid var(--rule);margin-top:8px}
+  .tl{display:grid;grid-template-columns:120px 1fr;gap:34px;padding:22px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+  @media(max-width:640px){.tl{grid-template-columns:72px 1fr;gap:18px}}
+  .tl .yr{font-family:'Newsreader',serif;font-size:30px;color:var(--blue);letter-spacing:-.02em}
+  .tl p{font-size:16.5px;color:var(--ink-2);line-height:1.55;max-width:70ch}
+  .tl p b{color:var(--ink);font-weight:600}
+  .tl .pat{font-family:'IBM Plex Mono';font-size:13px;color:var(--ink-3)}
+
+  /* ---------- TEAM ---------- */
+  .team-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+  @media(max-width:760px){.team-grid{grid-template-columns:1fr}}
+  .person{background:var(--paper);border:1px solid var(--rule);border-radius:3px;padding:28px 26px}
+  .person .role{font-family:'IBM Plex Mono';font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-ink);margin-bottom:10px}
+  .person h3{font-size:23px;margin-bottom:10px}
+  .person p{font-size:15px;color:var(--ink-2);line-height:1.55}
+  .adv-row{margin-top:28px;border-top:1px solid var(--rule)}
+  .adv{display:grid;grid-template-columns:250px 1fr;gap:30px;padding:20px 0;border-bottom:1px solid var(--rule)}
+  @media(max-width:680px){.adv{grid-template-columns:1fr;gap:6px}}
+  .adv .nm{font-weight:600;font-size:17px}
+  .adv .nm span{display:block;font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:4px;font-weight:400}
+  .adv p{font-size:15px;color:var(--ink-2);line-height:1.5}
+
+  /* ---------- REFERENCES ---------- */
+  .refs{border-top:1px solid var(--rule);counter-reset:r}
+  .ref{display:grid;grid-template-columns:64px 1fr;gap:18px;padding:16px 0;border-bottom:1px solid var(--rule)}
+  .ref .rn{font-family:'IBM Plex Mono';font-size:13px;color:var(--amber-ink);padding-top:2px}
+  .ref p{font-size:15px;line-height:1.55;color:var(--ink-2)}
+  .ref p b{color:var(--ink);font-weight:600}
+  .ref .rmeta{font-family:'IBM Plex Mono';font-size:12.5px;color:var(--ink-3)}
+  .refs-note{font-size:14px;color:var(--ink-3);margin-top:18px;max-width:74ch;line-height:1.55}
+
+  /* product datasheet block */
+  .ds-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:44px;align-items:start}
+  @media(max-width:860px){.ds-grid{grid-template-columns:1fr}}
+  .inc-table{width:100%;border-collapse:collapse;font-size:15px;margin-top:8px}
+  .inc-table td{padding:11px 4px;border-bottom:1px solid var(--rule);color:var(--ink-2)}
+  .inc-table td:first-child{font-family:'IBM Plex Mono';font-size:13px;color:var(--ink);width:46px}
+  .modes{margin-top:8px}
+  .modes p{font-size:15px;color:var(--ink-2);line-height:1.55;padding:10px 0;border-bottom:1px solid var(--rule)}
+  .modes p b{font-family:'IBM Plex Mono';font-size:13px;color:var(--ink);font-weight:500}
+
+  /* ---------- ACCESSIBILITY / MODERN ---------- */
+  section{scroll-margin-top:84px}
+  .skip{position:absolute;left:-9999px;top:0;z-index:100;background:var(--ink);color:var(--paper);padding:11px 18px;font-family:'Archivo';font-size:14px;text-decoration:none}
+  .skip:focus{left:12px;top:12px}
+  a:focus-visible,button:focus-visible,.nav-cta:focus-visible{outline:2px solid var(--blue-2);outline-offset:3px;border-radius:2px}
+  input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--blue-2);outline-offset:0}
+
+  /* heat-strip as scroll progress */
+  .progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:60;pointer-events:none;
+    background:linear-gradient(90deg,var(--cm0),var(--cm1),var(--cm2),var(--cm3),var(--cm4),var(--cm5));
+    transform-origin:0 50%;transform:scaleX(0)}
+  @supports (animation-timeline: scroll()){
+    .progress{animation:prog linear both;animation-timeline:scroll(root)}
+  }
+  @keyframes prog{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+  /* scroll-driven reveals (progressive enhancement; IO fallback in JS) */
+  @supports (animation-timeline: view()){
+    html.sda .reveal{transition:none;animation:rv .8s ease both;animation-timeline:view();animation-range:entry 5% entry 36%}
+    html.sda .reveal.in{animation:none;opacity:1;transform:none}
+  }
+  @keyframes rv{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    .reveal{opacity:1!important;transform:none!important;transition:none!important;animation:none!important}
+    .btn .arr,.btn,.nav-links a{transition:none!important}
+    .progress{animation:none}
+  }
+
+  /* sticky first column on the modality table */
+  .ctable th:first-child{position:sticky;left:0;background:var(--paper);z-index:2}
+  .ctable thead th:first-child{z-index:3}
+
+  /* figure numbers */
+  .fign{font-family:'IBM Plex Mono';font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber-ink);margin-right:10px}
+  .on-dark-cap .fign{color:var(--amber)}
+
+  /* ---------- PROOF PLATE (the climax) ---------- */
+  .plate-band{background:var(--slate);padding:72px 0 64px;margin-top:14px}
+  .plate-kicker{font-family:'Newsreader',serif;font-size:clamp(24px,3.1vw,36px);font-style:italic;color:#fff;
+    line-height:1.25;max-width:34ch;margin-bottom:40px;letter-spacing:-.01em;text-wrap:balance}
+  .plate-kicker em{font-style:normal;color:var(--amber)}
+  .plate-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:720px){.plate-grid{grid-template-columns:1fr}}
+  .plate-cell{background:#fff;border-radius:4px;padding:10px;box-shadow:0 30px 70px -30px rgba(0,0,0,.6);position:relative}
+  .plate-defect .defect-locator{position:absolute;left:65%;top:62%;width:13%;aspect-ratio:1;border:2px solid var(--amber);border-radius:50%;
+    transform:translate(-50%,-50%);pointer-events:none;opacity:0;animation:locatorIn .8s ease 1.1s forwards}
+  .plate-defect .defect-locator::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--amber);opacity:0;animation:locatorPulse 2.4s ease-out 1.9s infinite}
+  @keyframes locatorIn{to{opacity:.95}}
+  @keyframes locatorPulse{0%{transform:scale(.7);opacity:.7}100%{transform:scale(1.8);opacity:0}}
+  @media (prefers-reduced-motion: reduce){
+    .plate-defect .defect-locator{animation:none;opacity:.95}
+    .plate-defect .defect-locator::after{animation:none;opacity:0}
+  }
+  .plate-cell img{width:100%;height:auto;display:block;border-radius:2px}
+  .plate-tag{font-family:'IBM Plex Mono';font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;margin-top:14px;display:flex;align-items:center;gap:8px}
+  .plate-tag.ok{color:#5fd0a0}.plate-tag.bad{color:#e0863f}
+  .plate-cap{color:#8d99a6;margin-top:22px;max-width:96ch}
+  .plate-cap b{color:#AEB8C4}
+
+  /* footer index */
+  .foot-nav{display:flex;flex-wrap:wrap;gap:8px 26px;padding-bottom:34px;margin-bottom:38px;border-bottom:1px solid var(--slate-line)}
+  .foot-nav a{font-family:'IBM Plex Mono';font-size:12.5px;color:#8d99a6;text-decoration:none}
+  .foot-nav a:hover{color:#fff}
+
+  /* ---------- AUDIENCE FORK (IDEO) ---------- */
+  .fork{background:var(--paper-2);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .fork-inner{padding:30px 0}
+  .fork-q{font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:18px}
+  .fork-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:760px){.fork-row{grid-template-columns:1fr}}
+  .fork-btn{display:block;text-align:left;background:var(--paper);border:1px solid var(--rule);border-radius:3px;padding:20px 22px;cursor:pointer;transition:border-color .2s,transform .2s;font:inherit;color:inherit}
+  .fork-btn:hover{border-color:var(--ink);transform:translateY(-2px)}
+  .fork-btn[aria-pressed="true"]{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+  .fork-btn .fb-k{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber-ink);display:block;margin-bottom:8px}
+  .fork-btn .fb-t{font-family:'Newsreader',serif;font-size:21px;display:block;line-height:1.15;letter-spacing:-.01em}
+  .fork-btn .fb-d{font-size:14px;color:var(--ink-2);margin-top:8px;line-height:1.45}
+  .aud-line{display:none;background:var(--slate);color:#fff;padding:18px 0;font-size:0}
+  .aud-line.show{display:block}
+  .aud-line .wrap{font-size:16.5px}
+  .aud-line p{color:#cdd5de;line-height:1.5;max-width:80ch;font-size:16.5px}
+  .aud-line p b{color:#fff;font-weight:600}
+  .aud-line .ax{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:8px}
+  body[data-aud="mfg"] .only-lab,body[data-aud="inv"] .only-lab,
+  body[data-aud="lab"] .only-mfg,body[data-aud="inv"] .only-mfg,
+  body[data-aud="lab"] .only-inv,body[data-aud="mfg"] .only-inv{opacity:.5}
+
+  /* ---------- SIGNATURE INTERACTION (Fantasy) ---------- */
+  .sig-band{background:#0a0f15;border-top:1px solid var(--slate-line);border-bottom:1px solid var(--slate-line)}
+  .sig-wrap{padding:84px 0 76px}
+  .sig-head{max-width:60ch;margin-bottom:14px}
+  .sig-head .sx{font-family:'IBM Plex Mono';font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:20px}
+  .sig-head h2{color:#fff;font-size:clamp(30px,4.4vw,52px)}
+  .sig-head h2 em{font-style:italic;color:#7fb0e8}
+  .sig-sub{color:#9aa6b2;font-size:18px;line-height:1.55;max-width:54ch;margin-top:18px}
+  .sig-stage{margin-top:44px;display:grid;grid-template-columns:1fr 300px;gap:36px;align-items:center}
+  @media(max-width:860px){.sig-stage{grid-template-columns:1fr;gap:26px}}
+  .sig-canvas-wrap{position:relative;border-radius:6px;overflow:hidden;box-shadow:0 40px 90px -40px rgba(0,0,0,.7);background:#0a0f15;cursor:crosshair}
+  #sigCanvas{width:100%;aspect-ratio:7/5;display:block}
+  .sig-verdict{position:absolute;top:16px;left:16px;font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:8px 13px;border-radius:3px;background:rgba(10,15,21,.78);backdrop-filter:blur(8px);display:flex;align-items:center;gap:9px;transition:color .35s}
+  .sig-verdict .vd{width:8px;height:8px;border-radius:50%;transition:background .35s}
+  .sig-hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono';font-size:11.5px;letter-spacing:.05em;color:#aeb8c4;background:rgba(10,15,21,.7);padding:7px 14px;border-radius:20px;backdrop-filter:blur(8px);transition:opacity .4s;pointer-events:none;white-space:nowrap}
+  .sig-hint.gone{opacity:0}
+  .sig-controls{color:#fff}
+  .sig-controls .cl{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8d99a6;margin-bottom:10px}
+  .sig-cycles{font-family:'Newsreader',serif;font-size:46px;color:#fff;line-height:1;letter-spacing:-.02em}
+  .sig-cycles small{font-family:'IBM Plex Mono';font-size:13px;color:#8d99a6;letter-spacing:.05em;display:block;margin-top:8px;text-transform:none}
+  .sig-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;margin:26px 0 8px;
+    background:linear-gradient(90deg,var(--cm1),var(--cm3),var(--cm5));outline:none}
+  .sig-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;cursor:grab;box-shadow:0 2px 10px rgba(0,0,0,.5);border:3px solid var(--amber)}
+  .sig-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;cursor:grab;border:3px solid var(--amber)}
+  .sig-scale{display:flex;justify-content:space-between;font-family:'IBM Plex Mono';font-size:11px;color:#6e7a87;margin-top:4px}
+  .sig-read{margin-top:26px;border-top:1px solid var(--slate-line);padding-top:20px}
+  .sig-read .rl{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#8d99a6;margin-bottom:6px}
+  .sig-read .rv{font-family:'IBM Plex Mono';font-size:22px;color:#fff}
+  .sig-read .rv.bad{color:#e0863f}.sig-read .rv.ok{color:#5fd0a0}
+  .sig-cap{color:#6e7a87;font-family:'IBM Plex Mono';font-size:11.5px;line-height:1.6;margin-top:40px;max-width:96ch;letter-spacing:.02em}
+  .sig-cap b{color:#9aa6b2}
+
+  /* ---------- FLYWHEEL / STANDARD (frog) ---------- */
+  .fly-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center}
+  @media(max-width:860px){.fly-grid{grid-template-columns:1fr;gap:40px}}
+  .fly-steps{counter-reset:f}
+  .fly-step{display:grid;grid-template-columns:42px 1fr;gap:18px;padding:18px 0;border-bottom:1px solid var(--rule);align-items:start}
+  .fly-step .fn{font-family:'IBM Plex Mono';font-size:13px;color:var(--amber-ink);padding-top:3px}
+  .fly-step h3{font-size:20px;margin-bottom:5px}
+  .fly-step p{font-size:15px;color:var(--ink-2);line-height:1.5}
+  .fly-viz{aspect-ratio:1;position:relative}
+
+  /* ---------- CONVERSION LADDER (Clay) ---------- */
+  .ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:8px}
+  .fly-bridge{font-size:17px;color:var(--ink-2);margin:0 0 28px;max-width:60ch;line-height:1.5;font-style:italic}
+  /* instrument stub (deferred Mapper detail lives in a modal) */
+  .instrument-stub{margin:40px 0 8px;border:1px solid var(--rule);border-radius:6px;background:var(--paper-2);padding:30px 34px}
+  .is-line{display:flex;align-items:center;justify-content:space-between;gap:28px;flex-wrap:wrap}
+  .is-k{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-ink);margin-bottom:10px}
+  .is-d{font-size:15.5px;color:var(--ink-2);line-height:1.55;max-width:64ch;margin:0}
+  .is-open{flex:none;font-family:'IBM Plex Mono';font-size:13px;letter-spacing:.02em;background:var(--ink);color:var(--paper);border:none;border-radius:3px;padding:15px 24px;cursor:pointer;transition:transform .2s,background .2s}
+  .is-open:hover{transform:translateY(-2px);background:#000}
+  @media(max-width:680px){.is-line{flex-direction:column;align-items:flex-start}.is-open{width:100%;text-align:center}}
+  /* mapper modal: intro block + spacing for the moved content */
+  .mapper-modal .mapper-intro{margin:18px 0 30px;padding:22px 24px;border:1px solid var(--rule);border-radius:5px;background:var(--paper-2)}
+  .mapper-modal .mapper-intro .eyebrow{display:block;margin-bottom:14px}
+  .mapper-modal .prodcard{margin:0 0 26px}
+  .mapper-modal .ds-grid{margin-top:0}
+  @media(max-width:820px){.ladder{grid-template-columns:1fr}}
+  .rung{background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:30px 28px;display:flex;flex-direction:column}
+  .rung.feature{border-color:var(--blue);box-shadow:0 24px 50px -34px rgba(23,58,107,.5)}
+  .rung .rk{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-ink);margin-bottom:14px}
+  .rung h3{font-size:25px;margin-bottom:8px}
+  .rung .rp{font-size:15px;color:var(--ink-2);line-height:1.55;margin-bottom:20px;flex:1}
+  .rung .rprice{font-family:'IBM Plex Mono';font-size:14px;color:var(--ink);border-top:1px solid var(--rule);padding-top:16px;margin-bottom:18px}
+  .rung .rprice b{font-size:22px;font-weight:500}
+  .rung .rprice span{display:block;color:var(--ink-3);font-size:12px;margin-top:4px}
+  .pricing-note{font-size:13.5px;color:var(--ink-3);text-align:center;margin-top:26px}
+
+  /* ---------- NATIVE SVG FIGURES ---------- */
+  .nfig{background:var(--paper-2);border:1px solid var(--rule);border-radius:5px;padding:38px 40px}
+  .nfig.on-slate{background:#0c1520;border-color:var(--slate-line)}
+  .nfig svg{width:100%;height:auto;display:block}
+  .nfig text{font-family:'IBM Plex Mono',monospace}
+  .flow-lbl{font-size:12.5px;letter-spacing:.02em}
+  .flow-sub{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase}
+  .fig-physics svg text{font-family:'IBM Plex Mono',monospace}
+  /* ---- Feynman chalkboard figure ---- */
+  .chalkboard{background:#1f2d28;border:14px solid #4a3526;border-radius:6px;box-shadow:inset 0 0 70px rgba(0,0,0,.5), 0 18px 40px -20px rgba(0,0,0,.6);padding:0;overflow:hidden;position:relative}
+  .chalkboard::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 30% 30%, rgba(255,255,255,.025), transparent 70%);mix-blend-mode:screen}
+  .chalkboard svg{width:100%;height:auto;display:block}
+  .chalkboard svg text{font-family:'Newsreader',serif;fill:#eef0e9}
+  .ch-hand{font-style:italic}
+  .ch-chalk{stroke:#eef0e9;fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:.92}
+  .ch-blue{stroke:#8fc7e8}
+  .ch-amber{stroke:#e8b24a}
+  .ch-red{stroke:#e0795f}
+  .ch-faint{opacity:.5}
+  .ch-label{font-size:15px;fill:#eef0e9}
+  .ch-small{font-size:12.5px;fill:#c4cabe}
+  .ch-accent{fill:#e8b24a}
+  .ch-eq{font-family:'Newsreader',serif;font-style:italic;font-size:20px;fill:#eef0e9}
+  .ch-name{font-family:'Newsreader',serif;font-style:italic;font-size:13px;fill:#9fb0a4}
+  .fig-stage{font-size:11px;letter-spacing:.14em;fill:#9D5A0E}
+  .fig-var{font-family:'Newsreader',serif;font-size:21px;letter-spacing:0}
+  .fig-sub{font-size:10.5px;letter-spacing:.03em;fill:#5A6678}
+  .fig-op{font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+  .fig-eq{font-size:12.5px;letter-spacing:0}
+  .fig-mono{font-size:11px;letter-spacing:.04em}
+  .fig-foot{font-size:11px;letter-spacing:.01em}
+  @media(max-width:760px){.fig-eq{font-size:10px}.fig-var{font-size:17px}.fig-foot{font-size:9.5px}}
+  /* taxonomy grid */
+  .tax-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:860px){.tax-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:440px){.tax-grid{grid-template-columns:1fr}}
+  .tax-cell{background:#0a0f15;border-radius:4px;overflow:hidden;border:1px solid var(--slate-line)}
+  .tax-cell canvas{width:100%;aspect-ratio:1/0.78;display:block}
+  .tax-meta{display:flex;align-items:center;gap:8px;padding:11px 13px}
+  .tax-meta .td{width:7px;height:7px;border-radius:50%;flex:none}
+  .tax-meta .tn{font-family:'IBM Plex Mono';font-size:11.5px;letter-spacing:.06em;color:#cdd5de}
+  .tax-meta .ts{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#6e7a87;margin-left:auto}
+
+  /* ---------- v8: TAKEAWAY STRIP ---------- */
+  .takeaway{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:30px;border-top:1px solid var(--rule)}
+  @media(max-width:740px){.takeaway{grid-template-columns:1fr}}
+  .tk{padding:22px 26px 22px 0;border-bottom:1px solid var(--rule)}
+  .tk+.tk{padding-left:26px;border-left:1px solid var(--rule)}
+  @media(max-width:740px){.tk+.tk{padding-left:0;border-left:none}}
+  .tk .tkk{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber-ink);display:block;margin-bottom:10px}
+  .tk p{font-size:15.5px;color:var(--ink-2);line-height:1.5}.tk p b{color:var(--ink);font-weight:600}
+
+  /* ---------- v8: PROOF SILENCE ---------- */
+  .proof-silence{height:64px}
+  @media(max-width:740px){.proof-silence{height:32px}}
+
+  /* ---------- v8: PRODUCT CARD ---------- */
+  .prodcard{background:linear-gradient(180deg,var(--paper-2),var(--paper));border:1px solid var(--rule);border-radius:6px;padding:38px 40px;margin-top:14px}
+  .prodcard .pc-k{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-ink);margin-bottom:12px}
+  .prodcard h3{font-size:30px;margin-bottom:12px;letter-spacing:-.01em}
+  .prodcard p{font-size:16.5px;color:var(--ink-2);line-height:1.55;max-width:62ch}
+  .pc-row{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:26px;border-top:1px solid var(--rule);padding-top:22px}
+  @media(max-width:680px){.pc-row{grid-template-columns:1fr;gap:14px}}
+  .pc-row>div{font-size:16px;color:var(--ink);font-weight:500}
+  .pc-row .pcl{display:block;font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px;font-weight:400}
+
+  /* ---------- v8: SPEC DRAWER ---------- */
+  .spec-details{margin-top:8px;border-top:1px solid var(--rule)}
+  .spec-details summary{cursor:pointer;font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);padding:14px 0;list-style:none}
+  .spec-details summary::-webkit-details-marker{display:none}
+  .spec-details summary::before{content:'+ ';color:var(--amber-ink)}
+  .spec-details[open] summary::before{content:'\2212 '}
+
+  /* ---------- v8: CHAPTER RAIL (AREA 17) ---------- */
+  .chaprail{position:fixed;right:26px;left:auto;top:50%;bottom:auto;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:2px;pointer-events:auto;background:none;border:none;backdrop-filter:none;width:auto}
+  @media(max-width:1100px){.chaprail{display:none}}
+  .chaprail a{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.06em;color:var(--ink-3);text-decoration:none;padding:8px 10px;display:flex;align-items:center;gap:10px;opacity:.55;transition:opacity .25s,color .25s}
+  .chaprail a .cdot{width:6px;height:6px;border-radius:50%;background:var(--rule);transition:background .25s,transform .25s}
+  .chaprail a:hover,.chaprail a.active{opacity:1;color:var(--ink)}
+  .chaprail a.active .cdot{background:var(--amber);transform:scale(1.5)}
+
+  /* ---------- v8: HOVERABLE ATLAS ---------- */
+  .tax-cell.hoverable{transition:transform .25s,box-shadow .25s;cursor:crosshair}
+  .tax-cell.hoverable:hover{transform:translateY(-3px);box-shadow:0 18px 36px -22px rgba(0,0,0,.7)}
+  .tax-cell.hoverable canvas{transition:filter .25s}
+  .tax-cell.hoverable:hover canvas{filter:saturate(1.25) brightness(1.06)}
+
+  /* ---------- v8: ROI line ---------- */
+  .roi{margin-top:30px;border:1px solid var(--rule);border-radius:5px;padding:26px 30px;background:var(--paper-2)}
+  .roi-eq{display:flex;align-items:baseline;flex-wrap:wrap;gap:18px 22px}
+  .roi-eq>span{display:flex;flex-direction:column}
+  .roi-eq b{font-family:'Newsreader',serif;font-size:38px;letter-spacing:-.02em;line-height:1;color:var(--ink)}
+  .roi-eq small{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.04em;color:var(--ink-3);margin-top:6px}
+  .roi-to b,.roi-result b{color:var(--blue)}
+  .roi-arrow,.roi-eq-sign{font-family:'Newsreader',serif;font-size:30px;color:var(--ink-3);align-self:center}
+  .roi-result b{font-size:42px}
+  .roi-note{font-size:14px;color:var(--ink-2);line-height:1.5;margin-top:18px;padding-top:16px;border-top:1px solid var(--rule);max-width:78ch}
+  @media(max-width:600px){.roi-eq b{font-size:30px}.roi-result b{font-size:34px}.roi-arrow,.roi-eq-sign{display:none}}
+
+  /* ---------- v9: RECORD MODAL ---------- */
+  .record-overlay{position:fixed;inset:0;z-index:200;background:rgba(16,23,31,.55);backdrop-filter:blur(6px);
+    display:flex;align-items:flex-start;justify-content:center;padding:48px 20px;overflow-y:auto}
+  .record-overlay[hidden]{display:none}
+  .record-modal{position:relative;background:var(--paper);border:1px solid var(--rule);border-radius:6px;
+    max-width:880px;width:100%;margin:auto;box-shadow:0 50px 120px -40px rgba(0,0,0,.6)}
+  .record-scroll{padding:48px 52px 56px}
+  @media(max-width:640px){.record-scroll{padding:34px 24px 40px}}
+  .record-close{position:absolute;top:16px;right:18px;width:40px;height:40px;border:1px solid var(--rule);
+    background:var(--paper-2);border-radius:50%;font-size:24px;line-height:1;color:var(--ink-2);cursor:pointer;z-index:2}
+  .record-close:hover{color:var(--ink);border-color:var(--ink)}
+  .record-block{margin-top:30px}
+  .record-block .section-head{margin-bottom:22px}
+  .record-block .timeline,.record-block .refs{border-top:1px solid var(--rule)}
+  /* trigger button (team area) */
+  .record-row{margin-top:44px;border-top:1px solid var(--rule);padding-top:32px}
+  .record-trigger{display:flex;align-items:center;gap:18px;width:100%;text-align:left;background:var(--paper-2);
+    border:1px solid var(--rule);border-radius:5px;padding:24px 28px;cursor:pointer;transition:border-color .2s,transform .2s;font:inherit;color:inherit}
+  .record-trigger:hover{border-color:var(--ink);transform:translateY(-2px)}
+  .record-trigger .rt-k{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-ink)}
+  .record-trigger .rt-t{font-family:'Newsreader',serif;font-size:19px;color:var(--ink);flex:1}
+  .record-trigger .rt-arr{font-family:'IBM Plex Mono';color:var(--ink-3);font-size:18px}
+  .foot-record{background:none;border:none;color:#8d99a6;font-family:'IBM Plex Mono';font-size:12.5px;cursor:pointer;padding:0;text-decoration:none}
+  .foot-record:hover{color:#fff}
+
+  /* ---------- v9: TEAM BIO EXPANDER ---------- */
+  .bio-more{margin-top:6px}
+  .bio-more summary{cursor:pointer;font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);list-style:none;padding:6px 0}
+  .bio-more summary::-webkit-details-marker{display:none}
+  .bio-more summary::before{content:'+ ';color:var(--amber-ink)}
+  .bio-more[open] summary::before{content:'\2212 '}
+  .bio-more p{font-size:14.5px;color:var(--ink-2);line-height:1.55;margin-top:8px}
+
+  /* ---------- v9: LAB ROADMAP STRIP ---------- */
+  .lab-roadmap{margin-top:48px;padding-top:40px;border-top:1px solid var(--rule)}
+  .lab-roadmap .lr-head{margin-bottom:28px}
+  .lab-roadmap .lr-head h3{font-size:24px;letter-spacing:-.01em;margin-top:8px}
+
+  /* small inline media row */
+  .media-duo{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
+  @media(max-width:760px){.media-duo{grid-template-columns:1fr}}
+</style>
+</head>
+<body><style>
+#_gate{position:fixed;inset:0;z-index:99999;background:#0e0f0e;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px}
+#_gate form{display:flex;flex-direction:column;align-items:center;gap:14px}
+#_gate p{color:#8d99a6;font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin:0}
+#_gate input{background:#1a1c1a;border:1px solid #2e3330;color:#e7e3d8;padding:12px 18px;font-size:15px;border-radius:6px;outline:none;width:220px;text-align:center;letter-spacing:.1em}
+#_gate input:focus{border-color:#6fa0d8}
+#_gate button{background:#6fa0d8;color:#0e0f0e;border:none;padding:10px 28px;border-radius:6px;font-size:13px;letter-spacing:.06em;cursor:pointer;text-transform:uppercase}
+#_gate .err{color:#c0721b;font-size:12px;min-height:16px}
+</style>
+<div id="_gate">
+  <svg viewBox="0 0 32 32" fill="none" style="width:36px;height:36px" aria-hidden="true">
+    <path d="M16 28 C8.8 28 4 23 4 16.6 C4 9.6 9.4 4.6 16.4 4.6 C23.4 4.6 28 9.8 28 16.2" stroke="#E7E3D8" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M16 23.4 C11.6 23.4 8.8 20.4 8.8 16.5 C8.8 12.4 12 9.4 16.3 9.4 C20.6 9.4 23.3 12.4 23.4 16" stroke="#6FA0D8" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="22.6" cy="21.4" r="2.7" fill="#C0721B"/>
+  </svg>
+  <form onsubmit="return _checkGate(event)">
+    <p>Parthian Energy &mdash; Due Diligence</p>
+    <input id="_gpw" type="password" placeholder="Access code" autocomplete="off" autofocus />
+    <div class="err" id="_gerr"></div>
+    <button type="submit">Enter</button>
+  </form>
+</div>
+<script>
+(function(){
+  if(sessionStorage.getItem('_pe_auth')==='1'){
+    document.addEventListener('DOMContentLoaded',function(){
+      var g=document.getElementById('_gate');
+      if(g) g.remove();
+    });
+  }
+})();
+function _checkGate(e){
+  e.preventDefault();
+  if(document.getElementById('_gpw').value==='caltechalum'){
+    sessionStorage.setItem('_pe_auth','1');
+    document.getElementById('_gate').remove();
+  } else {
+    document.getElementById('_gerr').textContent='Incorrect access code.';
+    document.getElementById('_gpw').value='';
+  }
+  return false;
+}
+</script>
+<div class="arrival" id="arrival" hidden aria-hidden="true">
+  <span class="arr-dot"></span>
+  <span>You've left the cell. This is the company behind it.</span>
+</div>
+<a class="skip" href="#main">Skip to content</a>
+<nav class="chaprail" id="chapRail" aria-label="Chapters">
+  <a href="#proof" data-ch="proof"><span class="cdot"></span>The proof</a>
+  <a href="#problem" data-ch="case"><span class="cdot"></span>The case</a>
+  <a href="#labs" data-ch="product"><span class="cdot"></span>The product</a>
+  <a href="#team" data-ch="company"><span class="cdot"></span>Company</a>
+</nav>
+<div class="progress" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav aria-label="Primary">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+<svg class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M16 28 C8.8 28 4 23 4 16.6 C4 9.6 9.4 4.6 16.4 4.6 C23.4 4.6 28 9.8 28 16.2" stroke="#16202E" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M16 23.4 C11.6 23.4 8.8 20.4 8.8 16.5 C8.8 12.4 12 9.4 16.3 9.4 C20.6 9.4 23.3 12.4 23.4 16" stroke="#173A6B" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M15.9 18.9 C14.2 18.8 13.3 17.8 13.4 16.3 C13.5 14.9 14.7 13.9 16.2 14 C17.7 14 18.8 15 18.9 16.3" stroke="#2C5D9B" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="22.6" cy="21.4" r="2.7" fill="#C0721B"/>
+      </svg>
+      Parthian&nbsp;Energy
+    </a>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+      <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M1 1h16M1 7h16M1 13h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">&larr; Experience</a>
+      <a href="#proof">Proof</a>
+      <a href="#standard">The standard</a>
+      <a href="#problem">The case</a>
+      <a href="#labs">Instrument</a>
+      <a href="#team">Team</a>
+      <a class="nav-cta" href="#contact">Talk to us</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+<!-- HERO -->
+<section class="sec" id="proof" data-chapter="proof">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Demonstrated</span>
+      <h2>Results on commercial cells, validated by a national lab.</h2>
+    </div>
+  </div>
+
+  <div class="proof-silence reveal" aria-hidden="true"></div>
+  <div class="plate-band">
+    <div class="wrap">
+      <p class="plate-kicker reveal">This is a real cell hiding real lithium plating.<br><em>Every other test on the line called it healthy.</em></p>
+      <figure class="plate reveal">
+        <div class="plate-grid">
+          <div>
+            <div class="plate-cell"><img src="assets/measured-bx-field-map-of-inl-cell-14-at-1-khz-sm-50c109.webp" alt="Measured Bx field map of INL Cell 14 at 1 kHz — smooth, symmetric contours of a cell in optimal condition" width="977" height="804" loading="lazy" decoding="async"></div>
+            <div class="plate-tag ok"><span class="dot" style="background:#5fd0a0"></span>CELL 14 &mdash; OPTIMAL</div>
+          </div>
+          <div>
+            <div class="plate-cell plate-defect"><img src="assets/measured-bx-field-map-of-inl-cell-15-at-1-khz-co-9e983c.webp" alt="Measured Bx field map of INL Cell 15 at 1 kHz — contour distortion in the lower right marking lithium plating" width="977" height="804" loading="lazy" decoding="async"><span class="defect-locator" aria-hidden="true"></span></div>
+            <div class="plate-tag bad"><span class="dot" style="background:#e0863f"></span>CELL 15 &mdash; PLATING, LOWER RIGHT</div>
+          </div>
+        </div>
+        <figcaption class="figcap plate-cap on-dark-cap"><span class="fign">Figure 3</span><b>Measured data &mdash; not a simulation.</b> B<sub>x</sub> field maps of two 11 Ah commercial cells at 1 kHz, raw from the instrument, from the Idaho National Laboratory validation campaign. Cell 15 carries the signature of lithium plating after only 12 fast-charge cycles (up to 3C) &mdash; with no voltage or temperature anomaly to be found. 56 &times; 50 mm region; both maps on a common scale.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="proof-leadin reveal" style="margin-top:64px">
+      <h2 style="font-size:clamp(26px,3vw,38px);line-height:1.15;margin-bottom:14px">One result is a demonstration.<br>Six is a track record.</h2>
+      <p style="font-size:18px;color:var(--ink-2);max-width:62ch;line-height:1.55">Across four years, four defect classes, and partners from LG to a national lab &mdash; every detection below is tied to a specific commercial cell and program milestone.</p>
+    </div>
+    <div class="proof-grid reveal" style="margin-top:40px">
+      <div>
+        <div class="pf"><div class="n">01</div><div><h3>Torn-tab detection</h3><p>Detected submillimeter torn tabs in 59 Ah GM Bolt-type cells for LG during Phase I — the exact defect class behind the $2B recall.</p></div></div>
+        <div class="pf"><div class="n">02</div><div><h3>Lithium-plating detection, independently validated</h3><p>Detected plating in 11 Ah commercial Kokam cells, validated with Idaho National Laboratory — to our knowledge a first for any non-invasive sensing method. The measured data is Figure 3, above.</p></div></div>
+        <div class="pf"><div class="n">03</div><div><h3>Hidden weld-defect localization</h3><p>Localized a hidden weld defect in 30 Ah commercial pouch cells returned from the field — a cell that had passed conventional QC. <span class="mono" style="font-size:12px;color:var(--ink-3)">(2025)</span></p></div></div>
+        <div class="pf"><div class="n">04</div><div><h3>Format- and chemistry-agnostic in practice</h3><p>Demonstrated across NMC pouch and LFP prismatic formats, from 200 mAh to 100 Ah class cells — four distinct defect groups to date. <span class="mono" style="font-size:12px;color:var(--ink-3)">(2025)</span></p></div></div>
+        <div class="pf"><div class="n">05</div><div><h3>Phase IIB Go/No-Go: passed</h3><p>EMIS output correlated with fast-charge cycle number in 9 of 10 cells (each ≥10 Ah) — the DOE-defined success threshold for autonomous, machine-readable detection. <span class="mono" style="font-size:12px;color:var(--ink-3)">(2025)</span></p></div></div>
+        <div class="pf"><div class="n">06</div><div><h3>Instrument-grade precision, commodity cost</h3><p>0.02% impedance accuracy (0.005 m&Omega; at 2.5 m&Omega;) on in-house electronics, while hardware cost fell $50k &rarr; $4k &rarr; ~$1k across program phases.</p></div></div>
+      </div>
+        <div class="logos">
+        <div class="lh">Built &amp; validated with</div>
+        <div class="lg">Caltech<span>Origin of the technology &amp; patents</span></div>
+        <div class="lg">Idaho National Laboratory<span>Independent plating validation</span></div>
+        <div class="lg">U.S. Department of Energy<span>Phase I / II / IIB program support</span></div>
+        <div class="lg">NREL<span>Physics simulation &amp; ML-training partner</span></div>
+        <div class="lg">Berkeley National Laboratory<span>Failure-statistics &amp; ML analysis partner</span></div>
+        <div class="lg">LG Energy Solution<span>Program partner &amp; prospective customer</span></div>
+      </div>
+    </div>
+    <div class="proof-cta reveal" style="margin-top:64px;text-align:center">
+      <p style="font-size:clamp(20px,2.4vw,28px);font-family:'Newsreader',serif;font-style:italic;color:var(--ink);max-width:54ch;margin:0 auto 24px;line-height:1.3">Send us your cells. We send back the maps &mdash; your defects, your data, in two weeks.</p>
+      <a class="btn btn-primary" href="#start">Start a validation project <span class="arr">&rarr;</span></a>
+    </div>
+  </div>
+</section>
+
+<hr class="heat-strip">
+
+<section class="sec dark" id="atlas" data-chapter="proof">
+  <div class="wrap">
+    <div class="section-head reveal" style="margin-bottom:40px">
+      <span class="eyebrow on-dark">The signature atlas</span>
+      <h2>What the lab measured once, EMIS reads in every defect class.</h2>
+      <p class="lead">The same physics that resolved the INL plating signature generalizes: a torn tab pulls the field toward a corner, plating blooms as a hot-spot, a short collapses the contours to a point. Each break in symmetry is distinct &mdash; and machine-classifiable.</p>
+    </div>
+    <figure class="reveal">
+      <div class="tax-grid" id="taxGrid">
+        <div class="tax-cell hoverable"><canvas data-sig="healthy"></canvas><div class="tax-meta"><span class="td" style="background:#5fd0a0"></span><span class="tn">Healthy reference</span><span class="ts">baseline</span></div></div>
+        <div class="tax-cell hoverable"><canvas data-sig="torntab"></canvas><div class="tax-meta"><span class="td" style="background:#e0863f"></span><span class="tn">Torn tab</span><span class="ts">corner</span></div></div>
+        <div class="tax-cell hoverable"><canvas data-sig="plating"></canvas><div class="tax-meta"><span class="td" style="background:#e0863f"></span><span class="tn">Lithium plating</span><span class="ts">hot-spot</span></div></div>
+        <div class="tax-cell hoverable"><canvas data-sig="short"></canvas><div class="tax-meta"><span class="td" style="background:#c0451b"></span><span class="tn">Internal short</span><span class="ts">point</span></div></div>
+      </div>
+      <figcaption class="figcap"><span class="fign">Figure 2</span><b>Signature atlas.</b> Each defect class breaks the field's symmetry in its own way &mdash; a torn tab toward a corner, plating as a hot-spot, a short to a point. Distinct signatures are what make the output machine-classifiable. <span style="color:var(--ink-3)">Physics-based, calibrated to measured cells.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<hr class="heat-strip">
+
+<section class="sec" id="standard" data-chapter="proof">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">The system, not the box</span>
+      <h2>Anyone can build an instrument. We're building the reference.</h2>
+      <p class="lead">That measured result is proof of one cell. The deeper advantage is what happens when you measure thousands: every image EMIS captures sharpens a model trained on real, validated commercial-cell signatures &mdash; the layer the industry will calibrate against.</p>
+    </div>
+    <p class="fly-bridge reveal">Here's how a single measurement compounds into a standard a competitor can't simply buy:</p>
+    <div class="fly-grid reveal">
+      <div class="fly-steps">
+        <div class="fly-step"><div class="fn">01</div><div><h3>Scan</h3><p>EMIS images a cell's internal current density on the line or the bench &mdash; on-prem, your data never leaving the factory.</p></div></div>
+        <div class="fly-step"><div class="fn">02</div><div><h3>Label</h3><p>Each signature is tied to a known outcome &mdash; torn tab, plating, short, weld defect &mdash; validated against teardown and national-lab ground truth.</p></div></div>
+        <div class="fly-step"><div class="fn">03</div><div><h3>Sharpen</h3><p>The model that turns a 2D field into a machine-readable verdict improves &mdash; better thresholds, fewer false positives, broader cell coverage.</p></div></div>
+        <div class="fly-step"><div class="fn">04</div><div><h3>Compound</h3><p>Detection improves for the whole field, which pulls more cells through EMIS. The reference standard for "is this cell electrochemically sound" accrues to whoever measured the most cells first.</p></div></div>
+      </div>
+      <div class="fly-viz">
+        <svg viewBox="0 0 320 320" fill="none" aria-hidden="true" style="width:100%;height:auto">
+          <defs><linearGradient id="flg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#2b6f9b"/><stop offset="0.5" stop-color="#3fae8e"/><stop offset="1" stop-color="#e0a32f"/>
+          </linearGradient></defs>
+          <circle cx="160" cy="160" r="120" stroke="var(--rule)" stroke-width="1"/>
+          <circle cx="160" cy="160" r="120" stroke="url(#flg)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="565" stroke-dashoffset="150" transform="rotate(-90 160 160)"/>
+          <path d="M250 110 l14 6 -6 14" stroke="#e0a32f" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <g font-family="'IBM Plex Mono'" font-size="12" fill="var(--ink-2)" text-anchor="middle">
+            <text x="160" y="44">SCAN</text><text x="276" y="164">LABEL</text>
+            <text x="160" y="286">SHARPEN</text><text x="44" y="164">COMPOUND</text>
+          </g>
+          <circle cx="160" cy="160" r="46" fill="var(--paper-2)" stroke="var(--rule)"/>
+          <text x="160" y="156" font-family="'Newsreader',serif" font-size="15" fill="var(--ink)" text-anchor="middle">every</text>
+          <text x="160" y="174" font-family="'Newsreader',serif" font-size="15" fill="var(--ink)" text-anchor="middle">cell</text>
+        </svg>
+      </div>
+    </div>
+    <p class="lead reveal only-inv" style="margin-top:44px;border-left:2px solid var(--amber);padding-left:22px;font-size:18px">For investors: the instrument is the wedge; the labeled-signature dataset and the on-prem inference standard are the moat. Earlier patent priority (2013) plus the first large corpus of measured commercial-cell signatures is a position a better-funded fast-follower cannot simply buy.</p>
+  </div>
+</section>
+
+<hr class="heat-strip">
+
+<section class="sec panel" id="problem" data-chapter="case">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">The full case &middot; the problem</span>
+      <h2>A single point of scrap costs a gigafactory roughly €10M a year.</h2>
+      <p class="lead">The battery industry still lacks the inline QC maturity of semiconductors. A chip fab inspects every wafer in real time; most cell lines rely on delayed testing and days of aging — and still miss the defects that matter most.</p>
+    </div>
+    <div class="prob-evidence reveal">
+      <div class="pe-label">The problem, measured</div>
+      <div class="stat-row">
+        <div class="stat">
+          <div class="num">15–30%</div>
+          <div class="lbl">Scrap rate, early years</div>
+          <div class="src">Still ~10% after five years. <span class="mono">Fraunhofer FFB / RWTH Aachen, 2025</span></div>
+        </div>
+        <div class="stat">
+          <div class="num">€30k</div>
+          <div class="lbl">Per day, per scrap point</div>
+          <div class="src">Each point of scrap at full capacity — about €10M a year. <span class="mono">Fraunhofer FFB, 2025</span></div>
+        </div>
+        <div class="stat">
+          <div class="num">10–15%</div>
+          <div class="lbl">Lost to late detection</div>
+          <div class="src">Cells scrapped or reworked after delayed testing. <span class="mono">Nature Comms / Attia et al., 2025</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="prob-opportunity reveal">
+      <div class="pe-label good">The opportunity, measured</div>
+      <div class="roi">
+        <div class="roi-eq">
+          <span class="roi-from"><b>$10</b><small>/kWh today</small></span>
+          <span class="roi-arrow">&rarr;</span>
+          <span class="roi-to"><b>$5</b><small>/kWh with EMIS</small></span>
+          <span class="roi-eq-sign">=</span>
+          <span class="roi-result"><b>~$25M</b><small>recovered per year, 5 GWh line</small></span>
+        </div>
+        <p class="roi-note">Large-cell scrap runs double small-cell cost because manufacturers raise thresholds to cover what they can't measure. EMIS halves it &mdash; against a software fee comparable to existing QC.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="heat-strip">
+
+<section class="sec" id="compare" data-chapter="case">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">The full case &middot; the blind spot</span>
+      <h2>Every fast tool on the line reads one of two signals. EMIS reads a third.</h2>
+      <p class="lead">Each waits for damage to surface as voltage, gas, or geometry. EMIS images the current density itself &mdash; where the recall-class defects appear first.</p>
+    </div>
+    <div class="reveal" style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table class="ctable">
+        <thead>
+          <tr>
+            <th style="width:22%"></th>
+            <th>Self-discharge</th>
+            <th>Ultrasound</th>
+            <th>X-ray / CT</th>
+            <th>Eddy current</th>
+            <th class="us col-us-head">Parthian EMIS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Signal measured</th>
+            <td>Self-discharge current</td>
+            <td>Acoustic interfaces</td>
+            <td>X-ray attenuation (geometry)</td>
+            <td>Surface-induced currents</td>
+            <td class="col-us"><strong>Internal current density</strong></td>
+          </tr>
+          <tr>
+            <th>Images electrochemical function</th>
+            <td class="partial">Bulk average only</td>
+            <td class="no">No</td>
+            <td class="no">No — structure only</td>
+            <td class="no">No</td>
+            <td class="col-us yes">Yes — spatially resolved</td>
+          </tr>
+          <tr>
+            <th>Catches torn / misaligned tabs</th>
+            <td class="no">No — until leaking</td>
+            <td class="partial">Limited</td>
+            <td class="partial">If geometric</td>
+            <td class="partial">Surface only</td>
+            <td class="col-us yes">Yes — demonstrated</td>
+          </tr>
+          <tr>
+            <th>Catches lithium plating</th>
+            <td class="no">No</td>
+            <td class="partial">Only after drying/gassing</td>
+            <td class="no">No</td>
+            <td class="no">No</td>
+            <td class="col-us yes">Yes — INL-validated</td>
+          </tr>
+          <tr>
+            <th>Catches resistive weld defects</th>
+            <td class="no">No</td>
+            <td class="no">No</td>
+            <td class="partial">Geometry, not resistance</td>
+            <td class="partial">Limited</td>
+            <td class="col-us yes">Yes — demonstrated</td>
+          </tr>
+          <tr>
+            <th>Needs cell relaxation / aging</th>
+            <td class="no">Yes</td>
+            <td class="partial">Built + wetted first</td>
+            <td class="yes">No</td>
+            <td class="yes">No</td>
+            <td class="col-us yes">No</td>
+          </tr>
+          <tr>
+            <th>Works before electrolyte injection</th>
+            <td class="no">No</td>
+            <td class="no">No</td>
+            <td class="yes">Yes</td>
+            <td class="partial">Shallow layers</td>
+            <td class="col-us yes">Yes</td>
+          </tr>
+          <tr>
+            <th>Output</th>
+            <td>Pass / fail</td>
+            <td>2D map / scalar</td>
+            <td>3D geometry</td>
+            <td>Scalar</td>
+            <td class="col-us">2D map today &rarr; scalar <span class="mono" style="font-size:12px;color:var(--ink-3)">(roadmap)</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="takeaway reveal">
+      <div class="tk"><span class="tkk">Earlier</span><p>Flags defects on a dry electrode stack &mdash; <b>before electrolyte injection</b>, with no relaxation period.</p></div>
+      <div class="tk"><span class="tkk">Broader</span><p>Catches the recall-class faults the fast tools can't see &mdash; torn tabs, shorts, and <b>lithium plating, validated</b>.</p></div>
+      <div class="tk"><span class="tkk">Frictionless</span><p>Rides the existing ACIR station &mdash; <b>no added line time</b>, a &lt;1&nbsp;mm sensor plate, ML on-prem.</p></div>
+    </div>
+  </div>
+</section>
+
+<hr class="heat-strip">
+
+<section class="sec" id="how" data-chapter="case">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">How EMIS works</span>
+      <h2>An MRI for the inside of a cell — no contact, no opening it up.</h2>
+      <p class="lead">A cell's own current makes a magnetic field. Read that field from just above the surface, reconstruct the current inside, and a defect reveals itself as broken symmetry. Here's the idea on a chalkboard.</p>
+    </div>
+    <figure class="reveal" style="margin-top:48px">
+      <div class="chalkboard">
+        <svg viewBox="0 0 980 540" role="img" aria-label="A chalkboard explanation in Richard Feynman's style: electric current flowing inside a battery cell makes a magnetic field that curls around it; an array of sensors above the cell measures that field; working backward from the field to find the current inside is the hard part, because many different interior currents can make the same field outside.">
+          <defs>
+            <filter id="chalktex" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.5"/></filter>
+          </defs>
+
+          <!-- title, hand-written -->
+          <text class="ch-hand" x="40" y="50" style="font-size:26px;fill:#eef0e9">So — how do you see inside a battery without opening it up?</text>
+          <line class="ch-chalk ch-faint" x1="40" y1="62" x2="690" y2="66" stroke-width="1.5"/>
+
+          <!-- PANEL 1: the cell with current -->
+          <text class="ch-hand ch-accent" x="60" y="110" style="font-size:17px">① The current doesn't flow evenly.</text>
+          <!-- battery outline (slightly wobbly, hand-drawn) -->
+          <path class="ch-chalk" stroke-width="2" d="M70 135 L250 132 L252 250 L72 252 Z"/>
+          <!-- terminals -->
+          <path class="ch-chalk ch-amber" stroke-width="3" d="M64 165 L64 195"/>
+          <text class="ch-accent" x="48" y="160" style="font-size:18px">+</text>
+          <path class="ch-chalk ch-blue" stroke-width="3" d="M258 165 L258 195"/>
+          <!-- current streamlines, hand-drawn with little arrowheads -->
+          <path class="ch-chalk ch-blue" stroke-width="1.6" d="M80 158 C140 160 200 158 244 160"/>
+          <path class="ch-chalk ch-blue" stroke-width="1.6" d="M80 180 C140 184 200 182 244 182"/>
+          <path class="ch-chalk ch-blue" stroke-width="1.6" d="M80 204 C150 214 205 210 244 206"/>
+          <path class="ch-chalk ch-blue" stroke-width="1.6" d="M80 228 C140 232 200 230 244 230"/>
+          <!-- little chalk arrowheads -->
+          <path class="ch-chalk ch-blue" stroke-width="1.6" d="M238 156 L244 160 L238 164"/>
+          <path class="ch-chalk ch-blue" stroke-width="1.6" d="M238 178 L244 182 L238 186"/>
+          <path class="ch-chalk ch-blue" stroke-width="1.6" d="M238 202 L244 206 L238 210"/>
+          <!-- the trouble spot: a scribbled knot where a defect crowds the current -->
+          <path class="ch-chalk ch-red" stroke-width="1.8" d="M185 225 q8 -10 16 0 q8 10 -2 16 q-12 6 -16 -4 q-3 -8 2 -12"/>
+          <text class="ch-name" x="150" y="282" style="fill:#e0795f">↑ here's our troublemaker</text>
+
+          <!-- PANEL 2: the field curling around -->
+          <text class="ch-hand ch-accent" x="370" y="110" style="font-size:17px">② Moving charge makes a magnetic field.</text>
+          <!-- the field loops curling out of the cell, hand-drawn ellipses -->
+          <g class="ch-chalk ch-amber" stroke-width="1.5" filter="url(#chalktex)">
+            <path d="M470 150 C400 150 400 250 470 250 C540 250 540 150 470 150 Z" class="ch-faint"/>
+            <path d="M470 132 C375 130 375 270 470 270 C565 270 565 132 470 132 Z" class="ch-faint"/>
+            <path d="M470 116 C355 112 355 288 470 288 C585 288 585 116 470 116 Z" class="ch-faint"/>
+          </g>
+          <!-- the wire/current at center -->
+          <circle cx="470" cy="200" r="4" fill="#8fc7e8"/>
+          <text class="ch-small" x="455" y="225" style="fill:#8fc7e8">I</text>
+          <!-- a curl arrow showing direction -->
+          <path class="ch-chalk ch-amber" stroke-width="1.6" d="M548 175 a40 40 0 0 1 0 50"/>
+          <path class="ch-chalk ch-amber" stroke-width="1.6" d="M544 220 L549 227 L555 221"/>
+          <text class="ch-name" x="560" y="200">it curls<tspan x="560" dy="16">around</tspan></text>
+
+          <!-- PANEL 3: the sensors reading it -->
+          <text class="ch-hand ch-accent" x="700" y="110" style="font-size:17px">③ We read it from outside.</text>
+          <!-- sensor bar -->
+          <line class="ch-chalk" x1="710" y1="150" x2="920" y2="150" stroke-width="2"/>
+          <g class="ch-chalk" stroke-width="1.6" filter="url(#chalktex)">
+            <path d="M724 150 l0 -14 l10 0 l0 14"/>
+            <path d="M756 150 l0 -14 l10 0 l0 14"/>
+            <path d="M788 150 l0 -14 l10 0 l0 14"/>
+            <path d="M820 150 l0 -14 l10 0 l0 14"/>
+            <path d="M852 150 l0 -14 l10 0 l0 14"/>
+            <path d="M884 150 l0 -14 l10 0 l0 14"/>
+          </g>
+          <text class="ch-small" x="710" y="128">tiny magnetometers — they never touch the cell</text>
+          <!-- dashed lines from field up to sensors -->
+          <g class="ch-chalk ch-amber ch-faint" stroke-width="1.2" stroke-dasharray="4 5" filter="url(#chalktex)">
+            <path d="M760 162 L772 215"/>
+            <path d="M824 162 L815 220"/>
+            <path d="M856 162 L860 210"/>
+          </g>
+          <!-- the field hump they measure, sketched as a little curve -->
+          <path class="ch-chalk ch-amber" stroke-width="1.8" d="M712 250 C760 250 770 205 815 205 C860 205 872 250 918 250"/>
+          <text class="ch-name" x="792" y="272" text-anchor="middle">the field, as measured</text>
+
+          <!-- divider -->
+          <line class="ch-chalk ch-faint" x1="40" y1="320" x2="940" y2="324" stroke-width="1.2"/>
+
+          <!-- the honest hard part, Feynman-style -->
+          <text class="ch-hand" x="40" y="362" style="font-size:19px;fill:#eef0e9">Now here's the catch. Going <tspan class="ch-accent">forward</tspan> — current to field — is just textbook physics:</text>
+          <text class="ch-eq" x="120" y="402">B(r) = (μ₀/4π) ∫ J(r′) × (r−r′)/|r−r′|³ dV′</text>
+          <text class="ch-name" x="640" y="402">…the Biot–Savart law. Nothing new.</text>
+
+          <text class="ch-hand" x="40" y="448" style="font-size:19px;fill:#eef0e9">But we want to go <tspan style="fill:#e0795f">backward</tspan> — field to current. And that's slippery,</text>
+          <text class="ch-hand" x="40" y="476" style="font-size:19px;fill:#eef0e9">because <tspan class="ch-accent" style="font-style:normal">many different interior currents can make the very same field outside.</tspan></text>
+          <text class="ch-hand" x="40" y="510" style="font-size:18px;fill:#c4cabe">So you can't just invert it. You teach a model what real defects look like — and let it choose.</text>
+
+          <!-- Feynman's signature flourish -->
+          <text class="ch-name" x="800" y="510" style="font-size:14px;fill:#9fb0a4">— the inverse problem</text>
+        </svg>
+      </div>
+      <figcaption class="figcap"><span class="fign">Figure 1</span><b>The forward problem is physics; the inverse problem is the hard part.</b> Current inside the cell produces a magnetic field by the Biot&ndash;Savart law &mdash; that direction is exact. Recovering the interior current from the field measured outside is a classic <em>ill-posed inverse problem</em> (the same mathematical class as magnetoencephalography): many interior currents fit the same exterior field. EMIS resolves it with a learned operator trained against national-lab-validated cells, rather than inverting analytically.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<hr class="heat-strip">
+
+<section class="sec" id="labs" data-chapter="product">
+  <div class="wrap">
+    <div class="section-head reveal" style="max-width:64ch">
+      <span class="eyebrow">Available now &middot; Model EMIS08S01</span>
+      <h2>The Inhomogeneity Mapper, for research labs.</h2>
+      <p class="lead">Teams studying lithium plating and fast-charge cell design get an imaging tool that sees what nothing else can &mdash; today. Up to 1,000,000&times; more data points per cell than a single ACIR reading.</p>
+    </div>
+
+    <div class="instrument-stub reveal">
+      <div class="is-line">
+        <div>
+          <div class="is-k">The instrument</div>
+          <p class="is-d">A benchtop gantry images a cell's internal current density &mdash; non-contact, no teardown &mdash; and returns a machine-readable defect map. Chemistry-, size-, and format-agnostic, 200&nbsp;mAh to 100&nbsp;Ah. From US$&nbsp;9,975 / 6-month rental.</p>
+        </div>
+        <button class="is-open" data-open-mapper>Available now &mdash; Model EMIS08S01 &rarr;</button>
+      </div>
+    </div>
+
+<div class="ladder reveal" id="start" style="margin-top:54px;scroll-margin-top:90px">
+      <div class="rung">
+        <div class="rk">Step one &middot; no commitment</div>
+        <h3>Get the datasheet</h3>
+        <p class="rp">Full EMIS08S01 specifications, measurement modes, and channel architecture &mdash; everything your engineers need to evaluate fit.</p>
+        <div class="rprice"><b>Free</b><span>PDF, by email</span></div>
+        <a class="btn btn-ghost" href="mailto:froumi@parthiannrg.com?subject=EMIS08S01%20datasheet%20request&body=Please%20send%20the%20EMIS08S01%20datasheet.">Request datasheet</a>
+      </div>
+      <div class="rung feature">
+        <div class="rk">Step two &middot; see your own cells</div>
+        <h3>Run a validation</h3>
+        <p class="rp">Send us cells &mdash; healthy, suspect, or returned from the field. We image them and send back the current-density maps with a defect read. Your data, in about two weeks.</p>
+        <div class="rprice"><b>Scoped per project</b><span>NDA-backed; your data stays yours</span></div>
+        <a class="btn btn-primary" href="#contact">Start a validation <span class="arr">&rarr;</span></a>
+      </div>
+      <div class="rung">
+        <div class="rk">Step three &middot; bring it in-house</div>
+        <h3>Rent the instrument</h3>
+        <p class="rp">The EMIS08S01 on your bench. License, EIS hardware, and the 8-channel mapper included; XYZ gantry optional.</p>
+        <div class="rprice"><b>US$ 9,975</b><span>6-month rental, then US$ 999/mo &times; 18</span></div>
+        <a class="btn btn-ghost" href="#contact">Reserve a unit</a>
+      </div>
+    </div>
+    <p class="pricing-note reveal">Pricing shown for the research configuration. Manufacturing / inline integration is scoped directly &mdash; <a href="#contact" style="color:var(--blue)">talk to us</a>.</p>
+  </div>
+</section>
+
+<hr class="heat-strip">
+
+<section class="sec" id="team" data-chapter="company">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">The people</span>
+      <h2>Invented by its founders. Vetted by the people who built the field.</h2>
+    </div>
+    <div class="team-grid reveal">
+      <div class="person">
+        <div class="role">Founder &middot; CEO</div>
+        <h3>Farshid Roumi, PhD</h3>
+        <p>Caltech PhD. Inventor on 23+ patents. Recognized by the U.S. government as an Individual with Extraordinary Ability in Science.</p>
+        <details class="bio-more"><summary>Full bio</summary><p>Former senior research scientist at Caltech, where he founded and led an advanced energy-storage lab. Recognized as an Individual with Extraordinary Ability in Science and Engineering (2012); selected for the National Academy of Engineering's Frontiers of Engineering (2023).</p></details>
+      </div>
+      <div class="person">
+        <div class="role">Co-founder &middot; Vice President &middot; Principal Investigator</div>
+        <h3>Michelle Mahshid Roumi, PhD</h3>
+        <p>ML and signal processing for faint signals in noise. Her neutrino-detector hardware has run autonomously in Antarctica since 2013.</p>
+        <details class="bio-more"><summary>Full bio</summary><p>Developed an FPGA image-processing engine up to 4&times; faster than the reported state of the art. Former Caltech postdoctoral scholar; co-inventor of the EMIS patent family; PI of this program since Phase&nbsp;I.</p></details>
+      </div>
+    </div>
+    <div class="adv-row reveal">
+      <div class="adv">
+        <div class="nm">Rachid Yazami, PhD<span>Advisory board</span></div>
+        <p>Co-inventor of the graphite anode in every lithium-ion battery; Draper Prize laureate; co-inventor on 140+ battery patents; former president of the International Battery Association.</p>
+      </div>
+      <div class="adv">
+        <div class="nm">Mehdi Hatamian, PhD<span>Electrical engineering advisor</span></div>
+        <p>Member of the National Academy of Engineering for co-inventing the communications ICs in our cell phones; former Senior Vice President at Broadcom.</p>
+      </div>
+      <div class="adv">
+        <div class="nm">Puon Penn, MBA<span>Chief Strategy Officer</span></div>
+        <p>Former Executive Vice President at Wells Fargo, where he led the bank's venture investing business and founded its Global CleanTech Group.</p>
+      </div>
+      <div class="adv">
+        <div class="nm">Brian Dillard, M.S.<span>Adviser</span></div>
+        <p>Former Johnson Controls executive director for systems electronics and battery management systems; senior roles across EV battery manufacturing and integration.</p>
+      </div>
+    </div>
+  </div>
+      <div class="record-row reveal">
+        <button class="record-trigger" id="recordOpen" aria-haspopup="dialog">
+          <span class="rt-k">Patents &amp; references</span>
+          <span class="rt-t">The record &mdash; priority timeline, patent family, citations</span>
+          <span class="rt-arr">&rarr;</span>
+        </button>
+      </div>
+</section>
+
+<hr class="heat-strip">
+
+<section class="sec panel" id="contact" data-chapter="company">
+  <div class="wrap">
+    <div class="section-head reveal" style="margin-bottom:40px">
+      <span class="eyebrow">Get in touch</span>
+      <h2>Tell us about your cells.</h2>
+    </div>
+    <div class="contact-grid reveal">
+      <div>
+        <p class="mono" style="font-size:14px;color:var(--ink-2);margin-bottom:8px">Request a validation &mdash; or write directly to <a href="mailto:froumi@parthiannrg.com" style="color:var(--blue)">froumi@parthiannrg.com</a></p>
+        <p style="font-size:14px;color:var(--ink-3);margin-bottom:22px">We respond within two business days. Your cells and your data stay yours &mdash; NDA-backed.</p>
+        <form id="cform" action="https://formspree.io/f/xzdqylyl" method="POST">
+          <div class="form-row">
+            <div><label for="cf-name">Name</label><input id="cf-name" name="name" type="text" autocomplete="name" required></div>
+            <div><label for="cf-org">Organization</label><input id="cf-org" name="organization" type="text" autocomplete="organization" required></div>
+          </div>
+          <label for="cf-email">Work email</label><input id="cf-email" name="email" type="email" autocomplete="email" required>
+          <label for="cf-role">Your role</label>
+          <select id="cf-role" name="role">
+            <option>Battery R&amp;D / national lab</option>
+            <option>University battery group</option>
+            <option>Cell manufacturing QC / gigafactory</option>
+            <option>EV OEM</option>
+            <option>Investor / strategic partner</option>
+          </select>
+          <label for="cf-cells">Cells you'd like imaged</label>
+          <input id="cf-cells" name="cells" type="text" placeholder="e.g. 11 Ah NMC pouch, 21700 cylindrical, returned field units">
+          <label for="cf-msg">What are you trying to find?</label>
+          <textarea id="cf-msg" name="objective" placeholder="Plating after fast-charge, weld or tab defects, internal shorts, a research question…"></textarea>
+          <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center">Request validation <span class="arr">→</span></button>
+          <p class="cform-status mono" role="status" aria-live="polite" style="display:none;font-size:14px;margin-top:14px"></p>
+        </form>
+      </div>
+      <div>
+        <h3 style="font-size:21px;margin-bottom:14px">Technology foundation</h3>
+        <p style="color:var(--ink-2);font-size:16px;margin-bottom:18px">Invented at Caltech (2013) and exclusively licensed to Parthian, with NAE-member advisors and a published image- and signal-processing track record behind the machine learning.</p>
+        <p style="color:var(--ink-2);font-size:16px;margin-bottom:30px">A substantial issued-and-pending patent family spans US, EU, JP, KR, and CN.</p>
+        <h3 style="font-size:21px;margin-bottom:6px">Who we work with</h3>
+        <ul class="who">
+          <li><b>01</b> Gigafactory quality-control &amp; process engineers</li>
+          <li><b>02</b> National-lab &amp; university battery researchers</li>
+          <li><b>03</b> Strategic partners &amp; investors</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section><!-- RECORD MODAL (deferred priority + refs) -->
+<div class="record-overlay" id="recordOverlay" hidden>
+  <div class="record-modal" role="dialog" aria-modal="true" aria-labelledby="recordTitle" tabindex="-1">
+    <button class="record-close" id="recordClose" aria-label="Close">&times;</button>
+    <div class="record-scroll">
+      <span class="eyebrow" id="recordTitle">The record</span>
+      <div class="record-block"><div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Priority</span>
+      <h2>Current-density imaging of batteries is now a contested field. Our claim to it is a dated record, not an adjective.</h2>
+      <p class="lead">Invented at Caltech in 2013 and exclusively licensed to Parthian worldwide, with an issued-and-pending family across the US, EU, Japan, Korea, and China.</p>
+    </div>
+    <div class="timeline reveal">
+      <div class="tl"><div class="yr">2013</div><p><b>EMIS invented at Caltech</b> by F. Roumi &amp; M. Roumi — imaging a cell's interior through the magnetic field of its own current.</p></div>
+      <div class="tl"><div class="yr">2014</div><p><b>Foundational patent application filed.</b> <span class="pat">&rarr; US 9,658,292 family</span></p></div>
+      <div class="tl"><div class="yr">2017</div><p><b>First patent granted</b> — Systems and methods for detecting abnormalities in electrical and electrochemical energy units. <span class="pat">US 9,658,292</span></p></div>
+      <div class="tl"><div class="yr">2021</div><p><b>Core family issues:</b> energy-unit monitoring, management, and abnormality detection. <span class="pat">US 10,903,668 &middot; US 10,955,483 &middot; US 11,073,564</span> — with international counterparts issued and pending across EU, JP, KR, CN.</p></div>
+      <div class="tl"><div class="yr">2024</div><p><b>Lithium-plating detection validated with Idaho National Laboratory</b> on 11 Ah commercial cells — non-invasively, during operation.</p></div>
+      <div class="tl"><div class="yr">2025</div><p><b>Four defect classes demonstrated on commercial cells; DOE Phase IIB Go/No-Go milestone passed</b> (9 of 10 cells correctly resolved in fast-charge testing).</p></div>
+      <div class="tl"><div class="yr">2026</div><p><b>EMIS08S01 Inhomogeneity Mapper available to research laboratories.</b></p></div>
+    </div>
+  </div>
+</div>
+      <div class="record-block"><div class="wrap">
+    <div class="section-head reveal" style="margin-bottom:36px">
+      <span class="eyebrow">References &amp; patents</span>
+      <h2>The record.</h2>
+    </div>
+    <div class="refs reveal">
+      <div class="ref"><div class="rn">[P1]</div><p><b>US 9,658,292</b> &mdash; Systems and methods for detecting abnormalities in electrical and electrochemical energy units. <span class="rmeta">Inventors: Roumi &middot; Assignee: Caltech &middot; filed 2014, granted 2017 &middot; exclusively licensed to Parthian</span></p></div>
+      <div class="ref"><div class="rn">[P2]</div><p><b>US 10,903,668</b> &mdash; Systems and methods for management and monitoring of energy storage and distribution. <span class="rmeta">Roumi &middot; Caltech &middot; granted 2021</span></p></div>
+      <div class="ref"><div class="rn">[P3]</div><p><b>US 10,955,483</b> &mdash; Systems and methods for detecting abnormalities in electrical and electrochemical energy units. <span class="rmeta">Roumi &middot; Caltech &middot; granted 2021</span></p></div>
+      <div class="ref"><div class="rn">[P4]</div><p><b>US 11,073,564</b> &mdash; Systems and methods for monitoring characteristics of energy units. <span class="rmeta">Roumi &middot; Caltech &middot; granted 2021 &middot; international counterparts issued &amp; pending: EU, JP, KR, CN</span></p></div>
+      <div class="ref"><div class="rn">[1]</div><p>M. Roumi, F. Roumi, &ldquo;Electrochemical Magnetic Induction Spectroscopy.&rdquo; <span class="rmeta">ECS Meeting Abstracts MA2020-02(45):3784 &middot; DOI: 10.1149/MA2020-02453784mtgabs</span></p></div>
+      <div class="ref"><div class="rn">[2]</div><p>Lithium-plating detection in 11 Ah commercial cells, validation campaign with Idaho National Laboratory. <span class="rmeta">DOE SBIR Phase II &middot; data available to qualified partners under NDA</span></p></div>
+      <div class="ref"><div class="rn">[3]</div><p>M. Roumi, &ldquo;Advanced pattern-matching trigger system design for the ARIANNA High-Energy Neutrino Detector.&rdquo; <span class="rmeta">PhD thesis, UC Irvine, 2014</span></p></div>
+      <div class="ref"><div class="rn">[4]</div><p>Independent literature on the physics: high-throughput Li-plating quantification for fast-charge design, <span class="rmeta">Nature Energy 8, 450&ndash;461 (2023)</span>; magnetocardiography on the same mathematical foundation, <span class="rmeta">Communications Physics 5, 200 (2022)</span>.</p></div>
+    </div>
+    <details class="patent-full reveal" style="margin-top:28px">
+      <summary style="cursor:pointer;font-size:14px;color:var(--ink-3);letter-spacing:.04em;list-style:none;display:flex;align-items:center;gap:8px"><span class="pd-arrow" style="display:inline-block;transition:transform .2s">&#9654;</span> Complete patent family &mdash; 26 issued &amp; pending</summary>
+      <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:6px 40px">
+        <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:0 40px;border-bottom:1px solid var(--rule);padding-bottom:8px;margin-bottom:4px"><span style="font-size:11px;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase">Issued patents</span><span style="font-size:11px;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase">Published applications</span></div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <a class="pat-num" href="https://patents.google.com/patent/US12203994" target="_blank" rel="noopener">US 12,203,994</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US12158505" target="_blank" rel="noopener">US 12,158,505</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US11879946" target="_blank" rel="noopener">US 11,879,946</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US11831183" target="_blank" rel="noopener">US 11,831,183</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US11567134" target="_blank" rel="noopener">US 11,567,134</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US11549993" target="_blank" rel="noopener">US 11,549,993</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US11073564" target="_blank" rel="noopener">US 11,073,564</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US10955483" target="_blank" rel="noopener">US 10,955,483</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US10903668" target="_blank" rel="noopener">US 10,903,668</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US10389141" target="_blank" rel="noopener">US 10,389,141</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US10353012" target="_blank" rel="noopener">US 10,353,012</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US10330732" target="_blank" rel="noopener">US 10,330,732</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US9658292" target="_blank" rel="noopener">US 9,658,292</a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <a class="pat-num" href="https://patents.google.com/patent/US20250231247" target="_blank" rel="noopener">US 2025/0231247</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US20240142528" target="_blank" rel="noopener">US 2024/0142528</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US20230375631" target="_blank" rel="noopener">US 2023/0375631</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US20230324461" target="_blank" rel="noopener">US 2023/0324461</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US20210293889" target="_blank" rel="noopener">US 2021/0293889</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US20210286010" target="_blank" rel="noopener">US 2021/0286010</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US20210210965" target="_blank" rel="noopener">US 2021/0210965</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US20200088802" target="_blank" rel="noopener">US 2020/0088802</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US20200041569" target="_blank" rel="noopener">US 2020/0041569</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US20170315178" target="_blank" rel="noopener">US 2017/0315178</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US20170108552" target="_blank" rel="noopener">US 2017/0108552</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US20160190833" target="_blank" rel="noopener">US 2016/0190833</a>
+          <a class="pat-num" href="https://patents.google.com/patent/US20140272500" target="_blank" rel="noopener">US 2014/0272500</a>
+        </div>
+      </div>
+      <style>.patent-full summary::-webkit-details-marker{display:none}.patent-full[open] .pd-arrow{transform:rotate(90deg)}.pat-num{font-size:13px;font-family:var(--mono,monospace);color:var(--ink-2);text-decoration:none;letter-spacing:.02em}.pat-num:hover{color:var(--amber);text-decoration:underline}</style>
+    </details>
+    <p class="refs-note">Supported by the U.S. Department of Energy SBIR program (Phase I &middot; II &middot; IIB) and the State of California (CalSEED). Project partners: LG Energy Solution, National Renewable Energy Laboratory, Lawrence Berkeley National Laboratory.</p>
+  </div>
+</div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <hr class="heat-strip" style="margin-bottom:40px">
+  <div class="wrap">
+    <div class="foot-nav">
+      <a href="#proof">Proof</a><a href="#atlas">Signature atlas</a><a href="#standard">The standard</a><a href="#problem">The case</a><a href="#labs">Instrument</a><a href="#team">Team</a><button class="foot-record" data-open-record>The record</button><a href="#contact">Contact</a>
+    </div>
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="index.html" style="color:#fff">
+<svg class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M16 28 C8.8 28 4 23 4 16.6 C4 9.6 9.4 4.6 16.4 4.6 C23.4 4.6 28 9.8 28 16.2" stroke="#E7E3D8" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M16 23.4 C11.6 23.4 8.8 20.4 8.8 16.5 C8.8 12.4 12 9.4 16.3 9.4 C20.6 9.4 23.3 12.4 23.4 16" stroke="#6FA0D8" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M15.9 18.9 C14.2 18.8 13.3 17.8 13.4 16.3 C13.5 14.9 14.7 13.9 16.2 14 C17.7 14 18.8 15 18.9 16.3" stroke="#8FB6E2" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="22.6" cy="21.4" r="2.7" fill="#C0721B"/>
+      </svg>Parthian&nbsp;Energy
+        </a>
+        <p class="tag">Current-density imaging for battery quality control. Invented at Caltech, 2013 &mdash; exclusively licensed to Parthian.</p>
+      </div>
+      <div class="fmeta">
+        Pasadena, California<br>
+        <a href="mailto:froumi@parthiannrg.com" style="color:#8d99a6;text-decoration:none">froumi@parthiannrg.com</a><br>
+        US 9,658,292 &middot; 10,903,668 &middot; 10,955,483 &middot; 11,073,564<br>
+        © 2026 Parthian Energy, Inc.
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="record-overlay" id="mapperOv" hidden>
+  <div class="record-modal mapper-modal" role="dialog" aria-modal="true" aria-labelledby="mapperT" tabindex="-1">
+    <button class="record-close" id="mapperX" aria-label="Close">&times;</button>
+    <div class="record-scroll">
+    <span class="eyebrow" id="mapperT">Available now &middot; Model EMIS08S01</span>
+    <h2 style="margin-top:10px">The Inhomogeneity Mapper</h2>
+
+    <div class="mapper-intro">
+      <span class="eyebrow">From lab to line &middot; where it starts</span>
+      <div class="road">
+        <div class="rstep now">
+          <div class="when"><span class="pin">01</span>Today</div>
+          <div>
+            <h3>Research &amp; national labs</h3>
+            <p>The EMIS instrument delivering 2D current-density maps to trained scientists, plus paid joint-validation collaborations. Here, the expert-read map is an asset, not a limitation.</p>
+            <p class="note">Near-term revenue + the validation engine. Labs manufacture our credibility &mdash; every published result is third-party proof a QC director can take to risk-averse management.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="prodcard">
+      <div class="pc-main">
+        <div class="pc-k">Model EMIS08S01 &middot; available now</div>
+        <h3>The Inhomogeneity Mapper</h3>
+        <p>A benchtop instrument that images a cell's internal current density &mdash; non-contact, no teardown &mdash; and returns a machine-readable map of where the internal resistance deviates. Chemistry-, size-, and format-agnostic, from 200&nbsp;mAh to 100&nbsp;Ah.</p>
+        <div class="pc-row">
+          <div><span class="pcl">What it is</span>8-channel magnetic current-density mapper + EIS</div>
+          <div><span class="pcl">What you get</span>2D field map &rarr; scalar defect read</div>
+          <div><span class="pcl">From</span>US$&nbsp;9,975 / 6-mo rental</div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-grid">
+      <div>
+        <h3 style="font-size:24px;margin-bottom:6px">Datasheet summary</h3>
+        <p style="color:var(--ink-2);font-size:15.5px;margin-bottom:10px">EMIS08S01 &mdash; 8-channel internal-resistance inhomogeneity mapper. Rack-mounted; 120&nbsp;VAC.</p>
+        <details class="spec-details"><summary>Full specifications &amp; measurement modes</summary><ul class="spec-list">
+          <li><span>Cell voltage range</span><span>0.5 to +4.5 V</span></li>
+          <li><span>Current measurement accuracy</span><span>&plusmn;0.50% + 250 nA</span></li>
+          <li><span>Voltage measurement accuracy</span><span>&plusmn;0.05% + 0.1 mV</span></li>
+          <li><span>Magnetic field accuracy</span><span>0.1% + 0.1 nT</span></li>
+          <li><span>Local IR variation accuracy</span><span>0.3%</span></li>
+          <li><span>EMIS stability (nT per mA)</span><span>&plusmn;0.50%</span></li>
+          <li><span>Current sourcing range</span><span>&plusmn;10 / &plusmn;100 / &plusmn;1000 mA</span></li>
+          <li><span>Sourcing stability</span><span>&plusmn;0.10% pk (24 h) &middot; &plusmn;0.05% pk (1 min)</span></li>
+          <li><span>Frequency range</span><span>10 Hz &ndash; 10 kHz</span></li>
+          <li><span>Max 2D scan area</span><span>250 &times; 150 mm &middot; &plusmn;50 &micro;m repeatability</span></li>
+        </ul>
+        <div class="modes">
+          <p><b>ACIR-extension</b> &mdash; sinusoidal drive (100 Hz&ndash;10 kHz); B/I amplitude and phase map local internal resistance.</p>
+          <p><b>DCIR-extension</b> &mdash; a discharge pulse at ~1/100 the amplitude and 1/10 the duration of traditional DCIR.</p>
+          <p><b>dQ/dV-extension</b> &mdash; &Delta;B/&Delta;V under a gentle C/100 pulse maps local state of safety.</p>
+        </div></details>
+      </div>
+      <div>
+        <figure style="margin-bottom:22px">
+          <div class="photo"><img src="assets/emis08s01-2u-rack-mount-main-unit-front-panel-701ee2.webp" alt="EMIS08S01 2U rack-mount main unit, front panel" width="1100" height="618" loading="lazy" decoding="async"></div>
+          <figcaption class="figcap"><span class="fign">Figure 8</span><b>Main unit.</b> 2U rack chassis; EIS and EMIS share the same electronics.</figcaption>
+        </figure>
+        <h3 style="font-size:20px;margin:6px 0 4px">What's included</h3>
+        <table class="inc-table">
+          <tr><td>1&times;</td><td>EMIS license &amp; analytical software</td></tr>
+          <tr><td>1&times;</td><td>EIS 1-channel hardware</td></tr>
+          <tr><td>1&times;</td><td>EMIS 8-channel mapper hardware</td></tr>
+          <tr><td>+</td><td>XYZ 3-axis gantry &mdash; optional, US$ 5,475</td></tr>
+        </table>
+        <p class="mono" style="font-size:13.5px;color:var(--ink-2);margin-top:16px;border-top:1px solid var(--rule);padding-top:14px">Rental: US$ 9,975 / 6 months &middot; then US$ 999/month for 18 months</p>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- colormap: single source of truth (CSS custom props) ----
+const css = getComputedStyle(document.documentElement);
+const stops = ['--cm0','--cm1','--cm2','--cm3','--cm4','--cm5'].map(v=>{
+  const h = css.getPropertyValue(v).trim().replace('#','');
+  return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+});
+function cmap(t){
+  t=Math.max(0,Math.min(1,t));
+  const seg=(stops.length-1)*t, i=Math.floor(seg), f=seg-i;
+  const a=stops[Math.min(i,stops.length-1)], b=stops[Math.min(i+1,stops.length-1)];
+  return [a[0]+(b[0]-a[0])*f, a[1]+(b[1]-a[1])*f, a[2]+(b[2]-a[2])*f];
+}
+function field(x,y,sources){
+  let v=0;
+  for(const s of sources){const dx=x-s.x,dy=y-s.y;v+=s.a*Math.exp(-(dx*dx/s.sx+dy*dy/s.sy));}
+  return v;
+}
+const healthy=[{x:.28,y:.5,a:.62,sx:.05,sy:.12},{x:.72,y:.5,a:.62,sx:.05,sy:.12},{x:.5,y:.5,a:.30,sx:.18,sy:.10}];
+const defect=[{x:.28,y:.5,a:.55,sx:.05,sy:.12},{x:.72,y:.5,a:.50,sx:.05,sy:.12},{x:.5,y:.5,a:.26,sx:.18,sy:.10},{x:.78,y:.72,a:.95,sx:.012,sy:.012}];
+
+// ---- retina-sharp renderer: precompute two breathe frames, crossfade on the GPU ----
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function renderFrame(W,H,sources,breathe){
+  const c=document.createElement('canvas'); c.width=W; c.height=H;
+  const ctx=c.getContext('2d'), img=ctx.createImageData(W,H), d=img.data;
+  for(let py=0;py<H;py++)for(let px=0;px<W;px++){
+    let v=field(px/W,py/H,sources)*breathe;
+    const band=0.5+0.5*Math.cos(v*22);
+    v=v*0.92+band*0.06;
+    const col=cmap(v), o=(py*W+px)*4;
+    d[o]=col[0];d[o+1]=col[1];d[o+2]=col[2];d[o+3]=255;
+  }
+  ctx.putImageData(img,0,0);
+  return c;
+}
+function setupCell(id,sources){
+  const cv=document.getElementById(id); if(!cv) return null;
+  const ctx=cv.getContext('2d');
+  function build(){
+    const dpr=Math.min(devicePixelRatio||1,2);
+    const W=Math.round(cv.clientWidth*dpr)||560, H=Math.round(W*200/280);
+    cv.width=W; cv.height=H;
+    const A=renderFrame(W,H,sources,0.96), B=renderFrame(W,H,sources,1.04);
+    cv._frames=[A,B];
+    ctx.drawImage(A,0,0);
+  }
+  build();
+  let rw; addEventListener('resize',()=>{clearTimeout(rw);rw=setTimeout(build,250);},{passive:true});
+  return cv;
+}
+const cH=setupCell('cellHealthy',healthy), cD=setupCell('cellDefect',defect);
+if(!reduceMotion && cH && cD){
+  let visible=true;
+  new IntersectionObserver(es=>{visible=es[0].isIntersecting;},{threshold:0}).observe(cH.closest('.fig'));
+  (function loop(t){
+    if(visible){
+      const mix=0.5+0.5*Math.sin(t/900);
+      for(const cv of [cH,cD]){
+        const ctx=cv.getContext('2d'), [A,B]=cv._frames;
+        ctx.globalAlpha=1; ctx.drawImage(A,0,0,cv.width,cv.height);
+        ctx.globalAlpha=mix; ctx.drawImage(B,0,0,cv.width,cv.height);
+      }
+    }
+    requestAnimationFrame(loop);
+  })(0);
+}
+
+// ---- mobile menu ----
+const menuBtn=document.getElementById('menuBtn'), navLinks=document.getElementById('navLinks');
+menuBtn.addEventListener('click',()=>{
+  const open=navLinks.classList.toggle('open');
+  menuBtn.setAttribute('aria-expanded',open);
+  menuBtn.setAttribute('aria-label',open?'Close menu':'Open menu');
+});
+navLinks.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
+  navLinks.classList.remove('open');menuBtn.setAttribute('aria-expanded','false');
+}));
+
+// ---- scroll progress fallback (browsers without animation-timeline) ----
+if(!(window.CSS&&CSS.supports&&CSS.supports('animation-timeline: scroll()'))){
+  const bar=document.querySelector('.progress');
+  const onScroll=()=>{
+    const h=document.documentElement;
+    bar.style.transform='scaleX('+(h.scrollTop/(h.scrollHeight-h.clientHeight)||0)+')';
+  };
+  addEventListener('scroll',onScroll,{passive:true}); onScroll();
+}
+
+// ---- contact form -> mailto ----
+(function(){
+  const form=document.getElementById('cform'); if(!form) return;
+  const status=form.querySelector('.cform-status');
+  const btn=form.querySelector('button[type="submit"]');
+  function show(msg,color){status.textContent=msg;status.style.color=color;status.style.display='block';}
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if(!form.checkValidity()){form.reportValidity();return;}
+    const data=new FormData(form);
+    btn.disabled=true; const label=btn.innerHTML; btn.innerHTML='Sending…';
+    try{
+      const res=await fetch(form.action,{method:'POST',body:data,headers:{'Accept':'application/json'}});
+      if(res.ok){
+        form.reset();
+        show('Thank you — your request is in. We\u2019ll reply within two business days, usually sooner.', 'var(--blue)');
+        btn.style.display='none';
+      }else{
+        const j=await res.json().catch(()=>({}));
+        const m=(j.errors&&j.errors.map(x=>x.message).join(', '))||'Something went wrong.';
+        show(m+' You can also email froumi@parthiannrg.com directly.', '#c0451b');
+        btn.disabled=false; btn.innerHTML=label;
+      }
+    }catch(err){
+      // network failure — fall back to email client so the lead is never lost
+      const v=n=>encodeURIComponent((form.querySelector('[name="'+n+'"]')||{}).value||'');
+      const body=`Name: ${decodeURIComponent(v('name'))}%0AOrganization: ${decodeURIComponent(v('organization'))}%0AEmail: ${decodeURIComponent(v('email'))}%0ARole: ${decodeURIComponent(v('role'))}%0ACells: ${decodeURIComponent(v('cells'))}%0A%0A${decodeURIComponent(v('objective'))}`;
+      show('Couldn\u2019t reach the server — opening your email client instead.', '#c0451b');
+      window.location.href='mailto:froumi@parthiannrg.com?subject='+encodeURIComponent('EMIS validation request')+'&body='+body;
+      btn.disabled=false; btn.innerHTML=label;
+    }
+  });
+})();
+
+// ---- TAXONOMY SIGNATURE GRID (Figure 2) ----
+(function(){
+  const grid=document.getElementById('taxGrid'); if(!grid) return;
+  const ramp=[[27,58,107],[43,111,155],[63,174,142],[205,210,78],[224,163,47],[192,69,27]];
+  function cmap(t){t=Math.max(0,Math.min(1,t));const s=(ramp.length-1)*t,i=Math.floor(s),f=s-i;
+    const a=ramp[Math.min(i,5)],b=ramp[Math.min(i+1,5)];
+    return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f];}
+  function G(x,y,cx,cy,sx,sy,a){const dx=x-cx,dy=y-cy;return a*Math.exp(-(dx*dx/sx+dy*dy/sy));}
+  function base(x,y){return G(x,y,0.18,0.5,0.020,0.060,0.60)+G(x,y,0.82,0.5,0.020,0.060,0.60)+G(x,y,0.5,0.5,0.090,0.045,0.24);}
+  const sigs={
+    healthy:(x,y)=>base(x,y),
+    torntab:(x,y)=>base(x,y)+G(x,y,0.88,0.12,0.006,0.006,0.95)+G(x,y,0.88,0.12,0.02,0.02,0.4),
+    plating:(x,y)=>base(x,y)+G(x,y,0.74,0.30,0.010,0.010,0.92)+G(x,y,0.74,0.30,0.03,0.03,0.35),
+    short:(x,y)=>base(x,y)*0.7+G(x,y,0.5,0.55,0.0016,0.0016,1.05),
+    dendrite:(x,y)=>{let v=base(x,y);for(let k=0;k<10;k++){const t=k/9;v+=G(x,y,0.2+t*0.42,0.5+Math.sin(t*7)*0.04*t,0.004,0.0016,0.8-t*0.5);}return v;},
+    multi:(x,y)=>base(x,y)+G(x,y,0.8,0.24,0.008,0.008,0.85)+G(x,y,0.3,0.7,0.006,0.006,0.7)+G(x,y,0.6,0.46,0.003,0.003,0.6)
+  };
+  function draw(cv,fn){
+    const dpr=Math.min(devicePixelRatio||1,2);const r=cv.getBoundingClientRect();
+    const W=Math.max(2,Math.round(r.width*dpr)),H=Math.max(2,Math.round(r.height*dpr));
+    cv.width=W;cv.height=H;const ctx=cv.getContext('2d'),img=ctx.createImageData(W,H),d=img.data;
+    for(let py=0;py<H;py++)for(let px=0;px<W;px++){
+      let v=fn(px/W,py/H);const band=0.5+0.5*Math.cos(v*15);v=v*0.92+band*0.05;
+      const c=cmap(v),o=(py*W+px)*4;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255;}
+    ctx.putImageData(img,0,0);
+  }
+  function renderAll(){grid.querySelectorAll('canvas').forEach(cv=>draw(cv,sigs[cv.dataset.sig]));}
+  // render when scrolled into view (cheap, one-shot)
+  const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){renderAll();io.disconnect();
+    let rw;addEventListener('resize',()=>{clearTimeout(rw);rw=setTimeout(renderAll,250);},{passive:true});}},{threshold:.1});
+  io.observe(grid);
+})();
+
+// ---- AUDIENCE FORK (IDEO) — message + re-sequence + persist ----
+const audMsgs = {
+  lab: ["For research & development","EMIS images plating and current-density heterogeneity <b>in situ</b>, so you see onset in cycles \u2014 not after a teardown. The EMIS08S01 is available now; jump to the instrument, or run a validation on your own cells first."],
+  mfg: ["For cell manufacturing QC","The inline product rides your existing ACIR station \u2014 same electronics, ~10s, no added line time \u2014 and catches the latent defects (torn tabs, weld faults, shorts) that pass aging and cause recalls. Start with a validation on cells you've already scrapped or returned; see exactly what conventional QC missed."],
+  inv: ["For capital","Earlier patent priority (2013, Caltech), independent national-lab validation, and the first corpus of measured commercial-cell signatures. The instrument is the wedge; the labeled-signature standard is the moat. See <b>Proof</b>, <b>The standard</b>, and the full patent record."]
+};
+// per-audience emphasis: which sections lead. Others keep base order after these.
+const audOrder = {
+  lab: ['labs','signature','roadmap','proof','standard','priority'],
+  mfg: ['compare','roadmap','proof','standard','labs','priority'],
+  inv: ['standard','proof','priority','compare','roadmap','labs']
+};
+const main = document.getElementById('main');
+const movable = ['compare','signature','how','atlas','proof','standard','priority','roadmap','labs','team','refs','contact'];
+// capture base order once
+const baseOrder = movable.slice();
+function sectionEl(id){return document.getElementById(id)?.closest('section');}
+function applyOrder(k){
+  if(!k){ // restore base
+    baseOrder.forEach(id=>{const el=sectionEl(id); if(el) main.appendChild(el);});
+    return;
+  }
+  const lead = audOrder[k];
+  const rest = baseOrder.filter(id=>!lead.includes(id));
+  [...lead, ...rest].forEach(id=>{const el=sectionEl(id); if(el) main.appendChild(el);});
+}
+const forkBtns = document.querySelectorAll('.fork-btn');
+const audLine = document.getElementById('audLine');
+const audAx = document.getElementById('audAx');
+const audMsg = document.getElementById('audMsg');
+function selectAud(k,scroll){
+  if(!forkBtns.length || !audAx) return; // fork not present on this page
+  forkBtns.forEach(x=>x.setAttribute('aria-pressed', x.dataset.aud===k?'true':'false'));
+  document.body.dataset.aud=k;
+  audAx.textContent=audMsgs[k][0];
+  audMsg.innerHTML=audMsgs[k][1];
+  audLine.classList.add('show');
+  applyOrder(k);
+  try{localStorage.setItem('parthian-aud',k);}catch(e){}
+}
+forkBtns.forEach(b=>b.addEventListener('click',()=>selectAud(b.dataset.aud,false)));
+// restore prior choice (only if the fork exists on this page)
+if(forkBtns.length){ try{const saved=localStorage.getItem('parthian-aud'); if(saved&&audMsgs[saved]) selectAud(saved,false);}catch(e){} }
+
+// ---- SIGNATURE INTERACTION (Fantasy) — WebGL2 field shader ----
+(function(){
+  const cv=document.getElementById('sigCanvas'); if(!cv) return;
+  const gl=cv.getContext('webgl2',{antialias:true,premultipliedAlpha:false});
+  if(!gl){
+    const w=cv.parentElement;
+    w.style.cursor='default';
+    const fb=document.createElement('div');
+    fb.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;background:radial-gradient(circle at 74% 30%,rgba(192,69,27,.5),transparent 38%),radial-gradient(circle at 18% 50%,rgba(224,163,47,.35),transparent 30%),radial-gradient(circle at 82% 50%,rgba(224,163,47,.35),transparent 30%),#0a0f15';
+    fb.innerHTML='<span style="font-family:IBM Plex Mono,monospace;font-size:12px;letter-spacing:.06em;color:#aeb8c4;max-width:34ch;line-height:1.6">Interactive field view needs WebGL. The plating hot-spot would appear lower-right as charge cycles climb &mdash; see the measured maps in Figure&nbsp;3 below.</span>';
+    cv.style.aspectRatio='7/5';cv.style.display='block';
+    w.appendChild(fb);
+    return;
+  }
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const VS=`#version 300 es
+  in vec2 p; out vec2 uv; void main(){uv=p*0.5+0.5; gl_Position=vec4(p,0.,1.);}`;
+  const FS=`#version 300 es
+  precision highp float; in vec2 uv; out vec4 o;
+  uniform float uPlate,uReveal,uTime,uHasPtr,uAspect; uniform vec2 uPtr;
+  float lobe(vec2 q,vec2 c,vec2 s,float a){vec2 d=q-c; return a*exp(-(d.x*d.x/s.x+d.y*d.y/s.y));}
+  vec3 ramp(float t){t=clamp(t,0.,1.);
+    vec3 c0=vec3(0.106,0.227,0.420),c1=vec3(0.169,0.435,0.608),c2=vec3(0.247,0.682,0.557),
+         c3=vec3(0.804,0.823,0.306),c4=vec3(0.878,0.639,0.184),c5=vec3(0.753,0.271,0.106);
+    if(t<0.2)return mix(c0,c1,t/0.2); if(t<0.45)return mix(c1,c2,(t-0.2)/0.25);
+    if(t<0.65)return mix(c2,c3,(t-0.45)/0.20); if(t<0.82)return mix(c3,c4,(t-0.65)/0.17);
+    return mix(c4,c5,(t-0.82)/0.18);}
+  float baseField(vec2 q){float v=0.0;
+    v+=lobe(q,vec2(0.18,0.50),vec2(0.020,0.060),0.62);
+    v+=lobe(q,vec2(0.82,0.50),vec2(0.020,0.060),0.62);
+    v+=lobe(q,vec2(0.50,0.50),vec2(0.090,0.045),0.26); return v;}
+  vec3 shade(float v){float c=smoothstep(0.0,0.04,abs(fract(v*16.0)-0.5));
+    return ramp(v)*mix(0.82,1.0,c);}
+  void main(){vec2 q=uv;
+    float br=1.0+0.025*sin(uTime*1.1);
+    float amp=uPlate*0.95*br, spread=mix(0.004,0.011,uPlate);
+    float base=baseField(q);
+    float defect=lobe(q,vec2(0.74,0.30),vec2(spread,spread),amp)
+                +lobe(q,vec2(0.74,0.30),vec2(spread*3.0,spread*3.0),amp*0.35);
+    // defect is HIDDEN by default — the lens is the only way to reveal it
+    vec3 col=shade(base);
+    if(uHasPtr>0.5){
+      vec2 d=(uv-uPtr); d.y/=uAspect; float dist=length(d);
+      float lens=smoothstep(uReveal,uReveal*0.62,dist);   // 1 inside, 0 outside
+      vec3 revealed=shade(base+defect);                    // full defect inside the lens
+      col=mix(col,revealed,lens);
+      float ring=smoothstep(0.006,0.0,abs(dist-uReveal));
+      col=mix(col,vec3(1.0,0.85,0.4),ring*0.55);
+    }
+    o=vec4(col,1.0);}`;
+  function sh(t,s){const x=gl.createShader(t);gl.shaderSource(x,s);gl.compileShader(x);return x;}
+  const pr=gl.createProgram();
+  gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));
+  gl.linkProgram(pr);gl.useProgram(pr);
+  const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  const lp=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(lp);gl.vertexAttribPointer(lp,2,gl.FLOAT,false,0,0);
+  const U={}; ['uPlate','uReveal','uTime','uHasPtr','uPtr','uAspect'].forEach(n=>U[n]=gl.getUniformLocation(pr,n));
+  let plate=0.5, ptr=[0.5,0.5], hasPtr=0, aspect=1.4;
+  function resize(){const r=cv.getBoundingClientRect();const dpr=Math.min(devicePixelRatio||1,2);
+    cv.width=Math.max(2,r.width*dpr);cv.height=Math.max(2,r.height*dpr);aspect=r.width/r.height;
+    gl.viewport(0,0,cv.width,cv.height);}
+  const ro=new ResizeObserver(resize); ro.observe(cv); resize();
+  // cycle -> plating severity (calibrated: ~12 cycles begins, saturates ~120)
+  const slider=document.getElementById('sigSlider'), cyc=document.getElementById('sigCyc');
+  const verdict=document.getElementById('sigVerdict'), vtext=document.getElementById('sigVtext');
+  if(!verdict||!slider) return;
+  const vd=verdict.querySelector('.vd'), emis=document.getElementById('sigEmis'), hint=document.getElementById('sigHint');
+  let curCycle=60, foundDefect=false;
+  function emisReading(){
+    if(!foundDefect){ emis.textContent='\u2014'; emis.className='rv'; return; }
+    if(plate<0.04){emis.textContent='HEALTHY';emis.className='rv ok';}
+    else if(plate<0.35){emis.textContent='PLATING \u2014 EARLY';emis.className='rv bad';}
+    else {emis.textContent='PLATING \u2014 ADVANCED';emis.className='rv bad';}
+  }
+  function setCycle(n){
+    curCycle=n; cyc.textContent=n;
+    plate=Math.max(0,Math.min(1,(n-8)/110)); // onset ~cycle 8
+    const voltPass = n<118;
+    vtext.textContent = voltPass ? 'VOLTAGE TEST: PASS' : 'VOLTAGE TEST: FAIL';
+    vtext.style.color = voltPass ? '#5fd0a0' : '#e0863f';
+    vd.style.background = voltPass ? '#5fd0a0' : '#e0863f';
+    emisReading();
+  }
+  setCycle(60);
+  slider.addEventListener('input',e=>setCycle(+e.target.value));
+  const stage=document.getElementById('sigStage');
+  const DEFECT=[0.74,0.30];
+  function checkFound(){
+    const dx=ptr[0]-DEFECT[0], dy=(ptr[1]-DEFECT[1])/aspect;
+    const findR = matchMedia('(pointer:coarse)').matches ? 0.30 : 0.20;
+    if(Math.hypot(dx,dy)<findR){ if(!foundDefect){foundDefect=true; emisReading();} }
+  }
+  function moveP(x,y){const r=cv.getBoundingClientRect();
+    ptr=[(x-r.left)/r.width, 1.0-(y-r.top)/r.height];hasPtr=1;hint.classList.add('gone');checkFound();}
+  stage.addEventListener('pointermove',e=>moveP(e.clientX,e.clientY));
+  stage.addEventListener('pointerleave',()=>{hasPtr=0;});
+  stage.addEventListener('pointerdown',e=>moveP(e.clientX,e.clientY));
+  stage.addEventListener('touchmove',e=>{const t=e.touches[0];if(t){const r=cv.getBoundingClientRect();ptr=[(t.clientX-r.left)/r.width,1.0-(t.clientY-r.top)/r.height];hasPtr=1;hint.classList.add('gone');checkFound();}},{passive:true});
+  stage.addEventListener('touchstart',e=>{const t=e.touches[0];if(t){const r=cv.getBoundingClientRect();ptr=[(t.clientX-r.left)/r.width,1.0-(t.clientY-r.top)/r.height];hasPtr=1;hint.classList.add('gone');checkFound();}},{passive:true});
+  let visible=true;
+  new IntersectionObserver(es=>{visible=es[0].isIntersecting;},{threshold:0}).observe(cv);
+  function frame(t){
+    if(visible){
+      gl.uniform1f(U.uPlate,plate);gl.uniform1f(U.uReveal,0.22);
+      gl.uniform1f(U.uTime,reduce?0:t/1000);gl.uniform1f(U.uHasPtr,hasPtr);
+      gl.uniform2f(U.uPtr,ptr[0],ptr[1]);gl.uniform1f(U.uAspect,aspect);
+      gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+// ---- RECORD MODAL (deferred priority + refs) ----
+(function(){
+  const overlay=document.getElementById('recordOverlay');
+  if(!overlay) return;
+  const modal=overlay.querySelector('.record-modal');
+  const closeBtn=document.getElementById('recordClose');
+  let lastFocus=null;
+  function open(){
+    lastFocus=document.activeElement;
+    overlay.hidden=false;
+    document.body.style.overflow='hidden';
+    modal.focus();
+    document.addEventListener('keydown',onKey);
+  }
+  function close(){
+    overlay.hidden=true;
+    document.body.style.overflow='';
+    document.removeEventListener('keydown',onKey);
+    if(lastFocus) lastFocus.focus();
+  }
+  function onKey(e){
+    if(e.key==='Escape'){close();return;}
+    if(e.key==='Tab'){
+      const f=modal.querySelectorAll('a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])');
+      if(!f.length) return;
+      const first=f[0], last=f[f.length-1];
+      if(e.shiftKey && document.activeElement===first){e.preventDefault();last.focus();}
+      else if(!e.shiftKey && document.activeElement===last){e.preventDefault();first.focus();}
+    }
+  }
+  document.querySelectorAll('#recordOpen,[data-open-record]').forEach(b=>b.addEventListener('click',open));
+  closeBtn.addEventListener('click',close);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)close();});
+  // arriving from the homepage footer "The record" link (#refs) opens the modal
+  if(location.hash==='#refs'){ setTimeout(open, 120); }
+})();
+
+// ---- MAPPER MODAL (deferred instrument detail) ----
+(function(){
+  const overlay=document.getElementById('mapperOv');
+  if(!overlay) return;
+  const modal=overlay.querySelector('.mapper-modal');
+  const closeBtn=document.getElementById('mapperX');
+  let lastFocus=null;
+  function open(){
+    lastFocus=document.activeElement;
+    overlay.hidden=false;
+    document.body.style.overflow='hidden';
+    modal.scrollTop=0;
+    modal.focus();
+    document.addEventListener('keydown',onKey);
+  }
+  function close(){
+    overlay.hidden=true;
+    document.body.style.overflow='';
+    document.removeEventListener('keydown',onKey);
+    if(lastFocus) lastFocus.focus();
+  }
+  function onKey(e){
+    if(e.key==='Escape'){close();return;}
+    if(e.key==='Tab'){
+      const f=modal.querySelectorAll('a[href],button:not([disabled]),summary,[tabindex]:not([tabindex="-1"])');
+      if(!f.length) return;
+      const first=f[0], last=f[f.length-1];
+      if(e.shiftKey && document.activeElement===first){e.preventDefault();last.focus();}
+      else if(!e.shiftKey && document.activeElement===last){e.preventDefault();first.focus();}
+    }
+  }
+  document.querySelectorAll('[data-open-mapper]').forEach(b=>b.addEventListener('click',open));
+  closeBtn.addEventListener('click',close);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)close();});
+})();
+
+// ---- CHAPTER RAIL active state (AREA 17) ----
+(function(){
+  const rail=document.getElementById('chapRail'); if(!rail) return;
+  const links=[...rail.querySelectorAll('a')];
+  const chapters=['proof','case','product','company'];
+  // map each chapter to its first section currently in DOM
+  function firstOf(ch){const s=[...document.querySelectorAll(`section[data-chapter="${ch}"]`)]; return s[0];}
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const ch=e.target.dataset.chapter;
+        links.forEach(l=>l.classList.toggle('active', l.dataset.ch===ch));
+      }
+    });
+  },{rootMargin:'-45% 0px -45% 0px'});
+  document.querySelectorAll('section[data-chapter]').forEach(s=>io.observe(s));
+})();
+
+// ---- reveals: CSS scroll-driven where supported, IO fallback elsewhere ----
+if(window.CSS&&CSS.supports&&CSS.supports('animation-timeline: view()')&&!reduceMotion){
+  document.documentElement.classList.add('sda');
+}else{
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+  document.querySelectorAll('.reveal:not(.in)').forEach(el=>io.observe(el));
+}
+// ---- handoff: land directly on the hash target (no long visible scroll) ----
+(function(){
+  if(!location.hash) return;
+  const id=location.hash.slice(1);
+  // eager-load images so they reserve layout space before we settle the scroll
+  document.querySelectorAll('img[loading="lazy"]').forEach(i=>i.loading='eager');
+  function land(){ const t=document.getElementById(id); if(t) t.scrollIntoView({behavior:'auto', block:'start'}); }
+  // disable smooth scrolling during arrival so it snaps instead of racing through the page
+  const root=document.documentElement, prev=root.style.scrollBehavior;
+  root.style.scrollBehavior='auto';
+  land();
+  // re-correct as layout settles (fork reorder, image decode), then restore smooth scrolling
+  let n=0; const iv=setInterval(()=>{ land(); if(++n>=8){clearInterval(iv); root.style.scrollBehavior=prev;} }, 90);
+  window.addEventListener('load', land);
+})();
+// ---- arrival bridge: acknowledge the handoff from the immersive experience ----
+(function(){
+  const cameFromExperience = !!location.hash || /index\.html$|\/$/.test(document.referrer.split('?')[0].replace(location.origin,'')) && document.referrer.includes(location.host);
+  const fromExp = !!location.hash || (document.referrer && document.referrer.includes(location.host) && /\/(index\.html)?$/.test(new URL(document.referrer).pathname));
+  if(!fromExp) return;
+  const el=document.getElementById('arrival'); if(!el) return;
+  el.hidden=false;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.hidden=true,700); }, 4200);
+})();
+</script>
+
+</body>
+</html>
