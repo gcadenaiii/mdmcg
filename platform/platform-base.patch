@@ -1,0 +1,58 @@
+diff --git a/website/index.html b/website/index.html
+index 1d9dc7f..459eec4 100644
+--- a/website/index.html
++++ b/website/index.html
+@@ -4,7 +4,8 @@
+     <head>
+       <meta charset="UTF-8" />
+       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+-      <title>mdmcg — The first wearable MCG</title>
++      <meta name="robots" content="noindex, nofollow" />
++      <title>mdmcg platform</title>
+       <style>html, body { height: 100%; margin: 0; } #root { height: 100%; }</style>
+     </head>
+ 
+diff --git a/website/src/main.tsx b/website/src/main.tsx
+index ad185f3..78289dc 100644
+--- a/website/src/main.tsx
++++ b/website/src/main.tsx
+@@ -1,7 +1,6 @@
+ 
+ import { createRoot } from "react-dom/client";
+-import { BrowserRouter, Routes, Route } from "react-router";
+-import App from "./app/App.tsx";
++import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+ import Dashboard from "./platform/pages/Dashboard.tsx";
+ import GatewayDetail from "./platform/pages/GatewayDetail.tsx";
+ import PatientView from "./platform/pages/PatientView.tsx";
+@@ -11,14 +10,14 @@ import "./styles/index.css";
+ createRoot(document.getElementById("root")!).render(
+   <BrowserRouter>
+     <Routes>
+-      {/* Marketing site */}
+-      <Route path="/" element={<App />} />
+-
+       {/* Platform app */}
+       <Route path="/platform/" element={<Dashboard />} />
+       <Route path="/platform/gateway/:id" element={<GatewayDetail />} />
+       <Route path="/platform/patient/:id" element={<PatientView />} />
+       <Route path="/platform/live/:gatewayId" element={<LiveView />} />
++
++      {/* Anything else lands on the dashboard */}
++      <Route path="*" element={<Navigate to="/platform/" replace />} />
+     </Routes>
+   </BrowserRouter>
+ );
+diff --git a/website/vite.config.ts b/website/vite.config.ts
+index a5f01cb..31ed395 100644
+--- a/website/vite.config.ts
++++ b/website/vite.config.ts
+@@ -17,6 +17,8 @@ function figmaAssetResolver() {
+ }
+ 
+ export default defineConfig({
++  // Dashboard-only build: served from the /platform/ folder.
++  base: '/platform/',
+   plugins: [
+     figmaAssetResolver(),
+     // The React and Tailwind plugins are both required for Make, even if

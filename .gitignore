@@ -45,3 +45,7 @@ config.json
 # Website build artifacts
 website/node_modules/
 website/dist/
+
+# Release pipeline
+release/
+lab/site/

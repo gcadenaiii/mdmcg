@@ -1,0 +1,62 @@
+diff --git a/website/index.html b/website/index.html
+index 1d9dc7f..6bc4d64 100644
+--- a/website/index.html
++++ b/website/index.html
+@@ -4,12 +4,14 @@
+     <head>
+       <meta charset="UTF-8" />
+       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+-      <title>mdmcg — The first wearable MCG</title>
++      <meta name="robots" content="noindex, nofollow" />
++      <title>mdmcg — The first wearable MCG (earlier version)</title>
+       <style>html, body { height: 100%; margin: 0; } #root { height: 100%; }</style>
+     </head>
+ 
+     <body>
+       <div id="root"></div>
++      <a href="/" style="position:fixed;left:16px;bottom:16px;z-index:60;padding:8px 14px;border-radius:999px;background:#0A0E14;color:#fff;font:400 13px/1.2 Hind,system-ui,sans-serif;text-decoration:none;box-shadow:0 2px 10px rgba(0,0,0,.18)">Earlier version of this site. Go to the current site &rarr;</a>
+       <script type="module" src="/src/main.tsx"></script>
+     </body>
+   </html>
+diff --git a/website/src/main.tsx b/website/src/main.tsx
+index ad185f3..9de365a 100644
+--- a/website/src/main.tsx
++++ b/website/src/main.tsx
+@@ -2,23 +2,13 @@
+ import { createRoot } from "react-dom/client";
+ import { BrowserRouter, Routes, Route } from "react-router";
+ import App from "./app/App.tsx";
+-import Dashboard from "./platform/pages/Dashboard.tsx";
+-import GatewayDetail from "./platform/pages/GatewayDetail.tsx";
+-import PatientView from "./platform/pages/PatientView.tsx";
+-import LiveView from "./platform/pages/LiveView.tsx";
+ import "./styles/index.css";
+ 
+ createRoot(document.getElementById("root")!).render(
+-  <BrowserRouter>
++  <BrowserRouter basename="/v1">
+     <Routes>
+       {/* Marketing site */}
+       <Route path="/" element={<App />} />
+-
+-      {/* Platform app */}
+-      <Route path="/platform/" element={<Dashboard />} />
+-      <Route path="/platform/gateway/:id" element={<GatewayDetail />} />
+-      <Route path="/platform/patient/:id" element={<PatientView />} />
+-      <Route path="/platform/live/:gatewayId" element={<LiveView />} />
+     </Routes>
+   </BrowserRouter>
+ );
+diff --git a/website/vite.config.ts b/website/vite.config.ts
+index a5f01cb..7d09edf 100644
+--- a/website/vite.config.ts
++++ b/website/vite.config.ts
+@@ -17,6 +17,8 @@ function figmaAssetResolver() {
+ }
+ 
+ export default defineConfig({
++  // Archived copy: served from the /v1/ folder.
++  base: '/v1/',
+   plugins: [
+     figmaAssetResolver(),
+     // The React and Tailwind plugins are both required for Make, even if

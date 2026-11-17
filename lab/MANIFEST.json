@@ -1,0 +1,653 @@
+{
+  "imported_utc": "2026-11-17T08:16:17.956Z",
+  "research_commit": "1aa04a9",
+  "files": 125,
+  "bytes": 30455324,
+  "references_replaced": {
+    "total": 60,
+    "label": "internal study record",
+    "by_rule": {
+      "internal document": 34,
+      "script name": 3,
+      "drive path": 23
+    }
+  },
+  "leak_check": "passed",
+  "list": [
+    {
+      "path": "assets/SensorArea-CPIeTxUd.js",
+      "bytes": 140734,
+      "sha256": "3156021a8c588b9575758b3f623daf2ef90ea290470759049809b41f22ea2f70",
+      "references_replaced": 4
+    },
+    {
+      "path": "assets/SensorArea-DFPDqTwd.css",
+      "bytes": 34363,
+      "sha256": "cf9784b616d059b6f10bf16a10eed4df365b59dd146950fa53cfec846930119a"
+    },
+    {
+      "path": "assets/index-Boc1lK8Y.css",
+      "bytes": 29671,
+      "sha256": "fcba47324091cbaf8052e25b3ae9806582408e28769cb07201690dfc03c6f54a"
+    },
+    {
+      "path": "assets/index-C14mnSt6.js",
+      "bytes": 1342832,
+      "sha256": "d971f72003d4574dd69c745a070192a68223916c45a15a0ab7b9c5f7695959f5",
+      "references_replaced": 1
+    },
+    {
+      "path": "data/design/anatomy.json",
+      "bytes": 142316,
+      "sha256": "96baa12177e2bbac24fd69efb8de0250fcdcee5c507f58cc02eb0dce4d2ed234",
+      "references_replaced": 1
+    },
+    {
+      "path": "data/design/design.json",
+      "bytes": 1270394,
+      "sha256": "2e3205130c96a4a32e10231693f5467f52856c76211f1cc0e27485a598da5ca7",
+      "references_replaced": 35
+    },
+    {
+      "path": "data/design/skin_deepest_heart.json",
+      "bytes": 313504,
+      "sha256": "12ff5d49f512250c0ab787925c69158e299332cba3b2126d7398d7f675e1036d"
+    },
+    {
+      "path": "data/design/skin_full_chest_woman.json",
+      "bytes": 313011,
+      "sha256": "af0bef1d32e5de1d805f3a2fe7c35a37e0d93023aeb3f6bba804b819f525abdd"
+    },
+    {
+      "path": "data/design/skin_largest_man.json",
+      "bytes": 312558,
+      "sha256": "3ca7fe7461dc6476016b7cbc265cb8bd9f959fdb1c43a2622f0053dc5dcd61a7"
+    },
+    {
+      "path": "data/design/skin_lean_man.json",
+      "bytes": 312379,
+      "sha256": "cdd009f4460441030236b8afa5ea879f12558ea06d469fea914c753196caefd3"
+    },
+    {
+      "path": "data/design/skin_oldest_man.json",
+      "bytes": 313709,
+      "sha256": "893a6afd871f024da194d08abd1a4e07f3c9cb56e0dac1e257a380aa5440b6ad"
+    },
+    {
+      "path": "data/design/skin_oldest_woman.json",
+      "bytes": 312383,
+      "sha256": "d933e0fc1feae7b76561ab9a36186e5f072bf277d7d49e0ef063c21dcbc0fb93"
+    },
+    {
+      "path": "data/design/skin_typical_man.json",
+      "bytes": 313286,
+      "sha256": "8b295579c69d093a194b7ed36438f05c270755236ba130a9f36d64e243c10449"
+    },
+    {
+      "path": "data/design/skin_typical_woman.json",
+      "bytes": 312432,
+      "sha256": "158ae458e955e7c380fe1b24e1af5cbc1bea81df93b39f9f85114b3b9768b4be"
+    },
+    {
+      "path": "data/design/torso_embed.json",
+      "bytes": 344675,
+      "sha256": "285442b5c7671332861b00f290128756cab9935468926727c1d73aa779007049"
+    },
+    {
+      "path": "data/zenodo_heart_refit/chest_normals.f32",
+      "bytes": 2880,
+      "sha256": "b11337d5f532f18af1fc0eae742ecf6de4655fa072d18cf85c31f3ac0a9c1072"
+    },
+    {
+      "path": "data/zenodo_heart_refit/chest_positions.f32",
+      "bytes": 2880,
+      "sha256": "5f3eec18463d53e641f7aded7b8061899bc9aa4cd4f586c7042bf779dae30e11"
+    },
+    {
+      "path": "data/zenodo_heart_refit/chest_traces_geselowitz_pT.f32",
+      "bytes": 240000,
+      "sha256": "5b1678640720beb7850a2d8ef169cb86e98d00a7e042620dac898b595c2e841e"
+    },
+    {
+      "path": "data/zenodo_heart_refit/chest_traces_sarvas_pT.f32",
+      "bytes": 240000,
+      "sha256": "f48f1cdd305f09342094444a507795aa1ddb0fb628f3b4345ca990aac71392ee"
+    },
+    {
+      "path": "data/zenodo_heart_refit/clinic_ecg_clean_mV.f32",
+      "bytes": 120000,
+      "sha256": "585f9d525585cb3ce25b5bf23691e296415cb4877876be7e44fc33b0f201d8d7"
+    },
+    {
+      "path": "data/zenodo_heart_refit/clinic_ecg_mV.f32",
+      "bytes": 120000,
+      "sha256": "726ce967a15233ae982dfc3bc3ddfaf92259e890763a4058ebe0a51d33fb4313"
+    },
+    {
+      "path": "data/zenodo_heart_refit/clinic_mcg_pT.f32",
+      "bytes": 120000,
+      "sha256": "1f97657accc461f7773702f7a48ec4c6db2ed7937253e123f823863f6d6a132c"
+    },
+    {
+      "path": "data/zenodo_heart_refit/cut_activation_ms.f32",
+      "bytes": 41260,
+      "sha256": "90c93eaa4cda04832c8a7542d2a0a721c9bdaa0ca0d9fbc7cd0d0e53de5781f8"
+    },
+    {
+      "path": "data/zenodo_heart_refit/cut_triangles.u32",
+      "bytes": 227820,
+      "sha256": "cc90247ffe5a1d66218cde22a32fe681d129eb167a760d607b023c1b4fcd93a9"
+    },
+    {
+      "path": "data/zenodo_heart_refit/cut_vertices.f32",
+      "bytes": 123780,
+      "sha256": "65e6efbe51124b6b060e42acca833c1a44d065dc7d3db4c0f04936d219751168"
+    },
+    {
+      "path": "data/zenodo_heart_refit/cut_vm_u8.u8",
+      "bytes": 2578750,
+      "sha256": "bdf592735ae864b4d7329cf6a1594071a8cc79c7a3b41e0b858aede0e9396e43"
+    },
+    {
+      "path": "data/zenodo_heart_refit/ecg_mV.f32",
+      "bytes": 12000,
+      "sha256": "9b5089e8d3ede35b42a9b5b58c3d7eca2558438f598dd73b9a9d2c2d33793160"
+    },
+    {
+      "path": "data/zenodo_heart_refit/electrode_display_positions.f32",
+      "bytes": 108,
+      "sha256": "2c9d6ccbacc99dbfcbfc8bcc7c55fae6ca937858789317a7b7c9300912145e70"
+    },
+    {
+      "path": "data/zenodo_heart_refit/electrode_positions.f32",
+      "bytes": 108,
+      "sha256": "b800c0752089d7d0c549aa30cfcc94d722d9733fc66986cf316832a5ebe69051"
+    },
+    {
+      "path": "data/zenodo_heart_refit/electrodes.json",
+      "bytes": 30604,
+      "sha256": "27c66681192a53675a6bf275966f11b4468b8d9f379b64442ac04179055b1343",
+      "references_replaced": 3
+    },
+    {
+      "path": "data/zenodo_heart_refit/heart_activation_ms.f32",
+      "bytes": 163860,
+      "sha256": "0e2b15c40a5c6ed5b4166f55d924edae209eada422f44c8705c27282ed357a07"
+    },
+    {
+      "path": "data/zenodo_heart_refit/heart_region.u8",
+      "bytes": 40965,
+      "sha256": "80a1233ba65816536ffb9593b7661e4ba2ab3d65ccbbc65eca28b02fe5d37a2e"
+    },
+    {
+      "path": "data/zenodo_heart_refit/heart_triangles.u32",
+      "bytes": 983160,
+      "sha256": "67cc53dc9f9628a3fd77c62eed989b803a85a901dd3e6320fb911acbcd1fe5ce"
+    },
+    {
+      "path": "data/zenodo_heart_refit/heart_vertices.f32",
+      "bytes": 491580,
+      "sha256": "b3bf123540e415c49bb83eb4359c5a55b12fd432220d7f2bbdef022ef781bb82"
+    },
+    {
+      "path": "data/zenodo_heart_refit/heart_vm_u8.u8",
+      "bytes": 10241250,
+      "sha256": "c0b69cb4ace43e9744e0f12c2bec0159f63d72fbcac3d048286384953fac5ddb"
+    },
+    {
+      "path": "data/zenodo_heart_refit/mcg_pT.f32",
+      "bytes": 8000,
+      "sha256": "199b4c41761b1cf14152123f6910dc4d2837163c66a8f04b5dc577251a2c58d9"
+    },
+    {
+      "path": "data/zenodo_heart_refit/meta.json",
+      "bytes": 25667,
+      "sha256": "f0f12ae97e174078a3088ebd714b749b8c9029274198d48e20f309f4b92082de",
+      "references_replaced": 8
+    },
+    {
+      "path": "data/zenodo_heart_refit/noise.json",
+      "bytes": 41223,
+      "sha256": "dc361bac464fb9422c63071bfc0e31cd22d2383c59828ce6714641dce13e0798",
+      "references_replaced": 2
+    },
+    {
+      "path": "data/zenodo_heart_refit/noise_clean_strip_pT.f32",
+      "bytes": 20000,
+      "sha256": "60bab544924c3dac1ba67c2cd372f03ab6c49c325d709b9f86fb4ba6befaab6a"
+    },
+    {
+      "path": "data/zenodo_heart_refit/noise_motion_strips_pT.f32",
+      "bytes": 160000,
+      "sha256": "2a833afc8a77568d14bbdf50e519ceb0927e40a70c90bdae4d57dad2325b5a39"
+    },
+    {
+      "path": "data/zenodo_heart_refit/noise_strips_pT.f32",
+      "bytes": 240000,
+      "sha256": "62655de2a94f2565016d57b5339e0f8c88009863f1a3c85723566047cbb0497a"
+    },
+    {
+      "path": "data/zenodo_heart_refit/ribs_front.u8",
+      "bytes": 52800,
+      "sha256": "c54d1e84963e5e06cb61a2402dd1cde4f1c6b5738dde688300fc030a5704b848"
+    },
+    {
+      "path": "data/zenodo_heart_refit/sensor.json",
+      "bytes": 89086,
+      "sha256": "19354f0b57af0e0dc693a7b7230d1a1e2e989a6948d1aa23dbba0cd5095c4bd1",
+      "references_replaced": 1
+    },
+    {
+      "path": "data/zenodo_heart_refit/sensor_axes.f32",
+      "bytes": 96,
+      "sha256": "bb729a823932428a7bfa781ce00b2a63213b8ebd17ff7ff9a9ae81b6cec54b12"
+    },
+    {
+      "path": "data/zenodo_heart_refit/sensor_positions.f32",
+      "bytes": 96,
+      "sha256": "175b82eb991e78cc3b5fe2bc069015200382d0e4dfba2f26cb902d501b41399f"
+    },
+    {
+      "path": "data/zenodo_heart_refit/torso_display_points.f32",
+      "bytes": 172056,
+      "sha256": "a6b0ffae80ff82476ea89c685108c987bf5dd973d774679c4ce20891d214a999"
+    },
+    {
+      "path": "data/zenodo_heart_refit/torso_display_triangles.u32",
+      "bytes": 344064,
+      "sha256": "2e98e14e1c4d139641c53056e4a994e3b6624c7dc7d0c6439f2731ff6c43b52d"
+    },
+    {
+      "path": "data/zenodo_heart_refit/torso_points.f32",
+      "bytes": 10776,
+      "sha256": "3f21660ad8748c955fa3afc6ce4d7961e31e8d0926f42dff45b33794fafc9787"
+    },
+    {
+      "path": "data/zenodo_heart_refit/torso_triangles.u32",
+      "bytes": 21504,
+      "sha256": "13ae13d516107bc8aba7bd19ae741259e6d92d4c011c11904d193be602aafbfd"
+    },
+    {
+      "path": "data/zenodo_heart_refit/trust.json",
+      "bytes": 22385,
+      "sha256": "1b65326cd58c1b4df09f65860f3d35db421369e2a125539fd8a84e6b96d1e74e",
+      "references_replaced": 4
+    },
+    {
+      "path": "data/zenodo_heart_refit/trust_ecg_measured_median_mV.f32",
+      "bytes": 40800,
+      "sha256": "9042d865ff61778345c848f6ac4557cc24c191e9c1b4d16bb6a3dbe65e41ad2d"
+    },
+    {
+      "path": "data/zenodo_heart_refit/trust_ecg_measured_p5_mV.f32",
+      "bytes": 40800,
+      "sha256": "978fde023417ca1607d908b0c0c1e02904c1fb419170a1202dc946b42995f099"
+    },
+    {
+      "path": "data/zenodo_heart_refit/trust_ecg_measured_p95_mV.f32",
+      "bytes": 40800,
+      "sha256": "81e3f27fafc9c643a682bab856f5aee1b94e49ba59ab324705ffffbc31835570"
+    },
+    {
+      "path": "data/zenodo_heart_refit/trust_ecg_model_mV.f32",
+      "bytes": 40800,
+      "sha256": "eb79d6a033f014567684838f4adf4445b539ca0a8002de810d0bab6b578d39b2"
+    },
+    {
+      "path": "data/zenodo_heart_refit/trust_ecg_time_ms.f32",
+      "bytes": 3400,
+      "sha256": "38c774f4176e721612926ebf1d182564cc3aa716ce82f3eb001c3c7d21648a65"
+    },
+    {
+      "path": "index.html",
+      "bytes": 777,
+      "sha256": "dcae36118238390f00988c5e7e9f8a318e5d29964ec72d01fe70b354ddd8f2e4"
+    },
+    {
+      "path": "sensor-images/body__deepest_heart.webp",
+      "bytes": 158528,
+      "sha256": "20b90645248f1500f5e7dd36a32b9fea487617adc4cd202f05c6296b773991c5"
+    },
+    {
+      "path": "sensor-images/body__full_chest_woman.webp",
+      "bytes": 65174,
+      "sha256": "98ed8375e188726ae5fc9128bbd5a32afc13f5a5dcd3f35adc8c8e2fcd6bdde7"
+    },
+    {
+      "path": "sensor-images/body__largest_man.webp",
+      "bytes": 217816,
+      "sha256": "f5f2d6f87cc3ef0d34489bb4a2b37c2cfcec0e6721e6191e40e6257b30e939a0"
+    },
+    {
+      "path": "sensor-images/body__lean_man.webp",
+      "bytes": 142324,
+      "sha256": "161e5aaa3c60ca38652fbd4e46a2b352441b2aa1479e959bcd534133b9c5b3c6"
+    },
+    {
+      "path": "sensor-images/body__oldest_man.webp",
+      "bytes": 142052,
+      "sha256": "f2f7b0ab7d792313aa8388fba15eac6b1fb37f7c9ecfe08d0b59bbf6ba171bd4"
+    },
+    {
+      "path": "sensor-images/body__oldest_woman.webp",
+      "bytes": 82650,
+      "sha256": "f6d3b7a115cb7c4f5dea08f5c2c314d5ed71be8bf768d114017d2bec818f0295"
+    },
+    {
+      "path": "sensor-images/body__typical_man.webp",
+      "bytes": 225412,
+      "sha256": "c28d6714c234921d81549910e758d238ee2115b20c56ce26cbe40b227d8e97b4"
+    },
+    {
+      "path": "sensor-images/body__typical_woman.webp",
+      "bytes": 94594,
+      "sha256": "a1f9dab942bfd1ea3ed9914b4138de64329a77ac13ba404ae37e15d3db90120f"
+    },
+    {
+      "path": "sensor-images/case__hero.webp",
+      "bytes": 77694,
+      "sha256": "25b7288170006afa1fbf9da0304076190ba01273be0e2c8ea8c876ab9e04361d"
+    },
+    {
+      "path": "sensor-images/case__in-case.webp",
+      "bytes": 76454,
+      "sha256": "8d53a74e65a6f8af4ac9d8a428d47405fa082bc30f3346eae233da6cb54493eb"
+    },
+    {
+      "path": "sensor-images/case__in-hand.webp",
+      "bytes": 84046,
+      "sha256": "79a1ba0b1ce4342eed77a7f989e81898b2a838ae3c64044116037cf70945c086"
+    },
+    {
+      "path": "sensor-images/manifest.json",
+      "bytes": 27104,
+      "sha256": "d97cc037ee34506edb785f225c77b2c8cf876529abf9dd52d65f955d774fb20d",
+      "references_replaced": 1
+    },
+    {
+      "path": "sensor-images/option-4__battery.webp",
+      "bytes": 106422,
+      "sha256": "6c53493b59c5732e3314291a6259a1491860f4dbb9e14961369efdf86f90b5d8"
+    },
+    {
+      "path": "sensor-images/option-4__exploded.webp",
+      "bytes": 58838,
+      "sha256": "424f38123ec4b0b097ac8d3a71f12e87183658e76dd6c570bc4e1ad1d833f6f9"
+    },
+    {
+      "path": "sensor-images/option-4__hero.webp",
+      "bytes": 41906,
+      "sha256": "4cebff340bc96ebc4aa1181aaf406c1123957219972ba77f23578913dea75436"
+    },
+    {
+      "path": "sensor-images/option-4__patent-sheet.webp",
+      "bytes": 130582,
+      "sha256": "6b7cedaf0c2c66f2d32071b08dfc9e844bccd2bbce43b1e3e67fd58b5d35ac0e"
+    },
+    {
+      "path": "sensor-images/option-4__technology.webp",
+      "bytes": 123738,
+      "sha256": "28a24887f69abf3c0a07d800e2362de4b68ec7211514b6c5fa61a62cb2931b63"
+    },
+    {
+      "path": "sensor-images/option-4__three-view.webp",
+      "bytes": 105318,
+      "sha256": "bc1944bdb2e33d31bed1c0fffe02ba91f9d3be9393cb4057f8ef0cabe2460004"
+    },
+    {
+      "path": "sensor-images/option-4__works.webp",
+      "bytes": 78102,
+      "sha256": "23ca29f3411dae31b4990b9216d9e92c996a70f2347cbd909b421aaf931f7c98"
+    },
+    {
+      "path": "sensor-images/option-a__battery.webp",
+      "bytes": 101566,
+      "sha256": "4f11d40abfa59b02ca780933fb358d2f1c7c0ce8c75454b83dead3298caa6de4"
+    },
+    {
+      "path": "sensor-images/option-a__detail.webp",
+      "bytes": 95832,
+      "sha256": "5bf39eefd4fe59f0fa6e85bf0807596f0c15406885bee5a0f3cea1fd6bfae79f"
+    },
+    {
+      "path": "sensor-images/option-a__exploded.webp",
+      "bytes": 70144,
+      "sha256": "1afb10c318a44ddc1b800d341a8d22d5e6258b884ad675d736092ab913adb240"
+    },
+    {
+      "path": "sensor-images/option-a__garment-flat.webp",
+      "bytes": 159174,
+      "sha256": "0bd71b5ae3d7771c0b795a562834ac97d9f7d7eff8f0c191a2663dc067755e45"
+    },
+    {
+      "path": "sensor-images/option-a__garment.webp",
+      "bytes": 99846,
+      "sha256": "3ce23227d2ceba2a0271b914e7d76ff9b1a1a773e6a6d8226d9b87d61018a3ab"
+    },
+    {
+      "path": "sensor-images/option-a__hero.webp",
+      "bytes": 41256,
+      "sha256": "7e3237a74b3baa3b04f56b7a985c0a7e3fd793943d14ce9e88df1dbe4a4d0b87"
+    },
+    {
+      "path": "sensor-images/option-a__in-hand.webp",
+      "bytes": 146810,
+      "sha256": "a4edcbb23bfc564047258d5e7970972bf02c1ea28fd6b59c3a4345f72632b420"
+    },
+    {
+      "path": "sensor-images/option-a__patent-sheet.webp",
+      "bytes": 106146,
+      "sha256": "5b845bf607eb70d1e750c8aee554fda87775278f67fb3d695b3bc13904784e33"
+    },
+    {
+      "path": "sensor-images/option-a__technology.webp",
+      "bytes": 98864,
+      "sha256": "c0be43a1b4dc475e062840216968a89d882155694bfb1e3a9fc5b26e2fb03951"
+    },
+    {
+      "path": "sensor-images/option-a__three-view.webp",
+      "bytes": 92420,
+      "sha256": "ec46969d49db400b9f9b25357e436f99c6d5666fddbbdf1450d8622ecfb14933"
+    },
+    {
+      "path": "sensor-images/option-a__works.webp",
+      "bytes": 86536,
+      "sha256": "af74b19d32510b979021079727fb498c00c663d30312adb08fc260740c35c018"
+    },
+    {
+      "path": "sensor-images/option-a__worn-bare.webp",
+      "bytes": 106422,
+      "sha256": "512a598cd0764483b87b3653567e6598062f3504d2e253a8de022ad35aad2a22"
+    },
+    {
+      "path": "sensor-images/option-a__worn-strap.webp",
+      "bytes": 126750,
+      "sha256": "b05ad5a3008545c1607ca065370e1c56d568070d5a13d1e3502f15312480239b"
+    },
+    {
+      "path": "sensor-images/option-b__battery.webp",
+      "bytes": 108884,
+      "sha256": "dad0f78a2507826ee391c1e21293f1eb7d6d705ba0640818fe5f2053fb0fe18a"
+    },
+    {
+      "path": "sensor-images/option-b__detail.webp",
+      "bytes": 110528,
+      "sha256": "c809bd7cd1763cc1e9700c641697717bbcf15af2b324f547535f4df7d15aefa8"
+    },
+    {
+      "path": "sensor-images/option-b__exploded.webp",
+      "bytes": 74100,
+      "sha256": "24dcf6adb36ffdc08317e5d409f973b31240402531e3aa4780e328fd904c1348"
+    },
+    {
+      "path": "sensor-images/option-b__garment-flat.webp",
+      "bytes": 123252,
+      "sha256": "bf7ec700deb1748ccb17555d9e94a2852cd5558411bd39d92e403c3c8bf8a0d3"
+    },
+    {
+      "path": "sensor-images/option-b__garment.webp",
+      "bytes": 112768,
+      "sha256": "3f9418125190b9d2e482c6a83a27d11e18c5cd6c39c11d0c23a15f4b0e0d876f"
+    },
+    {
+      "path": "sensor-images/option-b__hero.webp",
+      "bytes": 44676,
+      "sha256": "2c9f0c3dfea53686cbaaa23021962b91d3a314ee22e393f88d58479f8cf77159"
+    },
+    {
+      "path": "sensor-images/option-b__in-hand.webp",
+      "bytes": 141808,
+      "sha256": "4339d634e0b521b5de29fe80752cc24aa7d59f0ef7500cb2267ffbd2b88a2deb"
+    },
+    {
+      "path": "sensor-images/option-b__patent-sheet.webp",
+      "bytes": 114928,
+      "sha256": "33c313282d264eda59c07e79bd4f80e35dd39cd7c1770f6fc09587f2147a45b2"
+    },
+    {
+      "path": "sensor-images/option-b__technology.webp",
+      "bytes": 80526,
+      "sha256": "193b270793d795260a18ec83818c6035aa3c2e978d0f4ccca4ad18105e3aabc6"
+    },
+    {
+      "path": "sensor-images/option-b__three-view.webp",
+      "bytes": 89264,
+      "sha256": "bf60a126d3942b52d1d1614bef4b4cdd67f609821dba77fb25f979a807bd5801"
+    },
+    {
+      "path": "sensor-images/option-b__works.webp",
+      "bytes": 104490,
+      "sha256": "fb9d5f104a2eb9618c2c162ed37dcbf13401aa6e58e1959e6a8494eab8cbc696"
+    },
+    {
+      "path": "sensor-images/option-b__worn-bare.webp",
+      "bytes": 127526,
+      "sha256": "94eaef988abff5c4d6207bc0a57f96b1272928dab7585f92c1bb735ef8a3abf1"
+    },
+    {
+      "path": "sensor-images/option-b__worn-strap.webp",
+      "bytes": 104102,
+      "sha256": "59bf832d2cd15bed035095b8aededfc6e3af54f712cbddc618d729e45d646ed8"
+    },
+    {
+      "path": "sensor-images/option-c__battery.webp",
+      "bytes": 87874,
+      "sha256": "6437c99edd7b2c935ac21d523525763932910f79c7cc0bdb2e9e82cdb623ebc9"
+    },
+    {
+      "path": "sensor-images/option-c__detail.webp",
+      "bytes": 77370,
+      "sha256": "1bfd4442ee73d4264a35a58c06b7da7e634fc457ab2d3da2240928dcf5dabe36"
+    },
+    {
+      "path": "sensor-images/option-c__exploded.webp",
+      "bytes": 60702,
+      "sha256": "f576062144a451c25a763f2d59081321727fcedfc39b7c2f5a72b352df5723e3"
+    },
+    {
+      "path": "sensor-images/option-c__garment-flat.webp",
+      "bytes": 106040,
+      "sha256": "9c51c483601dba29807430e94f66c06b37fed6d7ba3c90265208f8bb72bf006c"
+    },
+    {
+      "path": "sensor-images/option-c__garment.webp",
+      "bytes": 74452,
+      "sha256": "e1365a203d25ff1e9c91bae730615442f0c4285c7af48915fcd7defe2edb6a68"
+    },
+    {
+      "path": "sensor-images/option-c__hero.webp",
+      "bytes": 52002,
+      "sha256": "062641f2442a94cc91161c9b809263833f3a406caae6760e5004aa1b393724d2"
+    },
+    {
+      "path": "sensor-images/option-c__in-hand.webp",
+      "bytes": 107730,
+      "sha256": "a54abf905a96ee0aa7eb1cffa832fde3038ed2facd299f15bcac0af1c768d23d"
+    },
+    {
+      "path": "sensor-images/option-c__patent-sheet.webp",
+      "bytes": 118666,
+      "sha256": "c50cd47995c891e3f206a33a771ae96193166eef9bd63c39c05a5fa69891845b"
+    },
+    {
+      "path": "sensor-images/option-c__technology.webp",
+      "bytes": 109884,
+      "sha256": "7cc3e90a73e59244ec3b1d5e44321690225d2b0bbae2660eea67191fee0adb13"
+    },
+    {
+      "path": "sensor-images/option-c__three-view.webp",
+      "bytes": 93942,
+      "sha256": "1748a8131e495a4ec9f7b743b43de9a26d22c81eef4e3344acb94ebeb42015d4"
+    },
+    {
+      "path": "sensor-images/option-c__works.webp",
+      "bytes": 65512,
+      "sha256": "d8cecce777e0baf5c3cb9cd060973dba18e5fc1c1d7c59cac6c4d0ec97cff223"
+    },
+    {
+      "path": "sensor-images/option-c__worn-bare.webp",
+      "bytes": 117118,
+      "sha256": "e88f1091ade527b45357b6313daa5e7a4fa6031f901213a11a53787ec253b8f3"
+    },
+    {
+      "path": "sensor-images/option-c__worn-strap.webp",
+      "bytes": 142436,
+      "sha256": "c737819d2c80a99b77a913ca460177e1b4d8c61d5c2c7490941d863f8336fe3b"
+    },
+    {
+      "path": "sensor-images/shared__anatomy.webp",
+      "bytes": 124096,
+      "sha256": "c6d20eed8cd0b13658ab3838ab5c74e74a8d8ec4180ca2ff5d3922c28f177ac0"
+    },
+    {
+      "path": "sensor-images/shared__ct-axial.webp",
+      "bytes": 140200,
+      "sha256": "3357dcfcc8397bee575121df9439859596ac5594f856e240005f96b2ac209822"
+    },
+    {
+      "path": "sensor-images/shared__cutaway-chest.webp",
+      "bytes": 193452,
+      "sha256": "3afdf3af45ef8145375b9f2df6cabf5a40dfc92925dc7cd1bdad697fe2c539e6"
+    },
+    {
+      "path": "sensor-images/shared__garment-band-flat.webp",
+      "bytes": 125322,
+      "sha256": "c28b2056c19224d9be87e984c4300c5fe1184ac1c01cd255ef97d78eb081520e"
+    },
+    {
+      "path": "sensor-images/shared__garment-band-worn.webp",
+      "bytes": 146984,
+      "sha256": "9c6984307c0569174f751620f7e3cd5731a07a06daeddad18a48c4a3bc758f08"
+    },
+    {
+      "path": "sensor-images/shared__garment-shirt-flat.webp",
+      "bytes": 120764,
+      "sha256": "be771893eb31b69b8eb98e6630d8a983255113876102ab008e74d463f3daa90f"
+    },
+    {
+      "path": "sensor-images/shared__garment-shirt-worn.webp",
+      "bytes": 117022,
+      "sha256": "f2eaf9ef1ce4bd438b4ed043a71daf74d77e81801064d54c477a3ace6ca46059"
+    },
+    {
+      "path": "sensor-images/shared__garment-strap-worn.webp",
+      "bytes": 150434,
+      "sha256": "13eef1d371e9acf21157ce96a3834c2fd359d668994d9f3366727d3e380bc143"
+    },
+    {
+      "path": "sensor-images/shared__mri-slice.webp",
+      "bytes": 89028,
+      "sha256": "6d69e3410516454107a77fcea6fd13060fc460231e537cb508aacf242c4a3a6e"
+    },
+    {
+      "path": "sensor-images/shared__placement-steps.webp",
+      "bytes": 231230,
+      "sha256": "ca3e952e41ace1663d7b2cf8042ebb6e8bd9387a8ce458f63262fe9d8b64cece"
+    },
+    {
+      "path": "sensor-images/shared__volume-render.webp",
+      "bytes": 131310,
+      "sha256": "07a1e3b6bd82eb1527e946017ddc884707e39c93745c2ed5f5a93e8921a2bb3b"
+    }
+  ]
+}

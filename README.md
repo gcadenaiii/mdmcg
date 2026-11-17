@@ -126,3 +126,18 @@ pnpm dev --host     # http://localhost:5173
 `site.html` is protected by a JavaScript password gate.
 Password: stored in the site — share only with intended reviewers.
 The gate uses `sessionStorage` so it resets when the browser session ends.
+
+---
+
+## Release pipeline (redesign branch, local only)
+
+The new site is released as one folder of finished files; the server no longer builds anything.
+
+```
+node scripts/import-lab.mjs          # research tools -> lab/site/ (allow-list, internal references replaced, leak check)
+node scripts/assemble-release.mjs    # site/dist + v1/ + lab/ + platform/ -> release/<UTC timestamp>/
+node scripts/serve-release.mjs       # look at the newest release at http://127.0.0.1:5181/
+```
+
+`v1/` and `platform/` hold finished builds of the old app (see their READMEs). The proposed nginx files and the
+step-by-step deploy notes are in `infra/proposed/`. Nothing is uploaded by any script.
