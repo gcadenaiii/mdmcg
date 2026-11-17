@@ -25,8 +25,15 @@ SITE_CONTACT_EMAIL=someone@example.org
 
 Copy `.env.example` to `.env` (ignored by git) and set the real address there, or set the variable in the shell before
 `pnpm build`. The address is never written to the HTML in plain text: it is stored scrambled, and the mail link is
-assembled by the script at the moment of the click. If the variable is unset (or left at the example value), every
-"Email us" button is an ordinary link to `/work-with-us/`.
+assembled by the script at the moment of the click, with the subject line of the button that was pressed (each of the
+four group cards on `/work-with-us/` and the "Ask for access" button have their own). If the variable is unset (or left
+at the example value), every email button is an ordinary link to the contact block of `/work-with-us/`, and that block
+offers the team page instead. Set the variable for any build that is published.
+
+## The research tools
+
+`/lab/` opens with an access code. Link to it only with the `LabLink` component, which adds the "Partner access" cue;
+`pnpm check:content` fails on a link into `/lab/` without it. The visible name is always "Research tools".
 
 ## Private preview
 

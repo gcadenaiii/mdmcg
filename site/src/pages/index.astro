@@ -3,14 +3,16 @@ import Base from '../layouts/Base.astro';
 import Pic from '../components/Pic.astro';
 import Marks from '../components/Marks.astro';
 import Bars from '../components/Bars.astro';
-import Options from '../components/Options.astro';
 import Stage from '../components/Stage.astro';
 import WorkBand from '../components/WorkBand.astro';
+import LabLink from '../components/LabLink.astro';
+import AccessNote from '../components/AccessNote.astro';
 import { LAB, OPTIONS, TEAM } from '../config';
 ---
 <Base title="mdmcg" description="A small sensor for the breastbone, designed to record the heart's magnetic signal alongside its ECG.">
 
-<!-- ============ THE DEVICE SPINE: six scenes, one stage ============ -->
+<!-- ============ THE SPINE: six scenes, one stage. Why (scenes 1 and 2), then the design (scenes 3 to 6).
+     The order of the scenes here must match SCENES in src/three/stage.js. ============ -->
 <div class="wrap spine" id="spine">
 
   <section class="scene scene-hero" id="device" data-scene="Whole device" aria-labelledby="h-hero">
@@ -20,7 +22,7 @@ import { LAB, OPTIONS, TEAM } from '../config';
       <p class="lead">A small sensor for the breastbone, designed to record the heart's magnetic signal alongside its ECG.</p>
       <div class="actions">
         <a class="btn btn-primary" href="/device/">See the design</a>
-        <a class="btn btn-ghost" href={LAB.home}>Open the research tools</a>
+        <LabLink href={LAB.home}>Open the research tools</LabLink>
       </div>
     </div>
     <figure class="fig fig-hero" data-kind="render" data-gl>
@@ -44,13 +46,28 @@ import { LAB, OPTIONS, TEAM } from '../config';
 
   <Stage />
 
+  <!-- WHY -->
+  <section class="scene" id="why" data-scene="Two signals" aria-labelledby="h-why">
+    <div class="scene-text">
+      <p class="chip">Why two signals</p>
+      <h2 id="h-why" class="h2">Two signals<span class="teal">from one heartbeat.</span></h2>
+      <p class="lead">Every heartbeat is an electric current. That current makes a voltage on the skin, the ECG, and a magnetic field outside the chest.</p>
+      <p class="pull">An ECG does not determine the magnetic field. That is the reason to record both.</p>
+      <p><a class="textlink" href="/science/">Read the science</a></p>
+    </div>
+    <figure class="fig" data-kind="shot">
+      <div class="fig-media"><Pic name="twin-field" alt="The outline of a modelled chest with a grid of coloured squares, blue where the computed field points into the chest and red where it points out of the chest." /></div>
+    </figure>
+  </section>
+
+  <!-- THE DESIGN -->
   <section class="scene" id="inside" data-scene="It opens" aria-labelledby="h-inside">
     <div class="scene-text">
-      <p class="chip">The device</p>
+      <p class="chip">The design</p>
       <h2 id="h-inside" class="h2">It opens to<span class="teal">six sensors.</span></h2>
-      <p class="lead">One piece, battery inside. Six magnetic sensors sit in a small stiff core, and small is the point: it sits closer to the chest.</p>
+      <p class="lead">The design is one piece, with the battery inside. Six magnetic sensors would sit in a small stiff core, and small is the point: it would sit closer to the chest.</p>
       <div class="stats">
-        <div class="stat"><b>4.45<small>mm</small></b><span>largest gap under the small core</span></div>
+        <div class="stat"><b>4.45<small>mm</small></b><span>largest gap under the small core, on scanned chests</span></div>
         <div class="stat stat-dim"><b>9.50<small>mm</small></b><span>under a bank-card-sized plate</span></div>
       </div>
       <p><a class="textlink" href="/device/">Inside the device</a></p>
@@ -64,8 +81,8 @@ import { LAB, OPTIONS, TEAM } from '../config';
     <div class="scene-text">
       <p class="chip">Its own ECG</p>
       <h2 id="h-ecg" class="h2">Two soft wings.<span class="teal">Two signals.</span></h2>
-      <p class="lead">The wings carry ECG electrodes. The ECG marks each beat, and the magnetic beats are averaged on that mark.</p>
-      <p class="pull">An ECG does not determine the magnetic field. That is the reason to record both.</p>
+      <p class="lead">The wings are designed to carry ECG electrodes. The ECG would mark each beat, and the magnetic beats would be averaged on that mark.</p>
+      <p>The magnetic signal of a single beat is too faint to read, so beats are added up. Needing fewer beats means a stronger reading, which is why this site counts in beats.</p>
     </div>
     <figure class="fig" data-kind="render" data-gl>
       <div class="fig-media"><Pic name="device-wing" class="fade-edges" alt="A soft white woven wing joining the white core beside its teal ring, with a round electrode pad at the end of the wing." /></div>
@@ -76,26 +93,16 @@ import { LAB, OPTIONS, TEAM } from '../config';
     <div class="scene-text">
       <p class="chip">Where it is worn</p>
       <h2 id="h-worn" class="h2">On the breastbone.<span class="teal">A zone, not a point.</span></h2>
-      <p class="lead">Slide a finger down the middle of your chest until the bone stops. Centre it 3 cm above that.</p>
+      <p class="lead">Slide a finger down the middle of your chest until the bone stops. The design is centred just above that.</p>
       <div class="stats">
-        <div class="stat"><b>3<small>cm</small></b><span>to the wearer's left is forgiven</span></div>
-        <div class="stat stat-dim"><b>1<small>cm</small></b><span>to the right costs 1.4 times the beats</span></div>
+        <div class="stat"><b>3<small>cm</small></b><span>above where the bone stops</span></div>
+        <div class="stat stat-dim"><b>1<small>cm</small></b><span>to the right would cost 1.4 times the beats</span></div>
       </div>
+      <p>The place is a zone, not a point: forgiving toward the wearer's left, and a little up or down.</p>
+      <p><a class="textlink" href="/reading/">How a reading would go</a></p>
     </div>
     <figure class="fig" data-kind="shot">
       <div class="fig-media"><Pic name="chest-placement" alt="The front of a chest outlined from a scan, with the breastbone and ribs, a bold mark where the bone stops, an arrow marked 3 cm up, the device on the midline and a dashed outline of the zone it may sit in." /></div>
-    </figure>
-  </section>
-
-  <section class="scene" id="twin" data-scene="What the twin computes" aria-labelledby="h-twin">
-    <div class="scene-text">
-      <p class="chip">The science</p>
-      <h2 id="h-twin" class="h2">A second signal<span class="teal">from the same heartbeat.</span></h2>
-      <p class="lead">The heart's currents make a voltage on the skin and a magnetic field outside the chest. The twin computes that field: into the chest, and out of it.</p>
-      <p><a class="textlink" href="/science/">Read the science</a></p>
-    </div>
-    <figure class="fig" data-kind="shot">
-      <div class="fig-media"><Pic name="twin-field" alt="The outline of the twin's modelled chest with a grid of coloured squares, blue where the computed field points into the chest and red where it points out of the chest." /></div>
     </figure>
   </section>
 
@@ -104,7 +111,7 @@ import { LAB, OPTIONS, TEAM } from '../config';
       <p class="chip">Four proposals</p>
       <h2 id="h-options" class="h2">Four proposals.<span class="teal">One we recommend.</span></h2>
       <p class="lead">Each is a white shell with its own coloured ring. This site follows option 1.</p>
-      <p><a class="textlink" href="#sensor-row">Compare the four</a></p>
+      <p><a class="textlink" href="/device/#options">Compare the four</a></p>
     </div>
     <figure class="fig" data-kind="render" data-gl>
       <div class="fig-media">
@@ -117,63 +124,15 @@ import { LAB, OPTIONS, TEAM } from '../config';
 
 </div>
 
-<!-- ============ HEART TWIN ============ -->
-<section class="band band-mist feature" id="heart-twin" aria-labelledby="h-ht">
-  <div class="wrap feature-in">
-    <div class="feature-art art-night" data-r>
-      <Pic name="heart-only" sizes="(max-width: 900px) 92vw, 56vw" alt="The Heart Twin: a simulated heart coloured from deep blue, resting, to yellow, fired, half way through one beat." />
-      <div class="float float-br">
-        <p class="float-k">One heartbeat, three views</p>
-        <ul><li>The heart</li><li>An ECG lead</li><li>A magnetic channel</li></ul>
-      </div>
-    </div>
-    <div class="feature-text" data-r>
-      <p class="chip">Heart Twin</p>
-      <h2 id="h-ht" class="h2">A heart you can stop<span class="teal">and look inside.</span></h2>
-      <p class="lead">A simulated heart in a scanned chest. Watch one beat spread, and see the two signals it makes.</p>
-      <div class="actions"><a class="btn btn-primary" href={LAB.watch}>Open the Heart Twin</a><a class="textlink" href="/heart-twin/">How it works</a></div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ SENSOR EVALUATION ============ -->
-<section class="band band-tint feature feature-flip" id="sensors" aria-labelledby="h-se">
-  <div class="wrap feature-in">
-    <div class="feature-text" data-r>
-      <p class="chip">Sensor evaluation</p>
-      <h2 id="h-se" class="h2">Will it read<span class="teal">my heart?</span></h2>
-      <p class="lead">Pick a body from 42 scanned chests, a place to wear it and a device. See what a reading would need, as a range.</p>
-      <div class="actions"><a class="btn btn-primary" href={LAB.explore}>Try the sensor tool</a><a class="textlink" href="/sensors/">How it works</a></div>
-    </div>
-    <div class="feature-art art-ask" data-r>
-      <Pic name="strength-map" class="ask-chest ask-map" sizes="(max-width: 900px) 80vw, 40vw" alt="A chest outline from the research tool with a grid of squares, coloured from green, weak, to red, strong, showing where the computed heartbeat is strongest." />
-      <div class="ask-card">
-        <p class="ask-q">The typical man, lower breastbone, option 1, recovery wave</p>
-        <p class="ask-n"><span>about</span> 40 <span>beats</span></p>
-        <Bars label="Beats needed by place worn: 39.9 at the breastbone rule, 99.5 at the left chest pocket, 106.9 under the left breast." rows={[{ label: 'Breastbone', value: 39.9 }, { label: 'Chest pocket', value: 99.5 }, { label: 'Under left breast', value: 106.9 }]} />
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ THE FOUR OPTIONS ============ -->
-<section class="band" id="sensor-row" aria-labelledby="h-row">
-  <div class="wrap">
-    <header class="sec-head" data-r>
-      <p class="chip">The four options</p>
-      <h2 id="h-row" class="h2 h2-xl">Four ways<span class="teal">to build it.</span></h2>
-    </header>
-    <Options />
-  </div>
-</section>
-
-<!-- ============ THE ONE DARK BAND ============ -->
+<!-- ============ THE EVIDENCE: the one dark band opens it ============ -->
 <section class="band band-night" id="stands" aria-labelledby="h-stands">
   <div class="wrap">
+    <p class="chip">The evidence</p>
     <div class="score" data-r>
       <h2 id="h-stands" class="numeral">42</h2>
       <div class="score-side">
         <p class="score-line">real chests, scanned. One virtual trial of the design on every one of them.</p>
+        <p class="lead">Each chest shape comes from a CT scan. In each one a computer model of the heart beats, the design is set on the skin, and we work out what its sensors would pick up. That is the virtual trial.</p>
       </div>
     </div>
     <div class="verdicts">
@@ -194,14 +153,55 @@ import { LAB, OPTIONS, TEAM } from '../config';
   </div>
 </section>
 
+<!-- ============ THE TOOLS: HEART TWIN ============ -->
+<section class="band band-mist feature" id="heart-twin" aria-labelledby="h-ht">
+  <div class="wrap feature-in">
+    <div class="feature-art art-night" data-r>
+      <Pic name="heart-only" sizes="(max-width: 900px) 92vw, 56vw" alt="The Heart Twin: a simulated heart coloured from deep blue, resting, to yellow, fired, half way through one beat." />
+      <div class="float float-br">
+        <p class="float-k">One heartbeat, three views</p>
+        <ul><li>The heart</li><li>An ECG lead</li><li>A magnetic channel</li></ul>
+      </div>
+    </div>
+    <div class="feature-text" data-r>
+      <p class="chip">Heart Twin</p>
+      <h2 id="h-ht" class="h2">A heart you can stop<span class="teal">and look inside.</span></h2>
+      <p class="lead">The Heart Twin is a computer model: a simulated heart in a scanned chest. It shows one beat spreading, and the two signals it makes.</p>
+      <div class="actions"><a class="btn btn-primary" href="/heart-twin/">How the Heart Twin works</a><LabLink href={LAB.watch}>Open the Heart Twin</LabLink></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THE TOOLS: SENSOR STUDY ============ -->
+<section class="band band-tint feature feature-flip" id="sensors" aria-labelledby="h-se">
+  <div class="wrap feature-in">
+    <div class="feature-text" data-r>
+      <p class="chip">Sensor study</p>
+      <h2 id="h-se" class="h2">Will it read<span class="teal">my heart?</span></h2>
+      <p class="lead">Pick a body from the 42 scanned chests, a place to wear it and a device. The sensor tool shows how many beats a reading would need, as a range.</p>
+      <p>The card here shows the recovery wave: the slower, smaller wave that follows the main spike of each beat.</p>
+      <div class="actions"><a class="btn btn-primary" href="/sensors/">How the study works</a><LabLink href={LAB.explore}>Try the sensor tool</LabLink></div>
+    </div>
+    <div class="feature-art art-ask" data-r>
+      <Pic name="strength-map" class="ask-chest ask-map" sizes="(max-width: 900px) 80vw, 40vw" alt="A chest outline from the research tool with a grid of squares, coloured from green, weak, to red, strong, showing where the computed heartbeat is strongest." />
+      <div class="ask-card">
+        <p class="ask-q">The typical man, lower breastbone, option 1, recovery wave</p>
+        <p class="ask-n"><span>about</span> 40 <span>beats</span></p>
+        <Bars label="Beats needed by place worn: 39.9 at the breastbone rule, 99.5 at the left chest pocket, 106.9 under the left breast." rows={[{ label: 'Breastbone', value: 39.9 }, { label: 'Chest pocket', value: 99.5 }, { label: 'Under left breast', value: 106.9 }]} />
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ EVIDENCE ============ -->
 <section class="band" id="evidence" aria-labelledby="h-ev">
   <div class="wrap know">
     <div class="know-head" data-r>
       <p class="chip">Evidence</p>
-      <h2 id="h-ev" class="h2">The evidence,<span class="teal">open to inspect.</span></h2>
-      <p class="lead">Every figure on this site comes from one study on real anatomy, and the tools let you check it yourself.</p>
-      <div class="actions"><a class="btn btn-ghost" href="/evidence/">Read the evidence</a></div>
+      <h2 id="h-ev" class="h2">The evidence,<span class="teal">set out in full.</span></h2>
+      <p class="lead">The figures for size, place and fit come from one simulation study on 42 scanned chests. The evidence page sets it out, and partners can open the full research tools.</p>
+      <div class="actions"><a class="btn btn-primary" href="/evidence/">Read the evidence</a></div>
+      <AccessNote />
     </div>
     <div class="know-cards">
       <div class="kcard" data-r>
@@ -219,7 +219,7 @@ import { LAB, OPTIONS, TEAM } from '../config';
       <div class="kcard kcard-wide" data-r>
         <div>
           <h3>What the study uses</h3>
-          <ul><li>Real chest shapes from CT scans</li><li>The same heart model in every chest</li><li>Results written down in advance</li></ul>
+          <ul><li>Real chest shapes from CT scans</li><li>The same heart model in every chest</li><li>The sensor resting on the skin</li></ul>
         </div>
         <div>
           <h3>What it compares</h3>

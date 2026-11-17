@@ -5,9 +5,11 @@ import Bars from '../components/Bars.astro';
 import Marks from '../components/Marks.astro';
 import SizeCompare from '../components/SizeCompare.astro';
 import WorkBand from '../components/WorkBand.astro';
+import LabLink from '../components/LabLink.astro';
+import AccessNote from '../components/AccessNote.astro';
 import { LAB } from '../config';
 ---
-<Base title="The evidence" description="One virtual trial of the design on 42 real, scanned chests: what was compared, what it found, and where to check every figure yourself.">
+<Base title="The evidence" description="One virtual trial of the design on 42 real, scanned chests: what was compared, what was planned in advance, and what it found.">
 
 <section class="band band-night phero-night" aria-labelledby="h-page">
   <div class="wrap">
@@ -16,7 +18,7 @@ import { LAB } from '../config';
       <h1 id="h-page" class="numeral"><span class="sr">The evidence: </span>42</h1>
       <div class="score-side">
         <p class="score-line">real chests, scanned. One virtual trial of the design on every one of them.</p>
-        <div class="actions"><a class="btn btn-white" href={LAB.explore}>Check it in the lab</a></div>
+        <div class="actions"><a class="btn btn-white" href="#method">How the trial works</a></div>
       </div>
     </div>
     <div class="specs" data-r>
@@ -28,7 +30,7 @@ import { LAB } from '../config';
   </div>
 </section>
 
-<section class="band" aria-labelledby="h-method">
+<section class="band" id="method" aria-labelledby="h-method">
   <div class="wrap split split-wide-text">
     <div class="split-media frame frame-flush" data-r>
       <Pic name="chest-placement" sizes="(max-width: 900px) 92vw, 40vw" alt="The front of a chest outlined from a scan: skin, breastbone, ribs and the heart behind them, with the device on the breastbone." />
@@ -41,7 +43,7 @@ import { LAB } from '../config';
         <li>Real chest shapes from CT scans</li>
         <li>The same heart settings in every chest, so the differences come from anatomy</li>
         <li>The sensor rests on the skin under its own footprint</li>
-        <li>Results written down in advance</li>
+        <li>Four results written down in advance. One was supported: size</li>
       </ul>
     </div>
   </div>
@@ -53,6 +55,7 @@ import { LAB } from '../config';
       <p class="chip">Finding one: size</p>
       <h2 id="h-size" class="h2">Small sits<span class="teal">closer.</span></h2>
       <p class="lead">A small stiff core sits closer to the chest than a bank-card-sized one.</p>
+      <p>Of the four results written down in advance, this is the one the trial supported. The gaps were measured on the 42 scans.</p>
       <div class="stats">
         <div class="stat"><b>4.45<small>mm</small></b><span>largest gap under the 32 x 60 mm core</span></div>
         <div class="stat stat-dim"><b>9.50<small>mm</small></b><span>under an 86 x 54 mm plate</span></div>
@@ -77,7 +80,7 @@ import { LAB } from '../config';
       <p class="chip">Finding two: place</p>
       <h2 id="h-place" class="h2">The breastbone<span class="teal">needs fewer beats.</span></h2>
       <p class="lead">In the trial, the breastbone needs fewer beats than the shirt pocket or under the left breast.</p>
-      <p>The same spot was chosen in 39 of 42 rounds when each chest was left out in turn.</p>
+      <p>The same spot was chosen in 39 of 42 rounds when each chest was left out in turn. But the people left out needed 1.84 times the beats of their own best spot, more than the 1.5 set in advance. The chosen spot is stable; one position does not suit every chest equally.</p>
     </div>
   </div>
 </section>
@@ -87,7 +90,7 @@ import { LAB } from '../config';
     <header class="sec-head" data-r>
       <p class="chip">Finding three: fit</p>
       <h2 id="h-fit" class="h2 h2-xl">A zone,<span class="teal">not a point.</span></h2>
-      <p class="lead">Centre it 3 cm above where the breastbone stops, in the middle of the chest. The trial shows how much room there is around that rule.</p>
+      <p class="lead">Centre it 3 cm above where the breastbone stops, in the middle of the chest. The trial shows how much room there is around that rule. The zone was found after the results were seen, so it is exploratory and not one of the four planned results.</p>
     </header>
     <div class="tiles tiles-4">
       <article class="tile" data-r><span class="tile-n">3 cm</span><h3>To the wearer's left</h3><p>Beats rise by less than 25 %.</p></article>
@@ -104,7 +107,8 @@ import { LAB } from '../config';
       <p class="chip">What comes next</p>
       <h2 id="h-next" class="h2">More chests.<span class="teal">Older chests.</span></h2>
       <p class="lead">A second run on 89 older chests is under way. The plan is an open set of 131 chests, ages 21 to 94.</p>
-      <div class="actions"><a class="btn btn-ghost" href={LAB.method}>Sources and method</a></div>
+      <div class="actions"><LabLink href={LAB.method}>Sources and method</LabLink></div>
+      <AccessNote />
     </div>
     <div class="know-cards">
       <div class="kcard" data-r>
@@ -134,13 +138,11 @@ import { LAB } from '../config';
         <p class="tile-k">Real recording, modelled electrode failure</p>
         <h3>20 of 20 beats.</h3>
         <p>After a modelled electrode failure on a real recording, the ECG detector found 11 of 20 beats. The magnetic channel found all 20.</p>
-        <a class="textlink" href={LAB.electrodes}>Open the electrode test</a>
       </article>
       <article class="tile" data-r>
-        <p class="tile-k">Published by an independent group</p>
+        <p class="tile-k">Published by another group</p>
         <h3>A heartbeat, 10 mm from the chest.</h3>
-        <p>The kind of wire sensor option 1 uses has been reported under 2 pT per root hertz as a matched pair, showing a heartbeat with 6 averaged beats and no shielded room.</p>
-        <a class="textlink" href={LAB.option1evidence}>The evidence for option 1</a>
+        <p>The kind of wire sensor option 1 would use has been reported under 2 pT per root hertz as a matched pair, showing a heartbeat 10 mm from one person's chest with 6 averaged beats and no shielded room. That is one group, one person and a conference abstract.</p>
       </article>
     </div>
   </div>
@@ -150,7 +152,7 @@ import { LAB } from '../config';
   <div class="wrap">
     <p id="h-vow" class="vow vow-top" data-r>We'll make the claim when the evidence does.</p>
     <div class="actions vow-actions" data-r>
-      <a class="btn btn-white" href={LAB.trust}>See every check</a>
+      <LabLink class="btn btn-white" href={LAB.trust}>See every check</LabLink>
       <a class="onteal-link" href="/heart-twin/">How the Heart Twin works</a>
     </div>
   </div>

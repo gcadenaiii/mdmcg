@@ -5,6 +5,7 @@ import Traces from '../components/Traces.astro';
 import Averaging from '../components/Averaging.astro';
 import Bars from '../components/Bars.astro';
 import WorkBand from '../components/WorkBand.astro';
+import LabLink from '../components/LabLink.astro';
 import { LAB } from '../config';
 ---
 <Base title="A reading" description="How a reading is designed to go: take it from its case, place it on the breastbone, sit still, and let it average the beats.">
@@ -14,10 +15,10 @@ import { LAB } from '../config';
     <div class="phero-text">
       <p class="chip">A reading</p>
       <h1 id="h-page" class="display display-m">Sit still.<span class="teal">It averages the beats.</span></h1>
-      <p class="lead">One beat is too faint to read. Many beats, lined up on the ECG mark and averaged, are not.</p>
+      <p class="lead">One beat is too faint to read. Many beats, lined up on the ECG mark and averaged, are not. This is how a reading is designed to go.</p>
       <div class="actions">
-        <a class="btn btn-primary" href={LAB.explore}>Try a reading in the lab</a>
-        <a class="btn btn-ghost" href="/device/">See the device</a>
+        <a class="btn btn-primary" href="/device/">See the device</a>
+        <LabLink href={LAB.explore}>Try the sensor tool</LabLink>
       </div>
     </div>
     <div class="phero-art">
@@ -33,10 +34,10 @@ import { LAB } from '../config';
       <h2 id="h-flow" class="h2 h2-xl">From the case<span class="teal">to the record.</span></h2>
     </header>
     <ol class="flow">
-      <li data-r><b></b><h3>Take it from its case</h3><p>It lives there, charged, between readings.</p></li>
+      <li data-r><b></b><h3>Take it from its case</h3><p>It would live there, charged, between readings.</p></li>
       <li data-r><b></b><h3>Place it on the breastbone</h3><p>Find where the bone stops. Centre it 3 cm above.</p></li>
-      <li data-r><b></b><h3>Start</h3><p>The wings pick up the ECG. The core listens for the field.</p></li>
-      <li data-r><b></b><h3>Sit still</h3><p>It lines up each beat on the ECG mark and adds them.</p></li>
+      <li data-r><b></b><h3>Start</h3><p>The wings would pick up the ECG while the core listens for the field.</p></li>
+      <li data-r><b></b><h3>Sit still</h3><p>It would line up each beat on the ECG mark and add them.</p></li>
       <li data-r><b></b><h3>Read the record</h3><p>Two signals from the same heartbeats, on one clock.</p></li>
     </ol>
   </div>
@@ -51,8 +52,8 @@ import { LAB } from '../config';
       <p class="chip">Placing it</p>
       <h2 id="h-place" class="h2">One landmark.<span class="teal">One finger.</span></h2>
       <p class="lead">Slide a finger down the middle of your chest until the bone stops. Centre it 3 cm above that.</p>
-      <p>The place is a zone, not a point. Up to 3 cm toward the wearer's left is forgiven, and a little up or down. Not toward the right.</p>
-      <p><a class="textlink" href={LAB.option1wear}>See how it is worn</a></p>
+      <p>In the virtual trial the place is a zone, not a point. It is forgiving toward the wearer's left, and a little up or down. Not toward the right.</p>
+      <p><a class="textlink" href="/device/">Where and how it is worn</a></p>
     </div>
   </div>
 </section>
@@ -67,7 +68,7 @@ import { LAB } from '../config';
       <article class="tile" data-r>
         <p class="tile-k">Quick check</p>
         <h3>The main spike.</h3>
-        <p>The tall, sharp part of each beat. It clears after a handful of beats.</p>
+        <p>The tall, sharp part of each beat. In the virtual trial it clears after a handful of beats.</p>
         <div class="pair">
           <div><b>8</b><span>beats, about, for the middle person in the virtual trial</span></div>
         </div>
@@ -75,7 +76,7 @@ import { LAB } from '../config';
       <article class="tile" data-r>
         <p class="tile-k">Full review</p>
         <h3>Adds the recovery wave.</h3>
-        <p>The slower, smaller wave that follows the spike. It asks for more beats.</p>
+        <p>The slower, smaller wave that follows the spike. In the virtual trial it asks for more beats.</p>
         <div class="pair">
           <div><b>40</b><span>beats, about, for the middle person in the virtual trial</span></div>
         </div>
@@ -106,12 +107,12 @@ import { LAB } from '../config';
     <div class="split-text" data-r>
       <p class="chip">The record</p>
       <h2 id="h-record" class="h2">Two signals.<span class="teal">One clock.</span></h2>
-      <p class="lead">The record holds the heart's magnetic signal and its ECG, taken from the same beats.</p>
+      <p class="lead">The record is designed to hold the heart's magnetic signal and its ECG, taken from the same beats.</p>
       <ul class="ticks">
-        <li>The ECG marks each beat</li>
-        <li>Noisy beats are dropped</li>
+        <li>The ECG would mark each beat</li>
+        <li>Noisy beats would be dropped</li>
         <li>Beats are never picked for looking like a heartbeat</li>
-        <li>The device records and reports</li>
+        <li>The device is designed to record and report</li>
       </ul>
     </div>
     <div class="split-media" data-r>
@@ -128,7 +129,7 @@ import { LAB } from '../config';
     <div class="split-text" data-r>
       <p class="chip">Afterwards</p>
       <h2 id="h-after" class="h2">Back in<span class="teal">its case.</span></h2>
-      <p class="lead">The device charges in its case and is ready for the next reading.</p>
+      <p class="lead">The device would charge in its case, ready for the next reading.</p>
       <p><a class="textlink" href="/device/">More about the device</a></p>
     </div>
   </div>

@@ -34,7 +34,7 @@ if (mode === 'live' && info.gl && !args.includes('--hold')) {
   await page.mouse.up();
   await page.waitForTimeout(1800);
 }
-const ids = ['device', 'inside', 'ecg', 'worn', 'twin', 'options'];
+const ids = ['device', 'why', 'inside', 'ecg', 'worn', 'options'];
 for (let i = 0; i < ids.length; i++) {
   await page.evaluate((id) => {
     const el = document.getElementById(id);
@@ -52,7 +52,7 @@ if (mode === 'live' && info.gl) {
   const b = await page.evaluate(() => window.__stage.frames());
   console.log('frames drawn in 1.5 s at rest:', b - a);
   /* below the stage nothing may be drawn either, however far the page is scrolled */
-  await page.evaluate(() => window.scrollTo(0, document.getElementById('heart-twin').offsetTop + 200));
+  await page.evaluate(() => window.scrollTo(0, document.getElementById('stands').offsetTop + 200));
   await page.waitForTimeout(1200);
   const c = await page.evaluate(() => window.__stage.frames());
   for (let k = 0; k < 6; k++) { await page.mouse.wheel(0, 500); await page.waitForTimeout(150); }
@@ -61,7 +61,7 @@ if (mode === 'live' && info.gl) {
   /* half way between two scenes */
   await page.evaluate(() => { const el = document.getElementById('inside'); window.scrollTo(0, window.scrollY + el.getBoundingClientRect().top - window.innerHeight * 0.69); });
   await page.waitForTimeout(1500);
-  await page.screenshot({ path: path.join(out, `${mode}_${W}_between_1_2.png`) });
+  await page.screenshot({ path: path.join(out, `${mode}_${W}_between_2_3.png`) });
 }
 await browser.close();
 if (errors.length) { console.error('errors:\n' + errors.join('\n')); process.exit(1); }

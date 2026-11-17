@@ -10,12 +10,13 @@ export const NAV = [
   { href: '/device/', label: 'Device' },
   { href: '/science/', label: 'Science' },
   { href: '/heart-twin/', label: 'Heart Twin' },
-  { href: '/sensors/', label: 'Sensors' },
+  { href: '/sensors/', label: 'Sensor study' },
   { href: '/evidence/', label: 'Evidence' },
   { href: '/team/', label: 'Team' },
 ];
 
-/** The research tools live outside this site, at /lab/ (built and deployed separately). */
+/** The research tools live outside this site, at /lab/ (built and deployed separately). They open with an access code:
+    link to them with the LabLink component, which carries the "Partner access" cue. */
 export const LAB = {
   home: '/lab/',
   watch: '/lab/#/watch',

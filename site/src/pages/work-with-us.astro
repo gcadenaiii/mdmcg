@@ -2,7 +2,17 @@
 import Base from '../layouts/Base.astro';
 import Pic from '../components/Pic.astro';
 import EmailButton from '../components/EmailButton.astro';
+import LabLink from '../components/LabLink.astro';
 import { LAB } from '../config';
+import { HAS_CONTACT } from '../contact';
+
+// The four groups. Each card has its own email button, with a subject line that tells the founders who is writing.
+const GROUPS = [
+  { name: 'Sensor makers', text: 'Wind the wire sensor and make its drive with us.', label: 'Email us about sensors', subject: 'Sensor makers: the wire sensor' },
+  { name: 'Unshielded recordings', text: 'Share recordings taken close to the chest, outside a shielded room.', label: 'Email us about recordings', subject: 'Unshielded recordings' },
+  { name: 'Clinicians', text: 'Tell us what a short record of both signals would have to show to be worth looking at.', label: 'Email us as a clinician', subject: 'Clinicians: what the record should show' },
+  { name: 'Funders and reviewers', text: 'Read the evidence and meet the team on this site. Partners can open the full research tools.', label: 'Email us about funding', subject: 'Funding and review' },
+];
 ---
 <Base title="Work with us" description="Sensor makers, groups with unshielded recordings, clinicians, funders and reviewers: help us take the design from simulation to the bench.">
 
@@ -12,8 +22,9 @@ import { LAB } from '../config';
     <h1 id="h-page" class="display">Help us take it from simulation to the bench.</h1>
     <p class="lead">The design is drawn, and tried in a virtual trial on 42 scanned chests. The next step is hardware, and we are looking for the people to take it with.</p>
     <div class="close-cta" id="contact">
-      <EmailButton />
-      <p>Opens your email program. Nothing is stored on this site.</p>
+      {HAS_CONTACT ? <EmailButton /> : <a class="btn btn-white" href="/team/">Meet the founders</a>}
+      <p class="cta-who">The three founders read these emails and answer them. Say who you are, and what you make, measure or fund.</p>
+      {HAS_CONTACT && <p>Opens your email program. Nothing is stored on this site.</p>}
     </div>
   </div>
 </section>
@@ -25,10 +36,14 @@ import { LAB } from '../config';
       <h2 id="h-who" class="h2 h2-xl">Four kinds<span class="teal">of partner.</span></h2>
     </header>
     <ol class="needs needs-light">
-      <li data-r><span class="need-n">1</span><h3>Sensor makers</h3><p>Wind the wire sensor and make its drive with us.</p></li>
-      <li data-r><span class="need-n">2</span><h3>Unshielded recordings</h3><p>Share recordings taken close to the chest, outside a shielded room.</p></li>
-      <li data-r><span class="need-n">3</span><h3>Clinicians</h3><p>Tell us what a short record of both signals would have to show to be worth looking at.</p></li>
-      <li data-r><span class="need-n">4</span><h3>Funders and reviewers</h3><p>The study and its results are open in the research tools.</p></li>
+      {GROUPS.map((g, i) => (
+        <li data-r>
+          <span class="need-n">{i + 1}</span>
+          <h3>{g.name}</h3>
+          <p>{g.text}</p>
+          <EmailButton label={g.label} subject={g.subject} class="btn btn-ghost btn-small" />
+        </li>
+      ))}
     </ol>
   </div>
 </section>
@@ -51,27 +66,34 @@ import { LAB } from '../config';
   <div class="wrap">
     <header class="sec-head" data-r>
       <p class="chip">Before you write</p>
-      <h2 id="h-open" class="h2 h2-xl">Everything is<span class="teal">open to inspect.</span></h2>
+      <h2 id="h-open" class="h2 h2-xl">Read the evidence.<span class="teal">Ask for the tools.</span></h2>
     </header>
     <div class="tiles">
-      <article class="tile" data-r>
-        <p class="tile-k">Research tool</p>
-        <h3>Heart Twin</h3>
-        <p>A simulated heart in a scanned chest. Watch one beat and the two signals it makes.</p>
-        <a class="textlink" href={LAB.watch}>Open the Heart Twin</a>
-      </article>
-      <article class="tile" data-r>
-        <p class="tile-k">Research tool</p>
-        <h3>Sensor evaluation</h3>
-        <p>Pick a body, a place and a device, and see what a reading would need.</p>
-        <a class="textlink" href={LAB.explore}>Try the sensor tool</a>
-      </article>
       <article class="tile" data-r>
         <p class="tile-k">On this site</p>
         <h3>The evidence</h3>
         <p>One virtual trial of the design on 42 real chests, and what it found.</p>
         <a class="textlink" href="/evidence/">Read the evidence</a>
       </article>
+      <article class="tile" data-r>
+        <p class="tile-k">Research tool</p>
+        <h3>Heart Twin</h3>
+        <p>A simulated heart in a scanned chest. Watch one beat and the two signals it makes.</p>
+        <LabLink class="textlink" href={LAB.watch}>Open the Heart Twin</LabLink>
+      </article>
+      <article class="tile" data-r>
+        <p class="tile-k">Research tool</p>
+        <h3>Sensor tool</h3>
+        <p>Pick a body, a place and a device, and see what a reading would need.</p>
+        <LabLink class="textlink" href={LAB.explore}>Try the sensor tool</LabLink>
+      </article>
+    </div>
+    <div class="access" id="access" data-r>
+      <div>
+        <h3>Ask for access to the research tools</h3>
+        <p>The Heart Twin and the sensor tool open with an access code, which we give to partners. Tell us who you are and what you would like to look at.</p>
+      </div>
+      <EmailButton label="Ask for access" subject="Access to the research tools" class="btn btn-primary" />
     </div>
   </div>
 </section>
@@ -82,7 +104,7 @@ import { LAB } from '../config';
       <h2 id="h-end" class="h2 h2-xl">Tell us what you make, measure or fund.</h2>
       <div class="close-cta">
         <EmailButton />
-        <p>Opens your email program. Nothing is stored on this site.</p>
+        {HAS_CONTACT && <p>Opens your email program. Nothing is stored on this site.</p>}
       </div>
     </div>
   </div>

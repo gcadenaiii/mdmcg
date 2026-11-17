@@ -18,6 +18,17 @@ const RULES = [
   ['em dash', /—|&mdash;|&#8212;/],
   ['gmail', /gmail/i],
   ['plain mailto or address', /mailto:|[\w.+-]+@[\w-]+\.[a-z]{2,}/i],
+  // one name for the research tools (committee change brief, 2026-11-17)
+  ['"the lab"', /\b(the|in the|into the) lab\b/i],
+  // sentences removed on 2026-11-17: they described a working device, or said more than the facts sheet supports
+  ['device described as working', /sensors read the heart|sensor reads the room|The device records and reports|The device sits still and adds up beats|The device lives in a charging case|The device charges in its case|Built for\s*(<[^>]+>\s*)*an ordinary room/i],
+  ['"written down in advance" without the count', /<li>Results written down in advance/i],
+  ['"39 of 42 rounds" without what followed', /39 of 42 rounds when each chest was left out in turn\.\s*<\/p>/i],
+  ['"Checked against real recordings"', /Checked against\s*(<[^>]+>\s*)*real recordings|Every check is open/i],
+  ['the published sensor without "one person"', /a heartbeat seen 10 mm from the chest|showing a heartbeat with 6 averaged beats/i],
+  ['"every figure comes from one study"', /Every figure on this site/i],
+  ['"open to inspect"', /open to inspect|check it yourself|check every figure yourself/i],
+  ['old menu label', />Sensors<\/a>|Sensor evaluation/],
 ];
 
 const files = [];
@@ -38,6 +49,13 @@ for (const f of files) {
     if (m) { bad++; console.log(`${f}: ${name}: "${text.slice(Math.max(0, m.index - 40), m.index + 60).replace(/\s+/g, ' ')}"`); }
   }
   if (/gmail|—/i.test(html)) { bad++; console.log(`${f}: gmail or em dash somewhere in the file`); }
+}
+// every link into the research tools says so before the click
+for (const f of files) {
+  const html = readFileSync(f, 'utf8');
+  for (const m of html.matchAll(/<a\b[^>]*href="\/lab\/[^"]*"[^>]*>([\s\S]*?)<\/a>/g)) {
+    if (!/partner access/i.test(m[1])) { bad++; console.log(`${f}: link into the research tools without "Partner access": "${m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()}"`); }
+  }
 }
 console.log(`${files.length} pages checked, ${bad} problem(s).`);
 process.exit(bad ? 1 : 0);

@@ -353,3 +353,42 @@ picture > source { display: none; }
   .bars-big .bar-row { grid-template-columns: 7.4em minmax(0, 1fr) 3.4em; gap: 10px; font-size: 15px; }
   .bars-big .bar-v { font-size: 17px; }
 }
+
+/* ---------- the research tools open with an access code: the cue on every link that leads there ---------- */
+.gate { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 400; line-height: 1; letter-spacing: 0; white-space: nowrap; }
+.gate svg { flex: none; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; margin-top: -3px; }
+.btn .gate { margin-left: 14px; padding: 5px 0 3px 14px; border-left: 1px solid color-mix(in srgb, currentColor 32%, transparent); opacity: 0.86; }
+.gated { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.gated .gate { color: var(--ink-3); }
+.band-night .gated .gate, .band-teal .gated .gate { color: var(--on-dark-2); }
+.tile .gated { margin-top: auto; align-self: flex-start; }
+.tile p + .gated { margin-top: 24px; }
+.foot-nav .gate { margin-left: 8px; font-size: 12px; color: var(--on-dark-2); }
+.door-foot { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; margin-top: auto; padding: 24px 16px 0; }
+.door-foot .door-go { margin-top: 0; padding: 0; }
+.door-foot .gate { color: var(--ink-3); }
+.access-note a { color: var(--teal-deep); font-weight: 500; text-underline-offset: 3px; }
+.sec-head .access-note { margin-top: 20px; }
+.split-text .access-note { margin-top: 20px; }
+.band-night .access-note { color: var(--on-dark-2); }
+.band-night .access-note a { color: var(--on-dark); }
+
+/* ---------- the ask: who it is for, who answers, a button on each group card, and the way to ask for access ---------- */
+.close-for { margin-top: 24px; font-weight: 300; font-size: var(--fs-lead); line-height: 1.4; color: var(--on-teal-2); max-width: 24em; }
+.close-cta .cta-who { font-size: 17px; line-height: 1.5; max-width: 30em; color: var(--on-dark); }
+.needs li { display: flex; flex-direction: column; align-items: flex-start; }
+.needs li .btn { margin-top: auto; }
+.needs li p { margin-bottom: 24px; }
+.access { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px 48px; margin-top: 24px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-l); box-shadow: var(--shadow-s); padding: 32px; scroll-margin-top: 120px; }
+.access h3 { font-weight: 300; font-size: var(--fs-h3); line-height: 1.15; letter-spacing: -0.01em; }
+.access p { margin-top: 10px; color: var(--ink-2); font-size: 16px; line-height: 1.5; max-width: 38em; }
+.band-night > .wrap > .chip + .score { margin-top: 40px; }
+.score-side .lead { max-width: 26em; }
+
+@media (max-width: 900px) {
+  .access { padding: 24px 22px; }
+}
+@media (max-width: 560px) {
+  .btn:has(.gate) { flex-wrap: wrap; row-gap: 0; padding-block: 12px 10px; border-radius: 30px; }
+  .btn .gate { flex-basis: 100%; justify-content: center; margin-left: 0; padding: 2px 0 0; border-left: 0; }
+}

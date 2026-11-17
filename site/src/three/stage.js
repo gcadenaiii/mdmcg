@@ -10,16 +10,24 @@ import { VIEWS, FAMILY, FRAME_ONE, FRAME_FAMILY, sizeLines } from './shots.js';
 const HERO_AT_REST = 'picture';
 
 const TAU = Math.PI * 2;
-/* one row per scene on the page, in order. gl: 0 leaves the scene's still picture on the stage.
-   The camera goes once round the device over the six scenes. */
+/* one row per scene on the page, in the page's order (src/pages/index.astro): whole device, two signals, it opens,
+   its own ECG, on a chest, four proposals. gl: 0 leaves the scene's still picture on the stage.
+   The camera goes once round the device over the six scenes.
+   enter: where the camera comes from on the way into a scene, when that is not the scene before. It is used only
+   after a scene with gl: 0, so the change of place happens while the canvas is not seen. */
 const SCENES = [
   { ...VIEWS.hero, explode: 0, family: 0, gl: 1, lines: 1 },
+  { ...VIEWS.hero, az: VIEWS.hero.az + 1.1, dist: VIEWS.hero.dist * 1.25, explode: 0, family: 0, gl: 0, lines: 0 },
   { ...VIEWS.open, explode: 1, family: 0, gl: 1, lines: 0 },
   { ...VIEWS.wing, az: VIEWS.wing.az + TAU, explode: 0, family: 0, gl: 1, lines: 0 },
   { ...VIEWS.wing, az: VIEWS.wing.az + TAU + 0.25, dist: VIEWS.wing.dist * 1.5, explode: 0, family: 0, gl: 0, lines: 0 },
-  { ...VIEWS.family, az: VIEWS.family.az + TAU - 0.2, dist: VIEWS.family.dist * 1.12, explode: 0, family: 0, gl: 0, lines: 0 },
-  { ...VIEWS.family, az: VIEWS.family.az + TAU, explode: 0, family: 1, gl: 1, lines: 0 },
+  { ...VIEWS.family, az: VIEWS.family.az + TAU, explode: 0, family: 1, gl: 1, lines: 0,
+    enter: { ...VIEWS.family, az: VIEWS.family.az + TAU - 0.2, dist: VIEWS.family.dist * 1.12 } },
 ];
+/* the scene that shows the four options, and the scroll position past which the four are laid on the ground:
+   inside the scene before it, whose picture covers the stage (gl: 0) */
+const FAMILY_AT = SCENES.findIndex((s) => s.family === 1);
+const FAMILY_FROM = FAMILY_AT - 1;
 const KEYS = ['tx', 'ty', 'tz', 'az', 'el', 'dist', 'fit', 'explode', 'family', 'gl', 'lines'];
 const ease = (t) => t * t * (3 - 2 * t);
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -30,6 +38,8 @@ export function mount(spine, { rest = HERO_AT_REST } = {}) {
   const scenes = Array.from(spine.querySelectorAll('.scene'));
   if (!stage || scenes.length !== SCENES.length) return null;
   const heroFig = rest === 'picture' ? stage.querySelector('.fig-hero') : null;
+  /* the pictures of the scenes the model does not draw: each gives way as the model comes in over it */
+  const stills = Array.from(stage.querySelectorAll('.stage-layers > .fig:not([data-gl])'));
 
   const wrap = document.createElement('div');
   wrap.className = 'stage-gl';
@@ -88,14 +98,16 @@ export function mount(spine, { rest = HERO_AT_REST } = {}) {
     pos = p;
     const i = Math.min(SCENES.length - 2, Math.floor(p));
     const f = ease(p - i);
-    const a = SCENES[i], b = SCENES[i + 1];
+    const b = SCENES[i + 1], a = b.enter ? { ...SCENES[i], ...b.enter } : SCENES[i];
     for (const k of KEYS) goal[k] = a[k] + (b[k] - a[k]) * f;
     /* the picture hands over a little before the camera has finished */
     if (a.gl !== b.gl) goal.gl = a.gl > b.gl ? 1 - ease(clamp((p - i) / 0.7, 0, 1)) : ease(clamp((p - i - 0.3) / 0.7, 0, 1));
-    /* on the first scene the picture stays until the visitor scrolls, or turns the device by hand */
+    /* on the first scene the picture stays until the visitor scrolls, or turns the device by hand.
+       If the second scene keeps its own picture, the model then hands over to it as any other scene would. */
     if (heroFig && i === 0) {
       const turning = hold || drag.on || Math.abs(drag.az) > 0.004 || Math.abs(drag.el) > 0.004;
-      goal.gl = Math.max(turning ? 1 : 0, ease(clamp(p / 0.2, 0, 1)));
+      const leave = b.gl < 1 ? 1 - ease(clamp((p - 0.25) / 0.45, 0, 1)) : 1;
+      goal.gl = Math.max(turning ? 1 : 0, ease(clamp(p / 0.2, 0, 1))) * leave;
     }
   }
   function draw() {
@@ -117,7 +129,9 @@ export function mount(spine, { rest = HERO_AT_REST } = {}) {
     const shown = Math.round(cur.gl * appear * veil * 1000) / 1000;
     wrap.style.opacity = String(shown);
     wrap.style.pointerEvents = pos < 0.3 ? 'auto' : 'none';
-    if (heroFig) heroFig.style.opacity = heroFig.classList.contains('on') ? String(1 - shown) : '';
+    /* the hero picture gives way to the model, and does not come back while the model leaves for the next picture */
+    if (heroFig) heroFig.style.opacity = heroFig.classList.contains('on') ? String(Math.min(1 - shown, 1 - ease(clamp(pos / 0.2, 0, 1)))) : '';
+    for (const f of stills) f.style.opacity = f.classList.contains('on') && shown > 0 ? String(1 - shown) : '';
     /* size lines */
     const show = cur.lines * linesIn;
     svg.style.opacity = String(Math.round(show * 1000) / 1000);
@@ -169,7 +183,7 @@ export function mount(spine, { rest = HERO_AT_REST } = {}) {
     }
     if (appear < 1) { appear = Math.min(1, appear + dt / 0.5); moving = true; }
     /* one device or four: the ground is changed only while the canvas is not seen */
-    const want = pos > 3.5;
+    const want = pos > FAMILY_FROM;
     if (want !== family) {
       if (cur.gl * veil > 0.02) veil = Math.max(0, veil - dt / 0.18);
       else {
@@ -222,6 +236,7 @@ export function mount(spine, { rest = HERO_AT_REST } = {}) {
     ro.disconnect();
     spine.classList.remove('gl', 'gl-rest');
     if (heroFig) heroFig.style.opacity = '';
+    for (const f of stills) f.style.opacity = '';
     wrap.remove();
     S.dispose();
   }
