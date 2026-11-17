@@ -6,8 +6,6 @@ import Marks from '../components/Marks.astro';
 import Stage from '../components/Stage.astro';
 import WorkBand from '../components/WorkBand.astro';
 import LabLink from '../components/LabLink.astro';
-import AccessNote from '../components/AccessNote.astro';
-import Gate from '../components/Gate.astro';
 import { LAB } from '../config';
 const N = 8;
 ---
@@ -156,38 +154,37 @@ const N = 8;
     <header class="sec-head" data-r>
       <p class="chip">In the research tools</p>
       <h2 id="h-doors" class="h2 h2-xl">Five questions.<span class="teal">Five doors.</span></h2>
-      <AccessNote />
     </header>
     <div class="doors">
       <a class="door" href={LAB.watch} data-r>
         <span class="door-n">1</span>
         <h3>Watch the heart</h3>
         <p>One heartbeat, three views on one clock: the heart, an ECG lead, a magnetic channel.</p>
-        <span class="door-foot"><span class="door-go">Open</span><Gate /></span>
+        <span class="door-foot"><span class="door-go">Open</span></span>
       </a>
       <a class="door" href={LAB.sensor} data-r>
         <span class="door-n">2</span>
         <h3>Where should the sensor go?</h3>
         <p>Tap anywhere on the chest and see what a sensor there would read.</p>
-        <span class="door-foot"><span class="door-go">Open</span><Gate /></span>
+        <span class="door-foot"><span class="door-go">Open</span></span>
       </a>
       <a class="door" href={LAB.noise} data-r>
         <span class="door-n">3</span>
         <h3>How much noise can it take?</h3>
         <p>Slide the noise up and watch the heartbeat sink into it.</p>
-        <span class="door-foot"><span class="door-go">Open</span><Gate /></span>
+        <span class="door-foot"><span class="door-go">Open</span></span>
       </a>
       <a class="door" href={LAB.electrodes} data-r>
         <span class="door-n">4</span>
         <h3>When electrodes fail</h3>
         <p>Compare what each detector finds after the pads come loose.</p>
-        <span class="door-foot"><span class="door-go">Open</span><Gate /></span>
+        <span class="door-foot"><span class="door-go">Open</span></span>
       </a>
       <a class="door" href={LAB.trust} data-r>
         <span class="door-n">5</span>
         <h3>Can I trust it?</h3>
         <p>Every check of the twin against real people, in one place.</p>
-        <span class="door-foot"><span class="door-go">Open</span><Gate /></span>
+        <span class="door-foot"><span class="door-go">Open</span></span>
       </a>
     </div>
   </div>

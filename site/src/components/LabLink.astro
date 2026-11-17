@@ -1,11 +1,6 @@
 ---
-// A link into the research tools. It always says, before the click, that access is needed.
-// On a button the cue sits inside the pill; beside a text link it follows the link.
-import Gate from './Gate.astro';
+// A link into the research tools (/lab/): an ordinary button or link (owner, 2026-11-17: no "partner access" cue).
 interface Props { href: string; class?: string; }
 const { href, class: cls = 'btn btn-ghost' } = Astro.props;
-const button = cls.split(' ').includes('btn');
 ---
-{button
-  ? <a class={cls} href={href}><span><slot /></span><Gate /></a>
-  : <span class="gated"><a class={cls} href={href}><slot /><span class="sr">, partner access</span></a><span aria-hidden="true"><Gate /></span></span>}
+<a class={cls} href={href}><slot /></a>

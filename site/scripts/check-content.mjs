@@ -50,12 +50,5 @@ for (const f of files) {
   }
   if (/gmail|—/i.test(html)) { bad++; console.log(`${f}: gmail or em dash somewhere in the file`); }
 }
-// every link into the research tools says so before the click
-for (const f of files) {
-  const html = readFileSync(f, 'utf8');
-  for (const m of html.matchAll(/<a\b[^>]*href="\/lab\/[^"]*"[^>]*>([\s\S]*?)<\/a>/g)) {
-    if (!/partner access/i.test(m[1])) { bad++; console.log(`${f}: link into the research tools without "Partner access": "${m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()}"`); }
-  }
-}
 console.log(`${files.length} pages checked, ${bad} problem(s).`);
 process.exit(bad ? 1 : 0);

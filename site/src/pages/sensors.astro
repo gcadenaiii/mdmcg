@@ -8,7 +8,6 @@ import SizeCompare from '../components/SizeCompare.astro';
 import Stage from '../components/Stage.astro';
 import WorkBand from '../components/WorkBand.astro';
 import LabLink from '../components/LabLink.astro';
-import AccessNote from '../components/AccessNote.astro';
 import { LAB, OPTIONS } from '../config';
 const N = 9;
 ---
@@ -199,7 +198,6 @@ const N = 9;
       <h2 id="h-door" class="h2">Pick a body.<span class="teal">Pick a place.</span></h2>
       <p class="lead">Choose one of the scanned chests, a place to wear it and a device. The sensor tool answers with what a reading would need, as a range.</p>
       <div class="actions"><LabLink class="btn btn-primary" href={LAB.explore}>Try the sensor tool</LabLink><LabLink class="textlink" href={LAB.method}>Sources and method</LabLink></div>
-      <AccessNote />
     </div>
     <div class="split-media frame frame-night frame-flush" data-r>
       <Pic name="strength-map" alt="A chest outline with a grid of squares coloured from green, weak, to red, strong, showing where the computed heartbeat is strongest." />

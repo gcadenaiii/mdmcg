@@ -6,7 +6,6 @@ import Marks from '../components/Marks.astro';
 import SizeCompare from '../components/SizeCompare.astro';
 import WorkBand from '../components/WorkBand.astro';
 import LabLink from '../components/LabLink.astro';
-import AccessNote from '../components/AccessNote.astro';
 import { LAB } from '../config';
 ---
 <Base title="The evidence" description="One virtual trial of the design on 42 real, scanned chests: what was compared, what was planned in advance, and what it found.">
@@ -108,7 +107,6 @@ import { LAB } from '../config';
       <h2 id="h-next" class="h2">More chests.<span class="teal">Older chests.</span></h2>
       <p class="lead">A second run on 89 older chests is under way. The plan is an open set of 131 chests, ages 21 to 94.</p>
       <div class="actions"><LabLink href={LAB.method}>Sources and method</LabLink></div>
-      <AccessNote />
     </div>
     <div class="know-cards">
       <div class="kcard" data-r>
