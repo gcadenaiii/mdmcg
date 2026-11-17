@@ -20,7 +20,7 @@ import { LAB } from '../config';
       </div>
     </div>
     <div class="phero-art">
-      <Pic name="device-detail" class="render" eager sizes="(max-width: 900px) 92vw, 56vw" alt="Close view of the white core with its teal ring, four gold contacts on the lid, and a woven wing ending in a round electrode pad." />
+      <Pic name="device-detail" class="render fade-edges" eager sizes="(max-width: 900px) 92vw, 56vw" alt="Close view of the white core with its teal ring, four gold contacts on the lid, and a woven wing ending in a round electrode pad." />
     </div>
   </div>
 </section>
@@ -105,27 +105,18 @@ import { LAB } from '../config';
 </section>
 
 <section class="band band-mist" aria-labelledby="h-wear">
-  <div class="wrap">
-    <header class="sec-head" data-r>
+  <div class="wrap split">
+    <div class="split-text" data-r>
       <p class="chip">Ways to wear it</p>
-      <h2 id="h-wear" class="h2 h2-xl">Three carriers.<span class="teal">One core.</span></h2>
-    </header>
-    <div class="tiles">
-      <article class="tile" data-r>
-        <span class="tile-n">1</span>
-        <h3>Chest strap</h3>
-        <p>An elastic strap with a cradle that presses the core to the skin. The carrier we plan to make before the others.</p>
-      </article>
-      <article class="tile" data-r>
-        <span class="tile-n">2</span>
-        <h3>Stick-on carrier</h3>
-        <p>A skin-safe carrier holds the core and the wings. The core clips out and is kept.</p>
-      </article>
-      <article class="tile" data-r>
-        <div class="tile-art"><Pic name="garment-flat" sizes="(max-width: 900px) 92vw, 30vw" widths={[480, 768]} alt="A soft garment laid flat with a pocket at the breastbone and two fabric electrodes, and the device beside it." /></div>
-        <h3>Built into a garment</h3>
-        <p>The core docks in a pocket at the breastbone. Nothing of steel sits near it.</p>
-      </article>
+      <h2 id="h-wear" class="h2">Three carriers.<span class="teal">One core.</span></h2>
+      <ol class="rows">
+        <li><span class="ring r1">1</span><div><h3>Chest strap</h3><p>An elastic strap with a cradle that presses the core to the skin. The carrier we plan to make before the others.</p></div></li>
+        <li><span class="ring r1">2</span><div><h3>Stick-on carrier</h3><p>A skin-safe carrier holds the core and the wings. The core clips out and is kept.</p></div></li>
+        <li><span class="ring r1">3</span><div><h3>Built into a garment</h3><p>The core docks in a pocket at the breastbone. Nothing of steel sits near it.</p></div></li>
+      </ol>
+    </div>
+    <div class="split-media frame frame-flush" data-r>
+      <Pic name="garment-flat" alt="A soft garment laid flat with a pocket at the breastbone and two fabric electrodes, and the device beside it." />
     </div>
   </div>
 </section>

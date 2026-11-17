@@ -8,7 +8,7 @@ const plate = (cx: number, top: number, len: number) => ({ x: cx - (len * S) / 2
 const big = plate(250, 60, 86), small = plate(250, 250, 60);
 const arc = (cx: number, top: number, half: number) => { const dy = R - Math.sqrt(R * R - half * half); return `M${cx - half} ${top + dy} A${R} ${R} 0 0 1 ${cx + half} ${top + dy}`; };
 ---
-<svg class="draw" viewBox="0 0 640 380" role="img" aria-label="Two stiff plates resting on the same curved chest, seen from the side. Under the bank-card-sized plate the largest gap is 9.50 millimetres. Under the small core it is 4.45 millimetres.">
+<svg class="draw" viewBox="0 0 720 380" role="img" aria-label="Two stiff plates resting on the same curved chest, seen from the side. Under the bank-card-sized plate the largest gap is 9.50 millimetres. Under the small core it is 4.45 millimetres.">
   <g fill="none" stroke-linecap="round">
     <path d={arc(250, 60, 240)} stroke="#CDD3DA" stroke-width="10" />
     <path d={arc(250, 250, 240)} stroke="#CDD3DA" stroke-width="10" />
@@ -20,9 +20,9 @@ const arc = (cx: number, top: number, half: number) => { const dy = R - Math.sqr
     <path d={`M${small.x + small.w + 14} ${small.y + 4} V${250 + small.sag - 5}`} /><path d={`M${small.x + small.w + 7} ${small.y + 4} h14`} /><path d={`M${small.x + small.w + 7} ${250 + small.sag - 5} h14`} />
   </g>
   <text class="d-num d-num-dim" x="508" y="74">9.50 mm</text>
-  <text x="508" y="100">bank-card size</text>
+  <text x="508" y="104">bank-card size</text>
   <text class="d-num" x="508" y="264">4.45 mm</text>
-  <text class="d-key" x="508" y="290">the small core</text>
+  <text class="d-key" x="508" y="294">the small core</text>
   <text x="20" y="176">chest</text>
   <text x="20" y="366">chest</text>
 </svg>

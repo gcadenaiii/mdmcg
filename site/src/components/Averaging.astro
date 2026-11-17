@@ -10,7 +10,7 @@ const path = (arr: number[], base: number) => arr.map((v, i) => `${i ? 'L' : 'M'
 const singles = [noisy(), noisy(), noisy()];
 ---
 <svg class="trace" viewBox={`0 0 ${W} 400`} role="img" aria-label="A drawing of averaging. Above, single heartbeats are hard to see in the noise. Below, many beats lined up on the ECG mark and averaged give one clear beat.">
-  <text class="t-key" x="0" y="18">One beat at a time</text>
+  <text class="t-key" x="0" y="22">One beat at a time</text>
   {singles.map((s) => <path class="t-faint" d={path(s, 150)} />)}
   <text class="t-key" x="0" y="262">Many beats, lined up and averaged</text>
   <path class="t-base" d={`M0 370 H${W}`} />

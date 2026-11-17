@@ -17,13 +17,14 @@
 
 /* ---------- page hero ---------- */
 .phero { position: relative; overflow: clip; }
-.phero-in { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--gap); align-items: center; min-height: min(78svh, 820px); padding-block: clamp(40px, 5vw, 72px) clamp(56px, 6vw, 96px); }
+.phero-in { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 7fr); gap: var(--gap); align-items: center; min-height: min(78svh, 820px); padding-block: clamp(40px, 5vw, 72px) clamp(56px, 6vw, 96px); }
 .phero-text > * + * { margin-top: 28px; }
 .phero-text .actions { margin-top: 40px; }
-.display-m { font-size: var(--fs-h2-xl); line-height: 0.98; }
+.display-m { font-size: clamp(40px, 4.7vw, 72px); line-height: 0.98; text-wrap: balance; }
 .phero-art { position: relative; display: flex; align-items: center; justify-content: center; min-width: 0; }
 .phero-art::before { content: ""; position: absolute; inset: -14% -12%; border-radius: 50%; background: radial-gradient(closest-side, var(--teal-10), rgba(255, 255, 255, 0) 100%); }
-.phero-art > * { position: relative; }
+.phero-art::before { z-index: 0; }
+.phero-art > *, .phero-art img { position: relative; z-index: 1; }
 .phero-art .render { width: 100%; max-width: 760px; height: auto; mix-blend-mode: multiply; filter: drop-shadow(0 48px 48px rgba(10, 14, 20, 0.14)); }
 .phero-art .shot { width: 100%; max-width: 640px; height: auto; border-radius: var(--r-l); box-shadow: var(--shadow-l); }
 .phero-art .shot-tall { max-width: 460px; }
@@ -113,7 +114,7 @@
 .trace .t-faint { stroke: var(--line-2); stroke-width: 1.2; }
 .trace .t-base { stroke: var(--line); stroke-width: 1; }
 .trace .t-mark { stroke: var(--teal); stroke-width: 1.5; stroke-dasharray: 3 5; }
-.trace text { font-family: var(--sans); font-size: 15px; fill: var(--ink-2); }
+.trace text { font-family: var(--sans); font-size: 22px; fill: var(--ink-2); }
 .trace .t-key { font-weight: 500; fill: var(--ink); }
 .trace-night .t-mcg { stroke: var(--on-dark); }
 .trace-night .t-ecg { stroke: #5FD0D9; }
@@ -121,9 +122,9 @@
 .trace-night text { fill: var(--on-dark-2); }
 .trace-night .t-key { fill: var(--on-dark); }
 .draw { display: block; width: 100%; height: auto; }
-.draw text { font-family: var(--sans); font-size: 15px; fill: var(--ink-2); }
+.draw text { font-family: var(--sans); font-size: 21px; fill: var(--ink-2); }
 .draw .d-key { font-weight: 500; fill: var(--ink); }
-.draw .d-num { font-family: var(--sans); font-weight: 300; font-size: 34px; letter-spacing: -0.02em; fill: var(--ink); }
+.draw .d-num { font-family: var(--sans); font-weight: 300; font-size: 42px; letter-spacing: -0.02em; fill: var(--ink); }
 .draw .d-num-dim { fill: var(--ink-3); }
 
 /* ---------- numbered steps (a reading) ---------- */
@@ -323,3 +324,32 @@
 .ask-hero { position: relative; right: auto; bottom: auto; width: 100%; max-width: 480px; }
 .band-team { padding-top: clamp(40px, 5vw, 72px); }
 .phero-center .phero-in { padding-bottom: clamp(40px, 5vw, 72px); }
+
+picture > source { display: none; }
+.band-night .pull { color: var(--on-dark); }
+.band-tint .frame:not(.frame-night) { background: var(--paper); box-shadow: var(--shadow-m); }
+
+/* numbered rows */
+.rows { margin-top: 36px; }
+.rows li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 20px; padding: 22px 0 20px; border-top: 1px solid var(--line-2); }
+.rows h3 { font-weight: 300; font-size: var(--fs-h3); line-height: 1.15; letter-spacing: -0.01em; }
+.rows p { margin-top: 6px; color: var(--ink-2); font-size: 16px; line-height: 1.5; max-width: 30em; }
+.band-mist .rows .ring { background: var(--paper); }
+
+.stage .panel { max-width: min(100%, 600px); }
+@media (max-width: 900px) {
+  .stage .bars-big .bar-row { grid-template-columns: 7.2em minmax(0, 1fr) 3.2em; font-size: 14px; gap: 8px; }
+  .stage .bars-big .bar-v { font-size: 15px; }
+  .stage .panel-ticks { margin-top: 8px; padding-top: 2px; }
+  .stage .panel-ticks li { font-size: 13px; padding: 5px 0 4px 26px; }
+  .stage .panel-ticks li::before { top: 9px; width: 11px; height: 6px; }
+  .stage .panel-k { font-size: 13px; }
+}
+
+/* teal text only on white: links on tinted bands use the deeper teal */
+.band-mist .textlink, .band-tint .textlink { color: var(--teal-deep); }
+
+@media (max-width: 560px) {
+  .bars-big .bar-row { grid-template-columns: 7.4em minmax(0, 1fr) 3.4em; gap: 10px; font-size: 15px; }
+  .bars-big .bar-v { font-size: 17px; }
+}
