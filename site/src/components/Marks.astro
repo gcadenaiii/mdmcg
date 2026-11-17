@@ -1,0 +1,8 @@
+---
+// A grid of small marks, one per chest. Circles for women, squares for men; `open` draws empty marks.
+interface Props { n: number; women?: number; open?: boolean; label: string; }
+const { n, women = 0, open = false, label } = Astro.props;
+---
+<div class:list={['marks', open ? 'marks-open' : 'marks-solid']} role="img" aria-label={label}>
+  {Array.from({ length: n }, (_, i) => <span class={open ? undefined : i < women ? 'w' : 'm'}></span>)}
+</div>

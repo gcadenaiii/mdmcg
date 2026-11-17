@@ -1,0 +1,28 @@
+---
+// Why small: a stiff plate over a curved chest. Both plates are drawn to one scale over the same curve.
+// 9.50 mm and 4.45 mm are the largest gaps found on the scanned chests (facts sheet, 1.3).
+const S = 5.2;               // px per mm
+const R = 97 * S;            // one curve for both plates
+const sag = (len: number) => R - Math.sqrt(R * R - (len * S / 2) ** 2);
+const plate = (cx: number, top: number, len: number) => ({ x: cx - (len * S) / 2, y: top - 9, w: len * S, h: 9, sag: sag(len) });
+const big = plate(250, 60, 86), small = plate(250, 250, 60);
+const arc = (cx: number, top: number, half: number) => { const dy = R - Math.sqrt(R * R - half * half); return `M${cx - half} ${top + dy} A${R} ${R} 0 0 1 ${cx + half} ${top + dy}`; };
+---
+<svg class="draw" viewBox="0 0 640 380" role="img" aria-label="Two stiff plates resting on the same curved chest, seen from the side. Under the bank-card-sized plate the largest gap is 9.50 millimetres. Under the small core it is 4.45 millimetres.">
+  <g fill="none" stroke-linecap="round">
+    <path d={arc(250, 60, 240)} stroke="#CDD3DA" stroke-width="10" />
+    <path d={arc(250, 250, 240)} stroke="#CDD3DA" stroke-width="10" />
+  </g>
+  <rect x={big.x} y={big.y - 5} width={big.w} height={big.h} rx="4" fill="#fff" stroke="#5F6876" stroke-width="2" />
+  <rect x={small.x} y={small.y - 5} width={small.w} height={small.h} rx="4" fill="#fff" stroke="#0E7C86" stroke-width="3" />
+  <g stroke="#0E7C86" stroke-width="1.5">
+    <path d={`M${big.x + big.w + 14} ${big.y + 4} V${60 + big.sag - 5}`} /><path d={`M${big.x + big.w + 7} ${big.y + 4} h14`} /><path d={`M${big.x + big.w + 7} ${60 + big.sag - 5} h14`} />
+    <path d={`M${small.x + small.w + 14} ${small.y + 4} V${250 + small.sag - 5}`} /><path d={`M${small.x + small.w + 7} ${small.y + 4} h14`} /><path d={`M${small.x + small.w + 7} ${250 + small.sag - 5} h14`} />
+  </g>
+  <text class="d-num d-num-dim" x="508" y="74">9.50 mm</text>
+  <text x="508" y="100">bank-card size</text>
+  <text class="d-num" x="508" y="264">4.45 mm</text>
+  <text class="d-key" x="508" y="290">the small core</text>
+  <text x="20" y="176">chest</text>
+  <text x="20" y="366">chest</text>
+</svg>

@@ -1,0 +1,194 @@
+---
+import Base from '../layouts/Base.astro';
+import Pic from '../components/Pic.astro';
+import Traces from '../components/Traces.astro';
+import Marks from '../components/Marks.astro';
+import Stage from '../components/Stage.astro';
+import WorkBand from '../components/WorkBand.astro';
+import { LAB } from '../config';
+const N = 8;
+---
+<Base title="Heart Twin" description="The Heart Twin is a simulated heart in a scanned chest. Eight steps from a chest scan to two signals, then into the live tool.">
+
+<section class="phero" aria-labelledby="h-page">
+  <div class="wrap phero-in">
+    <div class="phero-text">
+      <p class="chip">Heart Twin</p>
+      <h1 id="h-page" class="display display-m">A heart you can stop<span class="teal">and look inside.</span></h1>
+      <p class="lead">A simulated heart in a scanned chest. Built to test a heart sensor on many real bodies before it is made.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href={LAB.watch}>Open the Heart Twin</a>
+        <a class="btn btn-ghost" href="#step-1">See how it works</a>
+      </div>
+    </div>
+    <div class="phero-art">
+      <div class="feature-art art-night art-hero">
+        <Pic name="heart-only" eager sizes="(max-width: 900px) 92vw, 52vw" alt="The Heart Twin: a simulated heart coloured from deep blue, resting, to yellow, fired, half way through one beat." />
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap spine spine-steps" id="steps">
+
+  <section class="scene" id="step-1" data-scene="The question" aria-labelledby="h-s1">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">1</span><span>Step 1 of {N}</span></p>
+      <h2 id="h-s1" class="h2">What will<span class="teal">a sensor see?</span></h2>
+      <p class="lead">Before you make a heart sensor, you want to know what it will see. Not on one ideal body. On many real ones.</p>
+      <p>The Heart Twin is a computer model made for that question.</p>
+    </div>
+    <figure class="fig" data-kind="shot">
+      <div class="fig-media"><Pic name="heart-in-chest" alt="The simulated heart inside a see-through chest, with lines running out to labelled ECG pads and magnetic sensors." /></div>
+    </figure>
+  </section>
+
+  <Stage />
+
+  <section class="scene" id="step-2" data-scene="From a scan to a chest" aria-labelledby="h-s2">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">2</span><span>Step 2 of {N}</span></p>
+      <h2 id="h-s2" class="h2">It starts with<span class="teal">a real chest.</span></h2>
+      <p class="lead">A routine chest scan gives the shape: the heart, the lungs, the blood inside the heart and the outline of the body.</p>
+      <p>The twin copies that anatomy, so the bone and the ribs sit where they sit in a person.</p>
+    </div>
+    <figure class="fig" data-kind="shot">
+      <div class="fig-media"><Pic name="chest-placement" alt="The front of a chest outlined from a scan: skin, breastbone, ribs and the heart behind them." /></div>
+    </figure>
+  </section>
+
+  <section class="scene" id="step-3" data-scene="One heartbeat" aria-labelledby="h-s3">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">3</span><span>Step 3 of {N}</span></p>
+      <h2 id="h-s3" class="h2">Then comes<span class="teal">the heartbeat.</span></h2>
+      <p class="lead">A network of fast fibres is grown on the inner wall of the heart. Each beat starts where that network meets the muscle, and spreads from there.</p>
+      <p>Blue is resting. Yellow has fired.</p>
+    </div>
+    <figure class="fig" data-kind="strip">
+      <div class="fig-media">
+        <div class="beats beats-2">
+          <Pic name="beat-44" sizes="(max-width: 900px) 40vw, 280px" widths={[320, 560]} alt="The heart at the start of a beat: almost all blue, with one small spot beginning to fire." />
+          <Pic name="beat-52" sizes="(max-width: 900px) 40vw, 280px" widths={[320, 560]} alt="A moment later: a yellow patch has spread across the front of the heart." />
+          <Pic name="beat-60" sizes="(max-width: 900px) 40vw, 280px" widths={[320, 560]} alt="Later again: most of the front of the heart has fired." />
+          <Pic name="beat-72" sizes="(max-width: 900px) 40vw, 280px" widths={[320, 560]} alt="Near the end of the spread: the heart is almost all yellow." />
+        </div>
+      </div>
+    </figure>
+  </section>
+
+  <section class="scene" id="step-4" data-scene="Two signals" aria-labelledby="h-s4">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">4</span><span>Step 4 of {N}</span></p>
+      <h2 id="h-s4" class="h2">Two signals<span class="teal">from one source.</span></h2>
+      <p class="lead">From that one beat the twin works out the ECG at pads on the skin, and the magnetic signal near the chest.</p>
+      <p class="pull">An ECG does not determine the magnetic field. Neither signal is made from the other.</p>
+    </div>
+    <figure class="fig" data-kind="chart">
+      <div class="fig-media"><div class="panel"><Traces /></div></div>
+    </figure>
+  </section>
+
+  <section class="scene" id="step-5" data-scene="Many bodies" aria-labelledby="h-s5">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">5</span><span>Step 5 of {N}</span></p>
+      <h2 id="h-s5" class="h2">Now do it<span class="teal">for many people.</span></h2>
+      <p class="lead">42 scanned chests, 17 men and 25 women, aged 21 to 59. Every heart gets the same settings, so the differences come from anatomy.</p>
+      <p>They are large. At the same spot, the signal is about five times stronger in one chest than in another.</p>
+    </div>
+    <figure class="fig" data-kind="chart">
+      <div class="fig-media">
+        <div class="panel">
+          <p class="panel-k">Scanned chests in the set</p>
+          <p class="panel-n">42</p>
+          <Marks n={42} women={25} label="42 scanned chests: 25 women shown as circles, 17 men shown as squares." />
+          <div class="pair">
+            <div><b>89</b><span>older chests, aged 61 to 94, in a second run now under way</span></div>
+            <div><b>131</b><span>chests planned for the open set, ages 21 to 94</span></div>
+          </div>
+        </div>
+      </div>
+    </figure>
+  </section>
+
+  <section class="scene" id="step-6" data-scene="Where is it strong" aria-labelledby="h-s6">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">6</span><span>Step 6 of {N}</span></p>
+      <h2 id="h-s6" class="h2">Place a sensor.<span class="teal">Anywhere.</span></h2>
+      <p class="lead">Put a virtual sensor on any spot of the chest and see what it would read. Where is the signal strong? How much does it change from body to body?</p>
+      <p>Use it to compare places, layouts and bodies.</p>
+      <p><a class="textlink" href={LAB.sensor}>Move the sensor yourself</a></p>
+    </div>
+    <figure class="fig" data-kind="shot">
+      <div class="fig-media"><Pic name="strength-map" alt="A chest outline with a grid of squares coloured from green, weak, to red, strong, showing where the computed heartbeat is strongest." /></div>
+    </figure>
+  </section>
+
+  <section class="scene" id="step-7" data-scene="Checked against people" aria-labelledby="h-s7">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">7</span><span>Step 7 of {N}</span></p>
+      <h2 id="h-s7" class="h2">Checked against<span class="teal">real recordings.</span></h2>
+      <p class="lead">We compare the twin with magnetic maps recorded from seven real people. Every check is open in the lab.</p>
+      <p><a class="textlink" href={LAB.trust}>See every check</a></p>
+    </div>
+    <figure class="fig" data-kind="shot">
+      <div class="fig-media"><Pic name="twin-field" alt="The computed field over a modelled chest, drawn as a grid of blue and red squares: into the chest and out of it." /></div>
+    </figure>
+  </section>
+
+  <section class="scene" id="step-8" data-scene="Look inside" aria-labelledby="h-s8">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">8</span><span>Step 8 of {N}</span></p>
+      <h2 id="h-s8" class="h2">Then cut it open<span class="teal">and look inside.</span></h2>
+      <p class="lead">Lift the front half away and watch when each part of the two lower chambers fires.</p>
+      <div class="actions"><a class="btn btn-primary" href={LAB.watch}>Watch the beating heart</a></div>
+    </div>
+    <figure class="fig" data-kind="shot">
+      <div class="fig-media"><Pic name="heart-open" alt="The simulated heart with its front half lifted away, showing the left and right ventricles, coloured by when each part fires." /></div>
+    </figure>
+  </section>
+
+</div>
+
+<section class="band band-mist" aria-labelledby="h-doors">
+  <div class="wrap">
+    <header class="sec-head" data-r>
+      <p class="chip">In the lab</p>
+      <h2 id="h-doors" class="h2 h2-xl">Five questions.<span class="teal">Five doors.</span></h2>
+    </header>
+    <div class="doors">
+      <a class="door" href={LAB.watch} data-r>
+        <span class="door-n">1</span>
+        <h3>Watch the heart</h3>
+        <p>One heartbeat, three views on one clock: the heart, an ECG lead, a magnetic channel.</p>
+        <span class="door-go">Open</span>
+      </a>
+      <a class="door" href={LAB.sensor} data-r>
+        <span class="door-n">2</span>
+        <h3>Where should the sensor go?</h3>
+        <p>Tap anywhere on the chest and see what a sensor there would read.</p>
+        <span class="door-go">Open</span>
+      </a>
+      <a class="door" href={LAB.noise} data-r>
+        <span class="door-n">3</span>
+        <h3>How much noise can it take?</h3>
+        <p>Slide the noise up and watch the heartbeat sink into it.</p>
+        <span class="door-go">Open</span>
+      </a>
+      <a class="door" href={LAB.electrodes} data-r>
+        <span class="door-n">4</span>
+        <h3>When electrodes fail</h3>
+        <p>Compare what each detector finds after the pads come loose.</p>
+        <span class="door-go">Open</span>
+      </a>
+      <a class="door" href={LAB.trust} data-r>
+        <span class="door-n">5</span>
+        <h3>Can I trust it?</h3>
+        <p>Every check of the twin against real people, in one place.</p>
+        <span class="door-go">Open</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<WorkBand title="Have recordings we could test the twin against?" />
+</Base>

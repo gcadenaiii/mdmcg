@@ -1,0 +1,44 @@
+---
+import '@fontsource/hind/latin-300.css';
+import '@fontsource/hind/latin-400.css';
+import '@fontsource/hind/latin-500.css';
+import '@fontsource/ibm-plex-mono/latin-400.css';
+import '../styles/site.css';
+import '../styles/pages.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { NOINDEX, SITE_NAME } from '../config';
+
+interface Props { title: string; description: string; }
+const { title, description } = Astro.props;
+const full = title === SITE_NAME ? `${SITE_NAME}: your heart, finally heard` : `${title} | ${SITE_NAME}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{NOINDEX && <meta name="robots" content="noindex, nofollow">}
+<title>{full}</title>
+<meta name="description" content={description}>
+<link rel="canonical" href={canonical}>
+<meta name="theme-color" content="#FFFFFF">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content={SITE_NAME}>
+<meta property="og:title" content={full}>
+<meta property="og:description" content={description}>
+<meta property="og:url" content={canonical}>
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<Nav />
+<main id="main">
+  <slot />
+</main>
+<Footer />
+<script src="../scripts/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+---
+// The two signals of one computed beat, on one clock. Shapes come from the research tool's export (src/data/traces.json),
+// each scaled to its own peak; no units are drawn.
+import data from '../data/traces.json';
+interface Props { night?: boolean; label?: string; }
+const { night = false, label = 'Two traces from one computed heartbeat on the same clock: the ECG above and the magnetic signal below. Both rise at the same moment.' } = Astro.props;
+const W = 640, X0 = 150, amp = 92;
+const path = (arr: number[], base: number) => arr.map((v, i) => `${i ? 'L' : 'M'}${(X0 + (i / (arr.length - 1)) * (W - X0)).toFixed(1)} ${(base - v * amp).toFixed(1)}`).join(' ');
+const peak = X0 + (data.ecg.indexOf(Math.max(...data.ecg)) / (data.ecg.length - 1)) * (W - X0);
+---
+<svg class:list={['trace', night && 'trace-night']} viewBox={`0 0 ${W} 330`} role="img" aria-label={label}>
+  <path class="t-base" d={`M${X0} 130 H${W}`} /><path class="t-base" d={`M${X0} 290 H${W}`} />
+  <path class="t-mark" d={`M${peak.toFixed(1)} 16 V314`} />
+  <path class="t-ecg" d={path(data.ecg, 130)} />
+  <path class="t-mcg" d={path(data.mcg, 290)} />
+  <text class="t-key" x="0" y="112">ECG</text><text x="0" y="134">at the skin</text>
+  <text class="t-key" x="0" y="272">Magnetic</text><text x="0" y="294">near the chest</text>
+</svg>

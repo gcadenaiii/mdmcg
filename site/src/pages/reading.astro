@@ -1,0 +1,138 @@
+---
+import Base from '../layouts/Base.astro';
+import Pic from '../components/Pic.astro';
+import Traces from '../components/Traces.astro';
+import Averaging from '../components/Averaging.astro';
+import Bars from '../components/Bars.astro';
+import WorkBand from '../components/WorkBand.astro';
+import { LAB } from '../config';
+---
+<Base title="A reading" description="How a reading is designed to go: take it from its case, place it on the breastbone, sit still, and let it average the beats.">
+
+<section class="phero" aria-labelledby="h-page">
+  <div class="wrap phero-in">
+    <div class="phero-text">
+      <p class="chip">A reading</p>
+      <h1 id="h-page" class="display display-m">Sit still.<span class="teal">It averages the beats.</span></h1>
+      <p class="lead">One beat is too faint to read. Many beats, lined up on the ECG mark and averaged, are not.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href={LAB.explore}>Try a reading in the lab</a>
+        <a class="btn btn-ghost" href="/device/">See the device</a>
+      </div>
+    </div>
+    <div class="phero-art">
+      <div class="panel"><Averaging /></div>
+    </div>
+  </div>
+</section>
+
+<section class="band band-mist" aria-labelledby="h-flow">
+  <div class="wrap">
+    <header class="sec-head" data-r>
+      <p class="chip">Five steps</p>
+      <h2 id="h-flow" class="h2 h2-xl">From the case<span class="teal">to the record.</span></h2>
+    </header>
+    <ol class="flow">
+      <li data-r><b></b><h3>Take it from its case</h3><p>It lives there, charged, between readings.</p></li>
+      <li data-r><b></b><h3>Place it on the breastbone</h3><p>Find where the bone stops. Centre it 3 cm above.</p></li>
+      <li data-r><b></b><h3>Start</h3><p>The wings pick up the ECG. The core listens for the field.</p></li>
+      <li data-r><b></b><h3>Sit still</h3><p>It lines up each beat on the ECG mark and adds them.</p></li>
+      <li data-r><b></b><h3>Read the record</h3><p>Two signals from the same heartbeats, on one clock.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="h-place">
+  <div class="wrap split split-wide-text">
+    <div class="split-media frame frame-flush" data-r>
+      <Pic name="chest-placement" sizes="(max-width: 900px) 92vw, 40vw" alt="The front of a chest outlined from a scan, with a bold mark where the breastbone stops, an arrow marked 3 cm up, the device on the midline and a dashed outline of the zone it may sit in." />
+    </div>
+    <div class="split-text" data-r>
+      <p class="chip">Placing it</p>
+      <h2 id="h-place" class="h2">One landmark.<span class="teal">One finger.</span></h2>
+      <p class="lead">Slide a finger down the middle of your chest until the bone stops. Centre it 3 cm above that.</p>
+      <p>The place is a zone, not a point. Up to 3 cm toward the wearer's left is forgiven, and a little up or down. Not toward the right.</p>
+      <p><a class="textlink" href={LAB.option1wear}>See how it is worn</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="band band-tint" aria-labelledby="h-kinds">
+  <div class="wrap">
+    <header class="sec-head" data-r>
+      <p class="chip">Two kinds of reading</p>
+      <h2 id="h-kinds" class="h2 h2-xl">Quick check.<span class="teal">Full review.</span></h2>
+    </header>
+    <div class="tiles tiles-2">
+      <article class="tile" data-r>
+        <p class="tile-k">Quick check</p>
+        <h3>The main spike.</h3>
+        <p>The tall, sharp part of each beat. It clears after a handful of beats.</p>
+        <div class="pair">
+          <div><b>8</b><span>beats, about, for the middle person in the virtual trial</span></div>
+        </div>
+      </article>
+      <article class="tile" data-r>
+        <p class="tile-k">Full review</p>
+        <h3>Adds the recovery wave.</h3>
+        <p>The slower, smaller wave that follows the spike. It asks for more beats.</p>
+        <div class="pair">
+          <div><b>40</b><span>beats, about, for the middle person in the virtual trial</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="h-where">
+  <div class="wrap split">
+    <div class="split-text" data-r>
+      <p class="chip">Why the breastbone</p>
+      <h2 id="h-where" class="h2">The right place<span class="teal">needs fewer beats.</span></h2>
+      <p class="lead">In the virtual trial, the breastbone needs fewer beats than the shirt pocket or under the left breast.</p>
+      <p>Fewer beats to average means less sitting still for the same record.</p>
+    </div>
+    <div class="split-media" data-r>
+      <div class="panel">
+        <p class="panel-k">Beats for the recovery wave, middle person, by place worn</p>
+        <Bars class="bars-big" label="Beats needed by place worn: 39.9 at the breastbone, 99.5 at the left chest pocket, 106.9 under the left breast." rows={[{ label: 'Breastbone', value: 39.9 }, { label: 'Chest pocket', value: 99.5 }, { label: 'Under left breast', value: 106.9 }]} />
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band band-night" aria-labelledby="h-record">
+  <div class="wrap split split-wide-media">
+    <div class="split-text" data-r>
+      <p class="chip">The record</p>
+      <h2 id="h-record" class="h2">Two signals.<span class="teal">One clock.</span></h2>
+      <p class="lead">The record holds the heart's magnetic signal and its ECG, taken from the same beats.</p>
+      <ul class="ticks">
+        <li>The ECG marks each beat</li>
+        <li>Noisy beats are dropped</li>
+        <li>Beats are never picked for looking like a heartbeat</li>
+        <li>The device records and reports</li>
+      </ul>
+    </div>
+    <div class="split-media" data-r>
+      <Traces night />
+    </div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="h-after">
+  <div class="wrap split">
+    <div class="split-media frame frame-multiply" data-r>
+      <Pic name="case" alt="A navy charging case, open, with a moulded white tray and a row of gold charging contacts." />
+    </div>
+    <div class="split-text" data-r>
+      <p class="chip">Afterwards</p>
+      <h2 id="h-after" class="h2">Back in<span class="teal">its case.</span></h2>
+      <p class="lead">The device charges in its case and is ready for the next reading.</p>
+      <p><a class="textlink" href="/device/">More about the device</a></p>
+    </div>
+  </div>
+</section>
+
+<WorkBand />
+</Base>

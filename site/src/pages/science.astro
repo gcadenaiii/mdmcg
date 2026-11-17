@@ -1,0 +1,141 @@
+---
+import Base from '../layouts/Base.astro';
+import Pic from '../components/Pic.astro';
+import Traces from '../components/Traces.astro';
+import Averaging from '../components/Averaging.astro';
+import Marks from '../components/Marks.astro';
+import WorkBand from '../components/WorkBand.astro';
+import { LAB } from '../config';
+---
+<Base title="The science" description="The heart's currents make a voltage on the skin and a magnetic field outside the chest. Why the design records both.">
+
+<section class="phero" aria-labelledby="h-page">
+  <div class="wrap phero-in">
+    <div class="phero-text">
+      <p class="chip">The science</p>
+      <h1 id="h-page" class="display display-m">A second signal<span class="teal">from the same heartbeat.</span></h1>
+      <p class="lead">Every heartbeat is an electric current. That current makes a voltage on the skin, the ECG, and a magnetic field outside the chest.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href={LAB.sensor}>See the field in the lab</a>
+        <a class="btn btn-ghost" href="/heart-twin/">Meet the Heart Twin</a>
+      </div>
+    </div>
+    <div class="phero-art">
+      <Pic name="twin-field" class="shot" eager sizes="(max-width: 900px) 92vw, 44vw" alt="The outline of a modelled chest with a grid of coloured squares, blue where the computed field points into the chest and red where it points out of the chest." />
+    </div>
+  </div>
+</section>
+
+<section class="band band-night" aria-labelledby="h-two">
+  <div class="wrap split">
+    <div class="split-text" data-r>
+      <p class="chip">One source, two signals</p>
+      <h2 id="h-two" class="h2">Same currents.<span class="teal">Different information.</span></h2>
+      <p class="lead">The model computes each signal from the same currents in the same body. Neither is made from the other.</p>
+      <p class="pull">An ECG does not determine the magnetic field. That is the reason to record both.</p>
+    </div>
+    <div class="split-media" data-r>
+      <Traces night />
+    </div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="h-field">
+  <div class="wrap split split-wide-media">
+    <div class="split-text" data-r>
+      <p class="chip">The field</p>
+      <h2 id="h-field" class="h2">Into the chest,<span class="teal">and out of it.</span></h2>
+      <p class="lead">The magnetic field of a heartbeat has a shape. On one side of the heart it points into the chest. On the other, out of it.</p>
+      <p>Where the sensor sits decides how much of that field it catches. The Heart Twin maps the whole front of the chest, spot by spot.</p>
+      <p><a class="textlink" href={LAB.sensor}>Move the sensor yourself</a></p>
+    </div>
+    <div class="split-media frame frame-night frame-flush" data-r>
+      <Pic name="strength-map" sizes="(max-width: 900px) 92vw, 56vw" alt="A chest outline with a grid of squares coloured from green, weak, to red, strong, showing where the computed heartbeat is strongest. A dashed line marks the heart behind." />
+    </div>
+  </div>
+</section>
+
+<section class="band band-mist" aria-labelledby="h-bodies">
+  <div class="wrap split">
+    <div class="split-media" data-r>
+      <div class="panel">
+        <p class="panel-k">The same spot, 42 scanned chests</p>
+        <p class="panel-n">5 <span>times</span></p>
+        <Marks n={42} women={25} label="42 scanned chests: 25 women shown as circles, 17 men shown as squares." />
+        <p class="panel-cap">In the virtual trial, the signal at the same spot is about five times stronger in one chest than in another.</p>
+      </div>
+    </div>
+    <div class="split-text" data-r>
+      <p class="chip">Bodies differ</p>
+      <h2 id="h-bodies" class="h2">No two chests<span class="teal">are alike.</span></h2>
+      <p class="lead">Every heart in the trial gets the same settings, so the differences come from anatomy. They are large.</p>
+      <p>That is why the design is tried on many real chest shapes, not on one ideal body.</p>
+      <p><a class="textlink" href="/evidence/">The 42 chests</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="h-avg">
+  <div class="wrap split split-wide-text">
+    <div class="split-text" data-r>
+      <p class="chip">Averaging</p>
+      <h2 id="h-avg" class="h2">One beat is faint.<span class="teal">Many are clear.</span></h2>
+      <p class="lead">The device sits still and adds up beats. Its own ECG marks each one, and the magnetic beats are lined up on that mark.</p>
+      <div class="stats">
+        <div class="stat"><b>8<small>beats</small></b><span>is about what the main spike needs for the middle person in the virtual trial</span></div>
+        <div class="stat stat-dim"><b>40<small>beats</small></b><span>is about what the slower recovery wave needs</span></div>
+      </div>
+      <p><a class="textlink" href="/reading/">How a reading would go</a></p>
+    </div>
+    <div class="split-media" data-r>
+      <div class="panel"><Averaging /></div>
+    </div>
+  </div>
+</section>
+
+<section class="band band-tint" aria-labelledby="h-room">
+  <div class="wrap">
+    <header class="sec-head" data-r>
+      <p class="chip">Outside a shielded room</p>
+      <h2 id="h-room" class="h2 h2-xl">Built for<span class="teal">an ordinary room.</span></h2>
+    </header>
+    <div class="tiles">
+      <article class="tile" data-r>
+        <p class="tile-k">Reference sensor</p>
+        <h3>It listens to the room, too.</h3>
+        <p>One three-axis reference sensor sits on the core. Each heart sensor is fitted against it, so what the room adds can be taken out.</p>
+      </article>
+      <article class="tile" data-r>
+        <p class="tile-k">Clean beats only</p>
+        <h3>Noisy beats are dropped.</h3>
+        <p>Beats are kept or dropped by their noise alone. They are never picked for looking like a heartbeat.</p>
+      </article>
+      <article class="tile" data-r>
+        <p class="tile-k">In print</p>
+        <h3>The wire sensor, published.</h3>
+        <p>An independent group has reported this kind of sensor under 2 pT per root hertz as a matched pair, and a heartbeat seen 10 mm from the chest with 6 averaged beats, with no shielded room.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="band band-night" aria-labelledby="h-fail">
+  <div class="wrap split">
+    <div class="split-text" data-r>
+      <p class="chip">When electrodes fail</p>
+      <h2 id="h-fail" class="h2">The magnetic channel<span class="teal">does not touch the skin.</span></h2>
+      <p class="lead">Electrodes can lift or dry out. A magnetic sensor has no contact to lose.</p>
+      <p>On a real recording with a modelled electrode failure, the ECG detector found 11 of 20 beats. The magnetic channel found all 20.</p>
+      <div class="actions"><a class="btn btn-white" href={LAB.electrodes}>Open the electrode test</a></div>
+    </div>
+    <div class="split-media" data-r>
+      <div class="specs specs-2">
+        <div class="spec"><b>11<small>of 20</small></b><span>beats found by the ECG detector after the modelled failure</span></div>
+        <div class="spec"><b>20<small>of 20</small></b><span>beats found by the magnetic channel on the same recording</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<WorkBand />
+</Base>

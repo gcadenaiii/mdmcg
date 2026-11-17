@@ -1,0 +1,208 @@
+---
+import Base from '../layouts/Base.astro';
+import Pic from '../components/Pic.astro';
+import Bars from '../components/Bars.astro';
+import Marks from '../components/Marks.astro';
+import Averaging from '../components/Averaging.astro';
+import SizeCompare from '../components/SizeCompare.astro';
+import Stage from '../components/Stage.astro';
+import WorkBand from '../components/WorkBand.astro';
+import { LAB, OPTIONS } from '../config';
+const N = 9;
+---
+<Base title="Sensor evaluation" description="Four ways to build a small magnetic heart sensor, tried on 42 scanned chests. Nine steps, then into the live tool.">
+
+<section class="phero" aria-labelledby="h-page">
+  <div class="wrap phero-in">
+    <div class="phero-text">
+      <p class="chip">Sensor evaluation</p>
+      <h1 id="h-page" class="display display-m">Will it read<span class="teal">my heart?</span></h1>
+      <p class="lead">Four ways to build a small magnetic heart sensor, tried on scanned chests before any hardware is made.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href={LAB.explore}>Try the sensor tool</a>
+        <a class="btn btn-ghost" href="#step-1">See how it works</a>
+      </div>
+    </div>
+    <div class="phero-art">
+      <div class="ask-card ask-hero">
+        <p class="ask-q">The typical man, lower breastbone, option 1, recovery wave</p>
+        <p class="ask-n"><span>about</span> 40 <span>beats</span></p>
+        <Bars label="Beats needed by place worn: 39.9 at the breastbone rule, 99.5 at the left chest pocket, 106.9 under the left breast." rows={[{ label: 'Breastbone', value: 39.9 }, { label: 'Chest pocket', value: 99.5 }, { label: 'Under left breast', value: 106.9 }]} />
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap spine spine-steps" id="steps">
+
+  <section class="scene" id="step-1" data-scene="The question" aria-labelledby="h-s1">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">1</span><span>Step 1 of {N}</span></p>
+      <h2 id="h-s1" class="h2">Could something<span class="teal">this small do it?</span></h2>
+      <p class="lead">Could a small device on the chest read the heart's magnetic signal? This is the design study that asks.</p>
+      <p>Four ways to build one, each tried on scanned human chests.</p>
+    </div>
+    <figure class="fig" data-kind="render">
+      <div class="fig-media"><Pic name="device-hero" alt="Option 1: a small white core with a teal ring and soft white wings that end in round electrode pads." /></div>
+    </figure>
+  </section>
+
+  <Stage />
+
+  <section class="scene" id="step-2" data-scene="The shape" aria-labelledby="h-s2">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">2</span><span>Step 2 of {N}</span></p>
+      <h2 id="h-s2" class="h2">A stiff core.<span class="teal">Two soft wings.</span></h2>
+      <p class="lead">A stiff white core, 60 by 32 by 9 millimetres, with six magnetic sensors inside. Two soft wings carry ECG pads.</p>
+      <p>The ECG only marks the moment of each beat. The magnetic signal is read on its own.</p>
+    </div>
+    <figure class="fig" data-kind="render">
+      <div class="fig-media"><Pic name="device-open" alt="The device opened into layers: lid, flexible sheet with the wings, a flat coil, the sensor board with upright wire sensors, the shell and a soft pad." /></div>
+    </figure>
+  </section>
+
+  <section class="scene" id="step-3" data-scene="Why small" aria-labelledby="h-s3">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">3</span><span>Step 3 of {N}</span></p>
+      <h2 id="h-s3" class="h2">Why small<span class="teal">wins.</span></h2>
+      <p class="lead">A stiff plate cannot follow a curved chest. On the scans, the largest gap under a bank-card-sized plate was 9.50 mm. Under the small core it was 4.45.</p>
+      <p>A small stiff core sits closer to the chest.</p>
+    </div>
+    <figure class="fig" data-kind="chart">
+      <div class="fig-media"><div class="panel"><SizeCompare /></div></div>
+    </figure>
+  </section>
+
+  <section class="scene" id="step-4" data-scene="Where it is worn" aria-labelledby="h-s4">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">4</span><span>Step 4 of {N}</span></p>
+      <h2 id="h-s4" class="h2">Find where<span class="teal">the bone stops.</span></h2>
+      <p class="lead">Slide a finger down the middle of your chest until the bone stops. Centre it 3 cm above that.</p>
+      <p>It is forgiving to the left, up to 3 cm, and a little up or down. Not to the right: 1 cm to the right costs 1.4 times the beats. Think of a zone, not a point.</p>
+    </div>
+    <figure class="fig" data-kind="shot">
+      <div class="fig-media"><Pic name="chest-placement" alt="The front of a chest outlined from a scan, with a bold mark where the breastbone stops, an arrow marked 3 cm up, the device on the midline and a dashed outline of the zone it may sit in." /></div>
+    </figure>
+  </section>
+
+  <section class="scene" id="step-5" data-scene="Adding up beats" aria-labelledby="h-s5">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">5</span><span>Step 5 of {N}</span></p>
+      <h2 id="h-s5" class="h2">One beat<span class="teal">is too faint.</span></h2>
+      <p class="lead">So the device sits still and adds up beats. A quick check reads the main spike. A full review also reads the slower recovery wave.</p>
+      <div class="stats">
+        <div class="stat"><b>8<small>beats</small></b><span>is about what the main spike needs for the middle person</span></div>
+        <div class="stat stat-dim"><b>40<small>beats</small></b><span>is about what the recovery wave needs</span></div>
+      </div>
+    </div>
+    <figure class="fig" data-kind="chart">
+      <div class="fig-media"><div class="panel"><Averaging /></div></div>
+    </figure>
+  </section>
+
+  <section class="scene" id="step-6" data-scene="Places differ" aria-labelledby="h-s6">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">6</span><span>Step 6 of {N}</span></p>
+      <h2 id="h-s6" class="h2">The place<span class="teal">matters.</span></h2>
+      <p class="lead">The same device, worn in three places. The breastbone needs fewer beats than the shirt pocket or under the left breast.</p>
+      <p>Bodies differ too: the middle person needs about 40 beats for the recovery wave, the hardest chest in the set 271.</p>
+    </div>
+    <figure class="fig" data-kind="chart">
+      <div class="fig-media">
+        <div class="panel">
+          <p class="panel-k">Beats for the recovery wave, middle person, by place worn</p>
+          <Bars class="bars-big" label="Beats needed by place worn: 39.9 at the breastbone, 99.5 at the left chest pocket, 106.9 under the left breast." rows={[{ label: 'Breastbone', value: 39.9 }, { label: 'Chest pocket', value: 99.5 }, { label: 'Under left breast', value: 106.9 }]} />
+        </div>
+      </div>
+    </figure>
+  </section>
+
+  <section class="scene" id="step-7" data-scene="Four ways to build it" aria-labelledby="h-s7">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">7</span><span>Step 7 of {N}</span></p>
+      <h2 id="h-s7" class="h2">Four ways<span class="teal">to build it.</span></h2>
+      <p class="lead">Four options, each a white shell with its own coloured ring: teal, sky blue, navy and gold.</p>
+      <p>Option 1, with wire sensors in one piece, is the one we recommend.</p>
+      <p><a class="textlink" href="#options">Compare the four</a></p>
+    </div>
+    <figure class="fig" data-kind="render">
+      <div class="fig-media">
+        <ul class="quad">
+          {OPTIONS.map((o) => <li><Pic name={o.img} alt={o.alt} sizes="(max-width: 900px) 40vw, 300px" widths={[320, 480, 640]} /><span class:list={['ring', o.ring]}>{o.n}</span></li>)}
+        </ul>
+      </div>
+    </figure>
+  </section>
+
+  <section class="scene" id="step-8" data-scene="What the study found" aria-labelledby="h-s8">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">8</span><span>Step 8 of {N}</span></p>
+      <h2 id="h-s8" class="h2">What the trial<span class="teal">found.</span></h2>
+      <p class="lead">One virtual trial of the design on 42 real chests. Three things stand out: size, place and fit.</p>
+      <p><a class="textlink" href="/evidence/">Read the evidence</a></p>
+    </div>
+    <figure class="fig" data-kind="chart">
+      <div class="fig-media">
+        <div class="panel">
+          <p class="panel-k">Scanned chests in the virtual trial</p>
+          <p class="panel-n">42</p>
+          <Marks n={42} women={25} label="42 scanned chests: 25 women shown as circles, 17 men shown as squares." />
+          <ul class="ticks panel-ticks">
+            <li>A small stiff core sits closer to the chest</li>
+            <li>The breastbone needs fewer beats</li>
+            <li>The wearing place is a zone, not a point</li>
+          </ul>
+        </div>
+      </div>
+    </figure>
+  </section>
+
+  <section class="scene" id="step-9" data-scene="What comes next" aria-labelledby="h-s9">
+    <div class="scene-text">
+      <p class="step-k"><span class="ring">9</span><span>Step 9 of {N}</span></p>
+      <h2 id="h-s9" class="h2">Next:<span class="teal">the bench.</span></h2>
+      <p class="lead">The wire sensor has to be wound and its drive made. Then the design moves from the virtual trial to the bench.</p>
+      <div class="actions"><a class="btn btn-primary" href="/work-with-us/">Work with us</a><a class="textlink" href={LAB.option1}>See option 1 in full</a></div>
+    </div>
+    <figure class="fig" data-kind="render">
+      <div class="fig-media"><Pic name="device-detail" alt="Close view of the white core with its teal ring and a woven wing ending in a round electrode pad." /></div>
+    </figure>
+  </section>
+
+</div>
+
+<section class="band band-mist" id="options" aria-labelledby="h-row">
+  <div class="wrap">
+    <header class="sec-head sec-head-row" data-r>
+      <div>
+        <p class="chip">The four options</p>
+        <h2 id="h-row" class="h2 h2-xl">Side by side.</h2>
+      </div>
+      <a class="btn btn-ghost" href={LAB.sensors}>Open all four in the lab</a>
+    </header>
+    <div class="otable" data-r>
+      <div class="orow orow-head" aria-hidden="true"><span></span><span>Option</span><span>Core</span><span>Sensors</span><span>Battery in the core</span></div>
+      <div class="orow"><span class="ring r1">1</span><h3>Wire sensors in one piece<small>Recommended</small></h3><span>60 x 32 x 9 mm</span><span>6 sensors</span><span>40 mAh</span></div>
+      <div class="orow"><span class="ring r2">2</span><h3>TMR chips with flux concentrators<small>Thinnest</small></h3><span>60 x 32 x 6 mm</span><span>6 sensors</span><span>20 mAh</span></div>
+      <div class="orow"><span class="ring r3">3</span><h3>Ready-made boards<small>Bench plate</small></h3><span>124 x 46 x 8 mm</span><span>4 sensors</span><span>Bench cell</span></div>
+      <div class="orow"><span class="ring r4">4</span><h3>Small fluxgates<small>Largest battery</small></h3><span>60 x 32 x 14 mm</span><span>6 sensors</span><span>80 mAh</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="h-door">
+  <div class="wrap split">
+    <div class="split-text" data-r>
+      <p class="chip">In the lab</p>
+      <h2 id="h-door" class="h2">Pick a body.<span class="teal">Pick a place.</span></h2>
+      <p class="lead">Choose one of the scanned chests, a place to wear it and a device. The tool answers with what a reading would need, as a range.</p>
+      <div class="actions"><a class="btn btn-primary" href={LAB.explore}>Will it read my heart?</a><a class="textlink" href={LAB.method}>Sources and method</a></div>
+    </div>
+    <div class="split-media frame frame-night frame-flush" data-r>
+      <Pic name="strength-map" alt="A chest outline with a grid of squares coloured from green, weak, to red, strong, showing where the computed heartbeat is strongest." />
+    </div>
+  </div>
+</section>
+
+<WorkBand title="Make sensors? Help us wind this one." />
+</Base>

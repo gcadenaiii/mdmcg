@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import Pic from '../components/Pic.astro';
+import WorkBand from '../components/WorkBand.astro';
+import { TEAM } from '../config';
+---
+<Base title="Team" description="The people behind the design. Founded by a team from Caltech.">
+
+<section class="phero phero-center" aria-labelledby="h-page">
+  <div class="wrap phero-in">
+    <div class="phero-text">
+      <p class="chip">Team</p>
+      <h1 id="h-page" class="display display-m">The people behind<span class="teal">the design.</span></h1>
+      <p class="lead">Founded by a team from Caltech.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band band-mist band-team" aria-label="The team">
+  <div class="wrap persons">
+    {TEAM.map((p) => (
+      <article class="person" data-r>
+        <div class="person-face"><Pic name={p.photo} alt={`Portrait of ${p.name}`} sizes="240px" widths={[240, 400]} /></div>
+        <div class="person-id">
+          <h2>{p.name}</h2>
+          <p>{p.role}</p>
+        </div>
+        <ul class="person-bio">
+          {p.bio.map((b) => <li>{b}</li>)}
+        </ul>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section class="band" aria-labelledby="h-know">
+  <div class="wrap">
+    <header class="sec-head" data-r>
+      <p class="chip">What the team brings</p>
+      <h2 id="h-know" class="h2 h2-xl">Sensors, devices,<span class="teal">and the road to market.</span></h2>
+    </header>
+    <div class="specs" data-r>
+      <div class="spec"><b>42</b><span>published patents in science and engineering</span></div>
+      <div class="spec"><b>15<small>+ years</small></b><span>taking products from concept to market</span></div>
+      <div class="spec"><b>10<small>+ years</small></b><span>commercializing research into market-ready products</span></div>
+      <div class="spec"><b>3</b><span>founders, all with Caltech in their story</span></div>
+    </div>
+  </div>
+</section>
+
+<WorkBand title="Want to build this with us?" />
+</Base>

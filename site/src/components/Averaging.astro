@@ -1,0 +1,18 @@
+---
+// A drawing of averaging: single beats with noise drawn over them, and the same beat after many are lined up and averaged.
+// The beat shape is the research tool's computed magnetic trace; the noise is drawn, seeded so every build is the same.
+import data from '../data/traces.json';
+const W = 640, amp = 78;
+let seed = 20261116;
+const rnd = () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+const noisy = () => { let s = 0; return data.mcg.map((v) => { s = s * 0.55 + (rnd() - 0.5) * 0.62; return v + s; }); };
+const path = (arr: number[], base: number) => arr.map((v, i) => `${i ? 'L' : 'M'}${((i / (arr.length - 1)) * W).toFixed(1)} ${(base - v * amp).toFixed(1)}`).join(' ');
+const singles = [noisy(), noisy(), noisy()];
+---
+<svg class="trace" viewBox={`0 0 ${W} 400`} role="img" aria-label="A drawing of averaging. Above, single heartbeats are hard to see in the noise. Below, many beats lined up on the ECG mark and averaged give one clear beat.">
+  <text class="t-key" x="0" y="18">One beat at a time</text>
+  {singles.map((s) => <path class="t-faint" d={path(s, 150)} />)}
+  <text class="t-key" x="0" y="262">Many beats, lined up and averaged</text>
+  <path class="t-base" d={`M0 370 H${W}`} />
+  <path class="t-mcg" d={path(data.mcg, 370)} />
+</svg>

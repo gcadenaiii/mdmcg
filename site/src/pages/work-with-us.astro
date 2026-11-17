@@ -1,0 +1,90 @@
+---
+import Base from '../layouts/Base.astro';
+import Pic from '../components/Pic.astro';
+import EmailButton from '../components/EmailButton.astro';
+import { LAB } from '../config';
+---
+<Base title="Work with us" description="Sensor makers, groups with unshielded recordings, clinicians, funders and reviewers: help us take the design from simulation to the bench.">
+
+<section class="hero-teal" aria-labelledby="h-page">
+  <div class="wrap hero-teal-in">
+    <p class="chip">Work with us</p>
+    <h1 id="h-page" class="display">Help us take it from simulation to the bench.</h1>
+    <p class="lead">The design is drawn, and tried in a virtual trial on 42 scanned chests. The next step is hardware, and we are looking for the people to take it with.</p>
+    <div class="close-cta" id="contact">
+      <EmailButton />
+      <p>Opens your email program. Nothing is stored on this site.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band band-mist" aria-labelledby="h-who">
+  <div class="wrap">
+    <header class="sec-head" data-r>
+      <p class="chip">Who we want to hear from</p>
+      <h2 id="h-who" class="h2 h2-xl">Four kinds<span class="teal">of partner.</span></h2>
+    </header>
+    <ol class="needs needs-light">
+      <li data-r><span class="need-n">1</span><h3>Sensor makers</h3><p>Wind the wire sensor and make its drive with us.</p></li>
+      <li data-r><span class="need-n">2</span><h3>Unshielded recordings</h3><p>Share recordings taken close to the chest, outside a shielded room.</p></li>
+      <li data-r><span class="need-n">3</span><h3>Clinicians</h3><p>Tell us what a short record of both signals would have to show to be worth looking at.</p></li>
+      <li data-r><span class="need-n">4</span><h3>Funders and reviewers</h3><p>The study and its results are open in the research tools.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="h-what">
+  <div class="wrap split split-wide-media">
+    <div class="split-text" data-r>
+      <p class="chip">What you would work on</p>
+      <h2 id="h-what" class="h2">One piece.<span class="teal">Six sensors.</span></h2>
+      <p class="lead">Option 1: a small stiff core with six wound wire sensors, its own ECG on two soft wings, and the battery inside.</p>
+      <div class="actions"><a class="btn btn-primary" href="/device/">See the device</a><a class="textlink" href="/sensors/">How we compared four options</a></div>
+    </div>
+    <div class="split-media frame frame-multiply" data-r>
+      <Pic name="device-battery" sizes="(max-width: 900px) 92vw, 54vw" alt="The device with its lid lifted to show the board inside the core, beside its open white tray with gold contacts." />
+    </div>
+  </div>
+</section>
+
+<section class="band band-tint" aria-labelledby="h-open">
+  <div class="wrap">
+    <header class="sec-head" data-r>
+      <p class="chip">Before you write</p>
+      <h2 id="h-open" class="h2 h2-xl">Everything is<span class="teal">open to inspect.</span></h2>
+    </header>
+    <div class="tiles">
+      <article class="tile" data-r>
+        <p class="tile-k">Research tool</p>
+        <h3>Heart Twin</h3>
+        <p>A simulated heart in a scanned chest. Watch one beat and the two signals it makes.</p>
+        <a class="textlink" href={LAB.watch}>Open the Heart Twin</a>
+      </article>
+      <article class="tile" data-r>
+        <p class="tile-k">Research tool</p>
+        <h3>Sensor evaluation</h3>
+        <p>Pick a body, a place and a device, and see what a reading would need.</p>
+        <a class="textlink" href={LAB.explore}>Try the sensor tool</a>
+      </article>
+      <article class="tile" data-r>
+        <p class="tile-k">On this site</p>
+        <h3>The evidence</h3>
+        <p>One virtual trial of the design on 42 real chests, and what it found.</p>
+        <a class="textlink" href="/evidence/">Read the evidence</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="band band-night" aria-labelledby="h-end">
+  <div class="wrap">
+    <div class="close" data-r>
+      <h2 id="h-end" class="h2 h2-xl">Tell us what you make, measure or fund.</h2>
+      <div class="close-cta">
+        <EmailButton />
+        <p>Opens your email program. Nothing is stored on this site.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</Base>

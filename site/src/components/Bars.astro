@@ -1,0 +1,12 @@
+---
+// Horizontal bars that start at zero. One row is highlighted (the first unless `strong` says otherwise).
+interface Row { label: string; value: number; show?: string; }
+interface Props { rows: Row[]; label: string; unit?: string; strong?: number; class?: string; }
+const { rows, label, unit = '', strong = 0, class: cls } = Astro.props;
+const max = Math.max(...rows.map((r) => r.value));
+---
+<div class:list={['bars', cls]} role="img" aria-label={label}>
+  {rows.map((r, i) => (
+    <div class="bar-row"><span class="bar-l">{r.label}</span><span class="bar-t"><span class:list={['bar-f', i !== strong && 'bar-pale']} style={`--w:${((r.value / max) * 100).toFixed(1)}%`}></span></span><span class="bar-v">{r.show ?? r.value}{unit && <small> {unit}</small>}</span></div>
+  ))}
+</div>

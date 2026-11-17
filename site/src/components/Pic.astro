@@ -1,0 +1,16 @@
+---
+// One picture, through Astro's image pipeline: AVIF and WebP, responsive widths, width and height set, lazy unless `eager`.
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props { name: string; alt: string; sizes?: string; class?: string; eager?: boolean; widths?: number[]; }
+const { name, alt, sizes = '(max-width: 900px) 92vw, 50vw', class: cls, eager = false, widths = [480, 768, 1080, 1440] } = Astro.props;
+
+const files = import.meta.glob<{ default: ImageMetadata }>('../assets/**/*.{webp,jpg,png}', { eager: true });
+const hit = Object.entries(files).find(([p]) => p.replace(/^.*\//, '').replace(/\.[a-z]+$/, '') === name);
+if (!hit) throw new Error(`Pic: no image named "${name}" in src/assets`);
+const src = hit[1].default;
+const w = widths.filter((x) => x < src.width).concat(src.width);
+---
+<Picture src={src} alt={alt} formats={['avif', 'webp']} fallbackFormat={src.format === 'jpg' ? 'jpg' : 'webp'} widths={w} sizes={sizes} class={cls}
+  loading={eager ? 'eager' : 'lazy'} decoding={eager ? 'sync' : 'async'} fetchpriority={eager ? 'high' : undefined} />
