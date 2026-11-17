@@ -16,3 +16,13 @@
 Roll back to the old site and settings:
 
     sudo cp /etc/nginx/sites-available/rpm.before-redesign /etc/nginx/sites-available/rpm && sudo nginx -t && sudo systemctl reload nginx
+
+## 2026-11-17 15:55 UTC
+
+Release `20261117T155418Z` is live (`/var/www/mdmcg/current`): home regrouped (why, design, evidence), accurate wording,
+"Sensor study" and "Research tools" names, partner-access cue, per-group email buttons, the live 3D device and re-rendered
+pictures. Only the `current` link changed; no nginx change, no reload. Previous release kept: `20261117T083926Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261117T083926Z /var/www/mdmcg/current
