@@ -4,10 +4,8 @@
 import { Studio, SPECS } from './studio.js';
 import { VIEWS, FAMILY, FRAME_ONE, FRAME_FAMILY, sizeLines } from './shots.js';
 
-/* What the first scene shows while nothing moves.
-   'picture': the page's own hero picture stays; the live model takes over when the visitor scrolls or drags, and hands back.
-   'model': the live model from the start, with one settling move. */
-const HERO_AT_REST = 'picture';
+/* The first two scenes keep their own pictures. The live model first appears at the third scene ("It opens").
+   A picture and the model are never seen together: the one on the stage fades to nothing, then the other fades in. */
 
 const TAU = Math.PI * 2;
 /* one row per scene on the page, in the page's order (src/pages/index.astro): whole device, two signals, it opens,
@@ -16,7 +14,7 @@ const TAU = Math.PI * 2;
    enter: where the camera comes from on the way into a scene, when that is not the scene before. It is used only
    after a scene with gl: 0, so the change of place happens while the canvas is not seen. */
 const SCENES = [
-  { ...VIEWS.hero, explode: 0, family: 0, gl: 1, lines: 1 },
+  { ...VIEWS.hero, explode: 0, family: 0, gl: 0, lines: 0 },
   { ...VIEWS.hero, az: VIEWS.hero.az + 1.1, dist: VIEWS.hero.dist * 1.25, explode: 0, family: 0, gl: 0, lines: 0 },
   { ...VIEWS.open, explode: 1, family: 0, gl: 1, lines: 0 },
   { ...VIEWS.wing, az: VIEWS.wing.az + TAU, explode: 0, family: 0, gl: 1, lines: 0 },
@@ -33,11 +31,11 @@ const ease = (t) => t * t * (3 - 2 * t);
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const NS = 'http://www.w3.org/2000/svg';
 
-export function mount(spine, { rest = HERO_AT_REST } = {}) {
+export function mount(spine) {
   const stage = spine.querySelector('.stage');
   const scenes = Array.from(spine.querySelectorAll('.scene'));
   if (!stage || scenes.length !== SCENES.length) return null;
-  const heroFig = rest === 'picture' ? stage.querySelector('.fig-hero') : null;
+  const heroFig = null;
   /* the pictures of the scenes the model does not draw: each gives way as the model comes in over it */
   const stills = Array.from(stage.querySelectorAll('.stage-layers > .fig:not([data-gl])'));
 
@@ -100,8 +98,10 @@ export function mount(spine, { rest = HERO_AT_REST } = {}) {
     const f = ease(p - i);
     const b = SCENES[i + 1], a = b.enter ? { ...SCENES[i], ...b.enter } : SCENES[i];
     for (const k of KEYS) goal[k] = a[k] + (b[k] - a[k]) * f;
-    /* the picture hands over a little before the camera has finished */
-    if (a.gl !== b.gl) goal.gl = a.gl > b.gl ? 1 - ease(clamp((p - i) / 0.7, 0, 1)) : ease(clamp((p - i - 0.3) / 0.7, 0, 1));
+    /* gl runs 0..1 across a hand-over. Below one half only the picture is seen (fading out as gl rises), above one half
+       only the model. The page puts the next scene's picture on the stage at 0.8 of the way (src/scripts/site.js), so a
+       model that is leaving reaches one half exactly there. */
+    if (a.gl !== b.gl) goal.gl = a.gl > b.gl ? 1 - ease(clamp((p - i - 0.6) / 0.4, 0, 1)) : ease(clamp((p - i - 0.3) / 0.7, 0, 1));
     /* on the first scene the picture stays until the visitor scrolls, or turns the device by hand.
        If the second scene keeps its own picture, the model then hands over to it as any other scene would. */
     if (heroFig && i === 0) {
@@ -126,12 +126,16 @@ export function mount(spine, { rest = HERO_AT_REST } = {}) {
     }
     S.fitAspect = cur.fit;
     S.draw({ tx: cur.tx, ty: cur.ty, tz: cur.tz, az: cur.az + drag.az, el: clamp(cur.el + drag.el, 0.12, 1.45), dist: cur.dist });
-    const shown = Math.round(cur.gl * appear * veil * 1000) / 1000;
+    const g = cur.gl;
+    const shown = Math.round(clamp(g * 2 - 1, 0, 1) * appear * veil * 1000) / 1000;
     wrap.style.opacity = String(shown);
-    wrap.style.pointerEvents = pos < 0.3 ? 'auto' : 'none';
-    /* the hero picture gives way to the model, and does not come back while the model leaves for the next picture */
-    if (heroFig) heroFig.style.opacity = heroFig.classList.contains('on') ? String(Math.min(1 - shown, 1 - ease(clamp(pos / 0.2, 0, 1)))) : '';
-    for (const f of stills) f.style.opacity = f.classList.contains('on') && shown > 0 ? String(1 - shown) : '';
+    /* one out, then one in: the picture is gone by the time the model starts to show, and the other way round */
+    const still = Math.round((1 - clamp(g * 2, 0, 1)) * 1000) / 1000;
+    for (const f of stills) {
+      const on = f.classList.contains('on') && g > 0;
+      f.style.opacity = on ? String(still) : '';
+      f.style.transition = on ? 'none' : '';
+    }
     /* size lines */
     const show = cur.lines * linesIn;
     svg.style.opacity = String(Math.round(show * 1000) / 1000);
@@ -217,10 +221,6 @@ export function mount(spine, { rest = HERO_AT_REST } = {}) {
   }
   function up() { if (!drag.on) return; drag.on = false; drag.gaz = 0; drag.gel = 0; wrap.classList.remove('dragging'); last = 0; kick(); }
   const wake = () => { last = 0; owed = 1; kick(); };
-  wrap.addEventListener('pointerdown', down);
-  wrap.addEventListener('pointermove', move);
-  wrap.addEventListener('pointerup', up);
-  wrap.addEventListener('pointercancel', up);
   window.addEventListener('scroll', kick, { passive: true });
   window.addEventListener('resize', wake);
   const ro = new ResizeObserver(wake);
@@ -236,7 +236,7 @@ export function mount(spine, { rest = HERO_AT_REST } = {}) {
     ro.disconnect();
     spine.classList.remove('gl', 'gl-rest');
     if (heroFig) heroFig.style.opacity = '';
-    for (const f of stills) f.style.opacity = '';
+    for (const f of stills) { f.style.opacity = ''; f.style.transition = ''; }
     wrap.remove();
     S.dispose();
   }

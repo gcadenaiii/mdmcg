@@ -1,0 +1,66 @@
+---
+// The heart twin's computed field over the front of the chest, drawn from src/data/field.json
+// (see its `note`: which twin, which instant of its beat, which files). The values are computed, never measured.
+//   field     which way the field points at one instant: into the chest, or out of it
+//   strength  how large the beat is at each spot
+// One colour scale for both: white is nothing, the warm end is the strong end; teal is the other direction.
+// The viewer faces the person, so the subject's right is on the left of the picture.
+import field from '../data/field.json';
+
+// compact: for a place where something overlaps the foot of the picture: the key goes on top and the waist is cropped away
+interface Props { kind: 'field' | 'strength'; alt: string; class?: string; compact?: boolean; }
+const { kind, alt, class: cls, compact = false } = Astro.props;
+
+const TEAL = [14, 124, 134];
+const ZERO = [255, 255, 255];
+const WARM = [212, 87, 59];
+const mix = (a: number[], b: number[], t: number) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(',')})`;
+/** -1 (into the chest) .. 0 .. +1 (out of the chest, or the strongest spot) */
+const colour = (t: number) => (t >= 0 ? mix(ZERO, WARM, Math.min(1, t)) : mix(ZERO, TEAL, Math.min(1, -t)));
+
+const p = field.pitch_mm;
+const out = new Set(field.excluded);
+const top = field.beat_size_pT[field.strongest];
+const value = (i: number) => (kind === 'field' ? field.instant.pT[i] / field.instant.peak_abs_pT : field.beat_size_pT[i] / top);
+const cells = field.left_mm.map((x, i) => ({ x: x - p / 2 + 0.7, y: -field.up_mm[i] - p / 2 + 0.7, fill: out.has(i) ? null : colour(value(i)) }));
+const path = (pts: number[][]) => `M${pts.map(([x, z]) => `${x} ${-z}`).join('L')}Z`;
+
+// the picture's window, in millimetres, with a band underneath for the key
+const vx = -236;
+const vw = 472;
+const mapH = compact ? 384 : 476;
+const keyH = 62;
+const vy = compact ? -240 - keyH : -240;
+const vh = mapH + keyH;
+const px = (x: number) => `${(((x - vx) / vw) * 100).toFixed(2)}%`;
+const py = (y: number) => `${(((y - vy) / vh) * 100).toFixed(2)}%`;
+
+// the key: a strip of the same colours, a word at each end
+const strip = { w: kind === 'field' ? 84 : 60, h: 15, y: compact ? vy + 26 : vy + mapH + 20 };
+const n = kind === 'field' ? 7 : 5;
+const steps = Array.from({ length: n }, (_, k) => (kind === 'field' ? -1 + (2 * k) / (n - 1) : k / (n - 1)));
+const sx = -strip.w / 2;
+const sw = strip.w / n;
+const ends = kind === 'field' ? ['into the chest', 'out of the chest'] : ['weaker', 'stronger'];
+---
+<div class:list={['dgm-box', cls]} style={`--ar:${(vw / vh).toFixed(4)}`}>
+  <div class="dgm" data-dgm="field" data-kind={kind}>
+    <svg class="dgm-svg" role="img" aria-label={alt} width="100%" height="100%">
+      <svg viewBox={`${vx} ${vy} ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+        <path d={path(field.torso)} class="dg-skin" />
+        {cells.map((c) => (
+          <rect x={c.x.toFixed(1)} y={c.y.toFixed(1)} width={p - 1.4} height={p - 1.4} rx="2.2" fill={c.fill ?? 'none'} class={c.fill ? 'dg-cell' : 'dg-cell dg-cell-out'} />
+        ))}
+        <path d={path(field.heart)} class="dg-heart-line" />
+        <g class="dg-key">
+          {steps.map((t, k) => <rect x={(sx + k * sw).toFixed(2)} y={strip.y} width={(sw + 0.3).toFixed(2)} height={strip.h} fill={colour(t)} />)}
+          <rect x={sx} y={strip.y} width={strip.w} height={strip.h} rx="3" class="dg-key-edge" />
+        </g>
+      </svg>
+      <text x={px(-150)} y={py(-176)} text-anchor="middle" class="dg-side">right</text>
+      <text x={px(150)} y={py(-176)} text-anchor="middle" class="dg-side">left</text>
+      <text x={px(sx - 7)} y={py(strip.y + strip.h / 2)} dy="0.36em" text-anchor="end" class="dg-label">{ends[0]}</text>
+      <text x={px(sx + strip.w + 7)} y={py(strip.y + strip.h / 2)} dy="0.36em" class="dg-label">{ends[1]}</text>
+    </svg>
+  </div>
+</div>

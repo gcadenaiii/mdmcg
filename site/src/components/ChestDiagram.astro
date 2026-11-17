@@ -1,0 +1,114 @@
+---
+// The front of one scanned chest, drawn from src/data/chest.json (see its `note` for the source of every number).
+// One set of data, four crops:
+//   landmark  the whole breastbone, the mark where the bone stops, and 3 cm up from it
+//   zone      close on the lower breastbone: the core at the rule and the outline it may sit within
+//   body      the whole chest with the device on it
+//   anatomy   the whole chest, nothing on it
+// The viewer faces the person, so the wearer's right is on the left of the picture.
+// Geometry is in millimetres inside a nested <svg viewBox>; lettering sits in the outer <svg> in real pixels,
+// so it keeps its size however small the drawing is shown.
+import chest from '../data/chest.json';
+
+type Variant = 'landmark' | 'zone' | 'body' | 'anatomy';
+interface Props { variant: Variant; alt: string; class?: string; }
+const { variant, alt, class: cls } = Astro.props;
+
+type Ring = number[][];
+const ring = (r: Ring) => `M${r.map(([x, z]) => `${x} ${-z}`).join('L')}Z`;
+const rings = (rs: Ring[]) => rs.map(ring).join('');
+const F = chest.front as Record<string, Ring[]>;
+
+const lm = { x: chest.landmark.left_mm, y: -chest.landmark.up_mm };
+const at = { x: chest.device_at.left_mm, y: -chest.device_at.up_mm };
+const core = chest.device.core;
+const hw = core.w / 2;
+const hl = core.l / 2;
+const W = chest.window;
+
+// the crops, in the picture's millimetres: [x, y, width, height]
+const whole = [-W.half_mm, -W.up_mm, 2 * W.half_mm, W.up_mm + W.down_mm];
+const box = ({
+  landmark: [lm.x - 125, lm.y - 197, 250, 250],
+  zone: [lm.x - 124, lm.y - 150, 214, 214],
+  body: whole,
+  anatomy: whole,
+} as Record<Variant, number[]>)[variant];
+const [vx, vy, vw, vh] = box;
+const px = (x: number) => `${(((x - vx) / vw) * 100).toFixed(2)}%`;
+const py = (y: number) => `${(((y - vy) / vh) * 100).toFixed(2)}%`;
+
+// the device from the front, to scale: app/src/sensors/PlacementStage.tsx DeviceFlat
+const wg = chest.device.wing;
+const P = (u: number, v: number) => `${u.toFixed(1)} ${v.toFixed(1)}`;
+const wing = (s: number) => {
+  const Q = (u: number, v: number) => P(s * u, v);
+  const p1 = [wg.lobe_x - 7.65, wg.lobe_z - 7.9];
+  const p2 = [wg.lobe_x - 8.64, wg.lobe_z + 6.81];
+  return `M${Q(14 + wg.dx, wg.zr)} C${Q(27 + wg.dx, wg.zr)} ${Q(34 + wg.dx, wg.zr + 4)} ${Q(p1[0], p1[1])} A${wg.lobe_r} ${wg.lobe_r} 0 1 ${s > 0 ? 1 : 0} ${Q(p2[0], p2[1])} C${Q(30 + wg.dx, wg.zr + 16.5)} ${Q(22 + wg.dx, wg.zr + 11.5)} ${Q(14 + wg.dx, wg.zr + 11.5)} Z`;
+};
+const tab = `M-5.3 ${-hl + 2} V${-(hl + 7)} A5.3 5.3 0 0 1 5.3 ${-(hl + 7)} V${-hl + 2} Z`;
+
+// how far the core may sit from the rule: its outline swept over the allowed centre positions (the app's own construction)
+const tol = chest.rule.within_cm;
+const zone = { x0: at.x - tol.right * 10 - hw, x1: at.x + tol.left * 10 + hw, y0: at.y - tol.up * 10 - hl, y1: at.y + tol.down * 10 + hl };
+
+// the 3 cm: a dimension line beside the breastbone, on the wearer's right, from the landmark's level up to the core's centre
+const dimX = variant === 'landmark' ? lm.x - 26 : at.x - hw - 11;
+const upText = `${chest.rule.above_cm} cm`;
+const showCore = variant === 'zone' || variant === 'body';
+const showMarks = variant !== 'anatomy';
+const showDim = variant === 'landmark' || variant === 'zone';
+// the two side words sit inside the body's outline on the whole-chest crops
+const pad = variant === 'body' || variant === 'anatomy' ? 30 : 14;
+---
+<div class:list={['dgm-box', cls]} style={`--ar:${(vw / vh).toFixed(4)}`}>
+  <div class="dgm" data-dgm="chest" data-variant={variant}>
+    <svg class="dgm-svg" role="img" aria-label={alt} width="100%" height="100%">
+      <svg viewBox={box.join(' ')} width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+        <rect x={vx} y={vy} width={vw} height={vh} class="dg-ground" />
+        <path d={rings(F.body)} class="dg-skin" />
+        <path d={rings(F.heart)} class="dg-heart" />
+        <path d={rings(F.ribs)} class="dg-rib" />
+        <path d={rings(F.cartilage)} class="dg-cart" />
+        <path d={rings(F.clavicles)} class="dg-rib" />
+        <path d={rings(F.sternum)} class="dg-bone" />
+        {variant === 'zone' && <rect x={zone.x0} y={zone.y0} width={zone.x1 - zone.x0} height={zone.y1 - zone.y0} rx={core.r + 4} class="dg-zone" />}
+        {showCore && (
+          <g transform={`translate(${at.x} ${at.y})`}>
+            {variant === 'body' && (
+              <>
+                {[-1, 1].map((s) => (
+                  <>
+                    <path d={wing(s)} class="dg-wing" />
+                    <circle cx={s * wg.lobe_x} cy={wg.lobe_z} r={wg.pad_r} class="dg-pad" />
+                  </>
+                ))}
+                <path d={tab} class="dg-wing" />
+              </>
+            )}
+            <rect x={-hw} y={-hl} width={core.w} height={core.l} rx={core.r} class="dg-core" />
+          </g>
+        )}
+        {showDim && (
+          <g class="dg-dim">
+            <path d={`M${lm.x - 11} ${lm.y} H${dimX - 4} M${(variant === 'landmark' ? at.x - 7 : at.x - hw - 2)} ${at.y} H${dimX - 4} M${dimX} ${lm.y} V${at.y}`} />
+            <path d={`M${dimX - 3.2} ${at.y + 6.5} L${dimX} ${at.y} L${dimX + 3.2} ${at.y + 6.5}`} />
+            {variant === 'landmark' && <path d={`M${at.x - 5} ${at.y} H${at.x + 5} M${at.x} ${at.y - 5} V${at.y + 5}`} class="dg-cross" />}
+          </g>
+        )}
+        {showMarks && (
+          <g class="dg-mark">
+            <circle cx={lm.x} cy={lm.y} r={variant === 'body' ? 7 : 8} class="dg-mark-ring" />
+            <circle cx={lm.x} cy={lm.y} r={variant === 'body' ? 2.6 : 3} class="dg-mark-dot" />
+          </g>
+        )}
+      </svg>
+      <text x={pad} y="14" dy="0.8em" class="dg-side">your right</text>
+      <text x="100%" y="14" dx={-pad} dy="0.8em" text-anchor="end" class="dg-side">your left</text>
+      {showDim && <text x={px(dimX - 5)} y={py((lm.y + at.y) / 2)} dy="0.36em" text-anchor="end" class="dg-label dg-strong">{upText}</text>}
+      {variant === 'landmark' && <text x={px(lm.x)} y={py(lm.y + 9)} dy="1.25em" text-anchor="middle" class="dg-label">{chest.landmark.where}</text>}
+      {variant === 'zone' && <text x={px(lm.x - 11)} y={py(lm.y)} dy="1.55em" text-anchor="end" class="dg-label">{chest.landmark.where}</text>}
+    </svg>
+  </div>
+</div>

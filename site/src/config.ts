@@ -3,6 +3,9 @@
 /** Private preview: true adds <meta name="robots" content="noindex, nofollow"> to every page. Set to false at launch. */
 export const NOINDEX = true;
 
+/** the pair of heartbeat traces under the home page's first screen (owner's choice; false gives the first screen without it) */
+export const HERO_BEAT = true;
+
 export const SITE_NAME = 'mdmcg';
 export const SITE_TAGLINE = 'Two signals from one heartbeat.';
 

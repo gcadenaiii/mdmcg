@@ -10,6 +10,8 @@ import {
 
 const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const H = Math.PI / 2;
+/** the coloured ring seen from above: its width in millimetres, set to match the hero picture */
+const RING_W = 0.95;
 
 /* ---------- lofted solids: a rounded rectangle swept along a profile of [outward, y] points ---------- */
 
@@ -215,13 +217,28 @@ export function makeMaterials() {
       g.addColorStop(0, '#5c5c5c'); g.addColorStop(0.5, '#a6a6a6'); g.addColorStop(1, '#5c5c5c');
       x.fillStyle = g; x.fillRect(0, y, s, 16);
     }
-    for (let i = 0; i < 5200; i++) { const v = 128 + Math.round((rnd() - 0.5) * 120); x.fillStyle = `rgba(${v},${v},${v},0.5)`; x.fillRect(rnd() * s, rnd() * s, 2, 2); }
+    x.globalAlpha = 0.3;
+    for (let c = 0; c < s; c += 16) {
+      const g = x.createLinearGradient(c, 0, c + 16, 0);
+      g.addColorStop(0, '#545454'); g.addColorStop(0.5, '#acacac'); g.addColorStop(1, '#545454');
+      x.fillStyle = g; x.fillRect(c, 0, 16, s);
+    }
+    x.globalAlpha = 1;
+    for (let i = 0; i < 3000; i++) { const v = 128 + Math.round((rnd() - 0.5) * 120); x.fillStyle = `rgba(${v},${v},${v},0.3)`; x.fillRect(rnd() * s, rnd() * s, 2, 2); }
   });
   const fuzz = canvasTexture(256, (x, s) => {
     x.fillStyle = '#ffffff'; x.fillRect(0, 0, s, s);
-    for (let i = 0; i < 2600; i++) { const v = 232 + Math.round(rnd() * 22); x.fillStyle = `rgb(${v},${v},${v})`; x.fillRect(rnd() * s, rnd() * s, 3, 3); }
+    for (let i = 0; i < 5200; i++) { const v = 214 + Math.round(rnd() * 40); x.fillStyle = `rgb(${v},${v},${v})`; x.fillRect(rnd() * s, rnd() * s, 3, 3); }
   });
   fuzz.colorSpace = SRGBColorSpace;
+  knit.repeat.set(0.46, 0.46);
+  /* the foam ring round each electrode: white, with a fine dark speckle */
+  const speck = canvasTexture(256, (x, s) => {
+    x.fillStyle = '#ffffff'; x.fillRect(0, 0, s, s);
+    for (let i = 0; i < 300; i++) { const v = 176 + Math.round(rnd() * 60); x.fillStyle = `rgb(${v},${v},${v})`; x.fillRect(rnd() * s, rnd() * s, 3, 3); }
+  });
+  speck.colorSpace = SRGBColorSpace;
+  speck.repeat.set(0.5, 0.5);
   const turns = canvasTexture(64, (x, s) => {
     x.fillStyle = '#ffffff'; x.fillRect(0, 0, s, s);
     x.fillStyle = '#9a9a9a'; for (let y = 0; y < s; y += 8) x.fillRect(0, y, s, 3);
@@ -229,9 +246,10 @@ export function makeMaterials() {
   turns.colorSpace = SRGBColorSpace;
   turns.repeat.set(1, 3);
   return {
-    shell: new MeshPhysicalMaterial({ color: new Color('#f5f5f2'), roughness: 0.4, metalness: 0, clearcoat: 0.3, clearcoatRoughness: 0.4 }),
-    cloth: new MeshPhysicalMaterial({ color: new Color('#f0eee9'), roughness: 0.96, metalness: 0, sheen: 0.9, sheenRoughness: 0.55, sheenColor: new Color('#ffffff'), map: fuzz, bumpMap: knit, bumpScale: 2.2, side: DoubleSide }),
-    gel: new MeshPhysicalMaterial({ color: new Color('#fbfbfa'), roughness: 0.28, metalness: 0, clearcoat: 0.55, clearcoatRoughness: 0.2, emissive: new Color('#ffffff'), emissiveIntensity: 0.06 }),
+    shell: new MeshPhysicalMaterial({ color: new Color('#f4f4f3'), roughness: 0.42, metalness: 0, clearcoat: 0.25, clearcoatRoughness: 0.45 }),
+    cloth: new MeshPhysicalMaterial({ color: new Color('#ebe8e8'), roughness: 1, metalness: 0, sheen: 0.5, sheenRoughness: 0.7, sheenColor: new Color('#ffffff'), map: fuzz, bumpMap: knit, bumpScale: 4, side: DoubleSide }),
+    rim: new MeshStandardMaterial({ color: new Color('#eeecec'), roughness: 1, map: speck, bumpMap: speck, bumpScale: 0.5 }),
+    gel: new MeshPhysicalMaterial({ color: new Color('#d2d2d1'), roughness: 0.3, metalness: 0, clearcoat: 0.6, clearcoatRoughness: 0.18 }),
     foam: new MeshStandardMaterial({ color: new Color('#d9dee3'), roughness: 1 }),
     board: new MeshPhysicalMaterial({ color: new Color('#1f6a55'), roughness: 0.42, clearcoat: 0.5, clearcoatRoughness: 0.3 }),
     copper: new MeshStandardMaterial({ color: new Color('#c87b4a'), roughness: 0.38, metalness: 0.85 }),
@@ -242,7 +260,7 @@ export function makeMaterials() {
   };
 }
 export function ringMaterial(colour) {
-  return new MeshPhysicalMaterial({ color: new Color(colour), roughness: 0.34, metalness: 0, clearcoat: 0.5, clearcoatRoughness: 0.3 });
+  return new MeshPhysicalMaterial({ color: new Color(colour), roughness: 0.5, metalness: 0, clearcoat: 0.2, clearcoatRoughness: 0.4, envMapIntensity: 0.6 });
 }
 
 /* ---------- one device ---------- */
@@ -254,8 +272,10 @@ export function buildDevice(spec, M, { inside = false } = {}) {
   const plan = wingPlan(spec.core);
   const ring = ringMaterial(spec.ring);
   const mesh = (g, m, shadow = true) => { const o = new Mesh(g, m); o.castShadow = shadow; o.receiveShadow = true; return o; };
-  const yT = t - 3.0;   // top of the shell wall: the parting line
-  const yL = t - 1.55;  // underside of the lid; the ring fills the gap
+  const yT = t - 1.7;   // top of the shell wall: the parting line
+  const yL = t - 1.55;  // underside of the lid, which sits inside the ring
+  const yR = t - 0.45;  // top of the ring: a band round the lid, as wide as RING_W seen from above
+  const inL = RING_W + 0.1; // how far the lid's outline is inside the shell's
 
   const pad = new Group();
   pad.add(mesh(slab(w, l, r, -padT, 0, 0.9, -1.1), M.foam));
@@ -268,14 +288,14 @@ export function buildDevice(spec, M, { inside = false } = {}) {
     [-1.3, yT], [-1.3, yT], [-1.3, 1], [-1.3, 1], ['C', 1],
   ]), M.shell));
   /* the coloured ring at the parting line */
-  tray.add(mesh(loft(w, l, r, [[-1.3, yT], [-0.2, yT], [-0.2, yT], ...arc(-0.2, (yT + yL) / 2, 0.36, (yL - yT) / 2, -H, H, 6), [-0.2, yL], [-0.2, yL], [-1.3, yL]]), ring));
+  tray.add(mesh(loft(w, l, r, [[-1.3, yT], [-0.12, yT], [-0.12, yT], [0.06, yT + 0.2], [0.06, yR - 0.4], ...arc(-0.34, yR - 0.4, 0.4, 0.4, 0, H, 6), [-RING_W, yR], [-RING_W, yR], [-RING_W, yL]]), ring));
 
   const lid = new Group();
-  const er = Math.min(3.4, hw * 0.3);
+  const er = Math.min(1.6, hw * 0.3);
   const crown = 0.22;
   const top = [];
-  for (const f of [0.2, 0.42, 0.66, 0.86, 0.97]) top.push([-(0.3 + er + (hw - 0.3 - er) * f), t + crown * (1 - (1 - f) * (1 - f))]);
-  lid.add(mesh(loft(w, l, r, [['C', yL], [-0.3, yL], [-0.3, yL], [-0.3, yL + 0.12], ...arc(-0.3 - er, yL + 0.12, er, t - yL - 0.12, 0, H, 12), ...top, ['C', t + crown]], 14, 10), M.shell));
+  for (const f of [0.2, 0.42, 0.66, 0.86, 0.97]) top.push([-(inL + er + (hw - inL - er) * f), t + crown * (1 - (1 - f) * (1 - f))]);
+  lid.add(mesh(loft(w, l, r, [['C', yL], [-inL, yL], [-inL, yL], [-inL, yR + 0.1], ...arc(-inL - er, yR + 0.1, er, t - yR - 0.1, 0, H, 12), ...top, ['C', t + crown]], 14, 10), M.shell));
 
   /* flat gold pads at the head end of the lid, which meet the spring pins of the charging case */
   for (let k = 0; k < (spec.contacts || 0); k++) {
@@ -286,7 +306,7 @@ export function buildDevice(spec, M, { inside = false } = {}) {
 
   /* the flexible sheet: clamped in the core, two wings and the top tab draped to the surface it lies on */
   const th = 1.7;
-  const yS = yT - th / 2 - 0.05;
+  const yS = t - 3.0 - th / 2 - 0.05; // the sheet leaves through the wall below the ring
   const ground = -padT + th / 2 + 0.06;
   const height = (x, z) => {
     const k = Math.max(smooth(hw - 0.4, hw + 15, Math.abs(x)), smooth(hl - 0.4, hl + 5.6, -z));
@@ -298,12 +318,12 @@ export function buildDevice(spec, M, { inside = false } = {}) {
     const y = height(x, z) + th / 2;
     const rimP = [];
     const span = lobeR - padR + 0.5;
-    for (let k = 0; k <= 12; k++) { const f = k / 12; rimP.push(new Vector2(padR - 0.5 + span * f, Math.sin(f * Math.PI) ** 0.7 * Math.min(2.2, span * 0.6) * (1 - 0.2 * f))); }
+    for (let k = 0; k <= 12; k++) { const f = k / 12; rimP.push(new Vector2(padR - 0.5 + span * f, Math.sin(f * Math.PI) ** 0.35 * Math.min(1.0, span * 0.6))); }
     const rim = new LatheGeometry(rimP.reverse(), 56);
     const uv = rim.attributes.uv, p = rim.attributes.position;
     for (let i = 0; i < uv.count; i++) uv.setXY(i, p.getX(i) / 4, p.getZ(i) / 4);
     rim.translate(x, y - 0.05, z);
-    flex.add(mesh(rim, M.cloth));
+    flex.add(mesh(rim, M.rim));
     const domeP = [];
     const dh = padR * 0.3;
     for (let k = 0; k <= 14; k++) { const a = (k / 14) * H; domeP.push(new Vector2(padR * Math.sin(a), dh * Math.cos(a))); }

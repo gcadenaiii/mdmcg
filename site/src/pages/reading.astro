@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Pic from '../components/Pic.astro';
+import ChestDiagram from '../components/ChestDiagram.astro';
 import Traces from '../components/Traces.astro';
 import Averaging from '../components/Averaging.astro';
 import Bars from '../components/Bars.astro';
@@ -31,7 +32,7 @@ import { LAB } from '../config';
   <div class="wrap">
     <header class="sec-head" data-r>
       <p class="chip">Five steps</p>
-      <h2 id="h-flow" class="h2 h2-xl">From the case<span class="teal">to the record.</span></h2>
+      <h2 id="h-flow" class="h2">From the case<span class="teal">to the record.</span></h2>
     </header>
     <ol class="flow">
       <li data-r><b></b><h3>Take it from its case</h3><p>It would live there, charged, between readings.</p></li>
@@ -46,7 +47,7 @@ import { LAB } from '../config';
 <section class="band" aria-labelledby="h-place">
   <div class="wrap split split-wide-text">
     <div class="split-media frame frame-flush" data-r>
-      <Pic name="chest-placement" sizes="(max-width: 900px) 92vw, 40vw" alt="The front of a chest outlined from a scan, with a bold mark where the breastbone stops, an arrow marked 3 cm up, the device on the midline and a dashed outline of the zone it may sit in." />
+      <ChestDiagram variant="landmark" alt="The breastbone and ribs of a chest outlined from a scan, seen from the front: a mark at the lower end of the breastbone, where the bone stops, and a line 3 cm up from it to the place the device is centred." />
     </div>
     <div class="split-text" data-r>
       <p class="chip">Placing it</p>
@@ -62,7 +63,7 @@ import { LAB } from '../config';
   <div class="wrap">
     <header class="sec-head" data-r>
       <p class="chip">Two kinds of reading</p>
-      <h2 id="h-kinds" class="h2 h2-xl">Quick check.<span class="teal">Full review.</span></h2>
+      <h2 id="h-kinds" class="h2">Quick check.<span class="teal">Full review.</span></h2>
     </header>
     <div class="tiles tiles-2">
       <article class="tile" data-r>

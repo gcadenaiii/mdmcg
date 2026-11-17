@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import Pic from '../components/Pic.astro';
+import ChestDiagram from '../components/ChestDiagram.astro';
+import FieldDiagram from '../components/FieldDiagram.astro';
 import Bars from '../components/Bars.astro';
 import Marks from '../components/Marks.astro';
 import Averaging from '../components/Averaging.astro';
@@ -82,7 +84,7 @@ const N = 9;
       <p>In the virtual trial it is forgiving toward the wearer's left and a little up or down. Not to the right: 1 cm to the right costs 1.4 times the beats. Think of a zone, not a point.</p>
     </div>
     <figure class="fig" data-kind="shot">
-      <div class="fig-media"><Pic name="chest-placement" alt="The front of a chest outlined from a scan, with a bold mark where the breastbone stops, an arrow marked 3 cm up, the device on the midline and a dashed outline of the zone it may sit in." /></div>
+      <div class="fig-media"><ChestDiagram variant="zone" alt="The lower breastbone of a chest outlined from a scan, seen from the front: a mark where the bone stops, 3 cm up from it the core of the device on the midline, and a dashed outline of the zone it may sit in, which reaches toward the wearer's left." /></div>
     </figure>
   </section>
 
@@ -177,7 +179,7 @@ const N = 9;
     <header class="sec-head sec-head-row" data-r>
       <div>
         <p class="chip">The four options</p>
-        <h2 id="h-row" class="h2 h2-xl">Side by side.</h2>
+        <h2 id="h-row" class="h2">Side by side.</h2>
       </div>
       <LabLink href={LAB.sensors}>All four in the research tools</LabLink>
     </header>
@@ -200,7 +202,7 @@ const N = 9;
       <div class="actions"><LabLink class="btn btn-primary" href={LAB.explore}>Try the sensor tool</LabLink><LabLink class="textlink" href={LAB.method}>Sources and method</LabLink></div>
     </div>
     <div class="split-media frame frame-night frame-flush" data-r>
-      <Pic name="strength-map" alt="A chest outline with a grid of squares coloured from green, weak, to red, strong, showing where the computed heartbeat is strongest." />
+      <FieldDiagram kind="strength" alt="The outline of a modelled chest with a grid of squares coloured from white, weaker, to a warm red, stronger, showing where the computed heartbeat is strongest. A dashed line marks the heart behind." />
     </div>
   </div>
 </section>

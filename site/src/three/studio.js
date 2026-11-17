@@ -30,7 +30,7 @@ export class Studio {
     const r = this.renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
     r.setPixelRatio(pixelRatio);
     r.toneMapping = NeutralToneMapping;
-    r.toneMappingExposure = 1.05;
+    r.toneMappingExposure = 1.0;
     r.shadowMap.enabled = true;
     r.shadowMap.type = PCFShadowMap;
     r.shadowMap.autoUpdate = false;
@@ -41,12 +41,13 @@ export class Studio {
     this.env = pm.fromScene(new RoomEnvironment(), 0.035);
     pm.dispose();
     this.scene.environment = this.env.texture;
-    this.scene.environmentIntensity = 0.4;
-    this.scene.add(new HemisphereLight(0xffffff, 0xd4dcdf, 0.26));
-    const key = this.key = new DirectionalLight(0xffffff, 1.55);
+    this.scene.environmentIntensity = 0.42;
+    this.scene.add(new HemisphereLight(0xffffff, 0xd2d2d0, 0.3));
+    const key = this.key = new DirectionalLight(0xffffff, 1.5);
     key.castShadow = true;
-    key.shadow.mapSize.set(2048, 2048);
-    key.shadow.radius = 10;
+    key.shadow.mapSize.set(1024, 1024);
+    key.shadow.radius = 24;
+    key.shadow.intensity = 0.4;
     key.shadow.bias = -0.0004;
     key.shadow.normalBias = 0.5;
     this.scene.add(key, key.target);
@@ -67,7 +68,7 @@ export class Studio {
     this.up = new OrthographicCamera(-1, 1, 1, -1, 0, 16);
     this.up.up.set(0, 0, -1);
     this.contactGeo = new BufferGeometry();
-    this.contact = new Mesh(this.contactGeo, new MeshBasicMaterial({ map: this.rtA.texture, transparent: true, opacity: 0.8, depthWrite: false, toneMapped: false }));
+    this.contact = new Mesh(this.contactGeo, new MeshBasicMaterial({ map: this.rtA.texture, transparent: true, opacity: 0.7, depthWrite: false, toneMapped: false }));
     this.contact.renderOrder = 2;
     this.scene.add(this.contact);
     this.frame = null;
@@ -115,7 +116,7 @@ export class Studio {
     u.lookAt(cx, y + 1, cz);
     const k = this.key, half = Math.max(w, d) * 0.6;
     k.target.position.set(cx, 0, cz);
-    k.position.set(cx - half * 1.0, half * 2.5, cz - half * 0.75);
+    k.position.set(cx - half * 1.0, half * 2.4, cz - half * 0.4);
     Object.assign(k.shadow.camera, { left: -half, right: half, top: half, bottom: -half, near: half * 0.5, far: half * 5 });
     k.shadow.camera.updateProjectionMatrix();
     this.dirty = true;
@@ -137,7 +138,7 @@ export class Studio {
     const size = this.rtA.width;
     /* blur in millimetres, so the look does not change with the frame */
     const mm = size / Math.max(this.frame.w, this.frame.d);
-    for (const reach of [2.6, 1.0]) {
+    for (const reach of [2.0, 0.8]) {
       const px = (reach * mm) / size;
       this.blurMat.uniforms.map.value = this.rtA.texture; this.blurMat.uniforms.step.value = [px, 0];
       r.setRenderTarget(this.rtB); r.render(this.quad, this.up);

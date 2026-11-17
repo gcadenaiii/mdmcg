@@ -1,6 +1,7 @@
 ---
+import Chests42 from '../components/Chests42.astro';
 import Base from '../layouts/Base.astro';
-import Pic from '../components/Pic.astro';
+import ChestDiagram from '../components/ChestDiagram.astro';
 import Bars from '../components/Bars.astro';
 import Marks from '../components/Marks.astro';
 import SizeCompare from '../components/SizeCompare.astro';
@@ -20,6 +21,7 @@ import { LAB } from '../config';
         <div class="actions"><a class="btn btn-white" href="#method">How the trial works</a></div>
       </div>
     </div>
+    <div data-r><Chests42 /></div>
     <div class="specs" data-r>
       <div class="spec"><b>25</b><span>women in the set</span></div>
       <div class="spec"><b>17</b><span>men in the set</span></div>
@@ -32,7 +34,7 @@ import { LAB } from '../config';
 <section class="band" id="method" aria-labelledby="h-method">
   <div class="wrap split split-wide-text">
     <div class="split-media frame frame-flush" data-r>
-      <Pic name="chest-placement" sizes="(max-width: 900px) 92vw, 40vw" alt="The front of a chest outlined from a scan: skin, breastbone, ribs and the heart behind them, with the device on the breastbone." />
+      <ChestDiagram variant="body" alt="The front of a chest outlined from a scan: skin, breastbone, ribs and the heart behind them, with the device on the lower breastbone and its two wings reaching to each side." />
     </div>
     <div class="split-text" data-r>
       <p class="chip">How the trial works</p>
@@ -88,7 +90,7 @@ import { LAB } from '../config';
   <div class="wrap">
     <header class="sec-head" data-r>
       <p class="chip">Finding three: fit</p>
-      <h2 id="h-fit" class="h2 h2-xl">A zone,<span class="teal">not a point.</span></h2>
+      <h2 id="h-fit" class="h2">A zone,<span class="teal">not a point.</span></h2>
       <p class="lead">Centre it 3 cm above where the breastbone stops, in the middle of the chest. The trial shows how much room there is around that rule. The zone was found after the results were seen, so it is exploratory and not one of the four planned results.</p>
     </header>
     <div class="tiles tiles-4">
@@ -129,7 +131,7 @@ import { LAB } from '../config';
   <div class="wrap">
     <header class="sec-head" data-r>
       <p class="chip">Beyond the trial</p>
-      <h2 id="h-more" class="h2 h2-xl">Two more reasons<span class="teal">to record both.</span></h2>
+      <h2 id="h-more" class="h2">Two more reasons<span class="teal">to record both.</span></h2>
     </header>
     <div class="tiles tiles-2">
       <article class="tile" data-r>

@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Pic from '../components/Pic.astro';
+import ChestDiagram from '../components/ChestDiagram.astro';
 import Options from '../components/Options.astro';
 import SizeCompare from '../components/SizeCompare.astro';
 import WorkBand from '../components/WorkBand.astro';
@@ -89,7 +90,7 @@ import { LAB } from '../config';
   <div class="wrap">
     <div class="split split-wide-text">
       <div class="split-media frame frame-flush" data-r>
-        <Pic name="chest-placement" sizes="(max-width: 900px) 92vw, 40vw" alt="The front of a chest outlined from a scan, with the breastbone and ribs, a bold mark where the bone stops, an arrow marked 3 cm up, the device on the midline and a dashed outline of the zone it may sit in." />
+        <ChestDiagram variant="body" alt="The front of a chest outlined from a scan: skin, breastbone, ribs and the heart behind them, with the device on the lower breastbone and its two wings reaching to each side." />
       </div>
       <div class="split-text" data-r>
         <p class="chip">Where it is worn</p>
@@ -143,7 +144,7 @@ import { LAB } from '../config';
     <header class="sec-head sec-head-row" data-r>
       <div>
         <p class="chip">The four options</p>
-        <h2 id="h-row" class="h2 h2-xl">Four ways<span class="teal">to build it.</span></h2>
+        <h2 id="h-row" class="h2">Four ways<span class="teal">to build it.</span></h2>
       </div>
       <a class="btn btn-ghost" href="/sensors/">How we compared them</a>
     </header>

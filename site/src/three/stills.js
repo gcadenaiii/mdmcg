@@ -2,6 +2,11 @@
 import { Studio, SPECS } from './studio.js';
 import { VIEWS, FAMILY, FRAME_ONE, FRAME_FAMILY, sizeLines } from './shots.js';
 
+/* Cameras used only by the stills (the live stage has its own wing view in shots.js). */
+const WING_STILL = { tx: -25, ty: 2, tz: 19, az: -0.85, el: 0.5, dist: 112, fit: 1.43 };
+const DETAIL_STILL = { tx: -21, ty: 1, tz: 13, az: -0.95, el: 0.52, dist: 176, fit: 1.33 };
+const WIDE_STILL = { ...VIEWS.hero, tx: 50, tz: -14, dist: 350, fit: 1.78 };
+
 let S = null;
 function studio() {
   if (!S) S = new Studio(document.createElement('canvas'), { pixelRatio: 1, shadowSize: 2048 });
@@ -27,7 +32,11 @@ const lines = (s, core) => sizeLines(core).map((d) => {
 export const STILLS = {
   hero(k = 1) { const s = one(0, 2400 * k, 1600 * k, VIEWS.hero); return { png: s.png(), lines: lines(s, SPECS[0].core) }; },
   open(k = 1) { const s = one(0, 1500 * k, 1700 * k, VIEWS.open, { explode: 1 }); return { png: s.png() }; },
-  wing(k = 1) { const s = one(0, 2000 * k, 1400 * k, VIEWS.wing); return { png: s.png() }; },
+  wing(k = 1) { const s = one(0, 2000 * k, 1400 * k, WING_STILL); return { png: s.png() }; },
+  detail(k = 1) { const s = one(0, 2000 * k, 1500 * k, DETAIL_STILL); return { png: s.png() }; },
+  wide(k = 1) { const s = one(0, 2800 * k, 1575 * k, WIDE_STILL, { frame: { cx: 0, cz: 0, w: 260, d: 230 } }); return { png: s.png() }; },
+  /** any view of option 1, for trying a camera: STILLS.at(k, width, height, view, explode) */
+  at(k = 1, w = 1600, h = 1200, view = VIEWS.hero, explode = 0) { const s = one(0, w * k, h * k, view, { explode }); return { png: s.png() }; },
   option(k = 1, i = 0) {
     const c = SPECS[i].core;
     const reach = Math.max(1, (c.l + 70) / 130);

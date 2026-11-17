@@ -1,0 +1,13 @@
+---
+// The first screen's heartbeat: the two signals of one computed beat on one clock, drawn once from left to right.
+// Shapes come from the research tool's export (src/data/traces.json), each scaled to its own peak; no units are drawn.
+import data from '../data/traces.json';
+const W = 560, X0 = 92, H = 104, amp = 30;
+const path = (arr: number[], base: number) => arr.map((v, i) => `${i ? 'L' : 'M'}${(X0 + (i / (arr.length - 1)) * (W - X0)).toFixed(1)} ${(base - v * amp).toFixed(1)}`).join(' ');
+---
+<svg class="herobeat" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Two thin traces of one computed heartbeat on the same clock: the ECG above and the magnetic signal below.">
+  <path class="hb-ecg" pathLength="1" d={path(data.ecg, 40)} />
+  <path class="hb-mcg" pathLength="1" d={path(data.mcg, 88)} />
+  <text x="0" y="44">ECG</text>
+  <text class="hb-k" x="0" y="92">Magnetic</text>
+</svg>

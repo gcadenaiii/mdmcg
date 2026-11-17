@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import Pic from '../components/Pic.astro';
+import FieldDiagram from '../components/FieldDiagram.astro';
 import Traces from '../components/Traces.astro';
 import Averaging from '../components/Averaging.astro';
 import Marks from '../components/Marks.astro';
@@ -22,7 +22,7 @@ import { LAB } from '../config';
       </div>
     </div>
     <div class="phero-art">
-      <Pic name="twin-field" class="shot" eager sizes="(max-width: 900px) 92vw, 44vw" alt="The outline of a modelled chest with a grid of coloured squares, blue where the computed field points into the chest and red where it points out of the chest." />
+      <FieldDiagram kind="strength" class="shot" alt="The outline of a modelled chest with a grid of squares coloured from white, weaker, to a warm red, stronger, showing where the computed heartbeat is strongest. A dashed line marks the heart behind." />
     </div>
   </div>
 </section>
@@ -51,7 +51,7 @@ import { LAB } from '../config';
       <p><LabLink class="textlink" href={LAB.sensor}>Move the sensor yourself</LabLink></p>
     </div>
     <div class="split-media frame frame-night frame-flush" data-r>
-      <Pic name="strength-map" sizes="(max-width: 900px) 92vw, 56vw" alt="A chest outline with a grid of squares coloured from green, weak, to red, strong, showing where the computed heartbeat is strongest. A dashed line marks the heart behind." />
+      <FieldDiagram kind="field" alt="The outline of a modelled chest with a grid of coloured squares over the heart: teal where the computed field points into the chest, a warm red where it points out of the chest. A dashed line marks the heart behind." />
     </div>
   </div>
 </section>
@@ -98,7 +98,7 @@ import { LAB } from '../config';
   <div class="wrap">
     <header class="sec-head" data-r>
       <p class="chip">Outside a shielded room</p>
-      <h2 id="h-room" class="h2 h2-xl">Designed for<span class="teal">an ordinary room.</span></h2>
+      <h2 id="h-room" class="h2">Designed for<span class="teal">an ordinary room.</span></h2>
     </header>
     <div class="tiles">
       <article class="tile" data-r>

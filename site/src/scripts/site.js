@@ -85,11 +85,16 @@ function show(s, i) {
 function tick() {
   if (bar) bar.classList.toggle('scrolled', window.scrollY > 8);
   spines.forEach((s) => {
-    let ref;
-    if (window.innerWidth <= 900) { const b = s.stage.getBoundingClientRect().bottom; ref = b + (window.innerHeight - b) * 0.55; }
-    else { ref = window.innerHeight * 0.55; }
+    /* wide: a scene takes the stage when its text is a little above the middle of the window.
+       phone: the stage sticks above the text. The first picture holds until the next scene's text has slid under the
+       stage; later scenes take over once their text has arrived in the space below it. */
+    const phone = window.innerWidth <= 900;
+    const b = phone ? s.stage.getBoundingClientRect().bottom : 0;
     let i = 0;
-    for (let k = 0; k < s.scenes.length; k++) { if (s.scenes[k].getBoundingClientRect().top <= ref) i = k; }
+    for (let k = 1; k < s.scenes.length; k++) {
+      const ref = !phone ? window.innerHeight * 0.55 : k === 1 ? b - 8 : b + (window.innerHeight - b) * 0.25;
+      if (s.scenes[k].getBoundingClientRect().top <= ref) i = k;
+    }
     show(s, i);
   });
 }

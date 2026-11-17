@@ -1,0 +1,10 @@
+---
+// The 42 scanned chests, each as its own front outline at one common scale (src/data/chests42.json, from the CT scans).
+import data from '../data/chests42.json';
+const d = (pts: number[][]) => pts.map((p, i) => `${i ? 'L' : 'M'}${p[0]} ${p[1]}`).join('') + 'Z';
+---
+<ul class="chests" role="img" aria-label={`The front outlines of the ${data.n} scanned chests, drawn at one scale. No two are the same shape.`}>
+  {data.chests.map((c) => (
+    <li><svg viewBox="-250 -195 500 350" aria-hidden="true" focusable="false"><path d={d(c.pts)} /></svg></li>
+  ))}
+</ul>

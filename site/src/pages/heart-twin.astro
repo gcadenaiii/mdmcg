@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import Pic from '../components/Pic.astro';
+import ChestDiagram from '../components/ChestDiagram.astro';
+import FieldDiagram from '../components/FieldDiagram.astro';
 import Traces from '../components/Traces.astro';
 import Marks from '../components/Marks.astro';
 import Stage from '../components/Stage.astro';
@@ -54,7 +56,7 @@ const N = 8;
       <p>The twin copies that anatomy, so the bone and the ribs sit where they sit in a person.</p>
     </div>
     <figure class="fig" data-kind="shot">
-      <div class="fig-media"><Pic name="chest-placement" alt="The front of a chest outlined from a scan: skin, breastbone, ribs and the heart behind them." /></div>
+      <div class="fig-media"><ChestDiagram variant="anatomy" alt="The front of a chest outlined from a scan: skin, collarbones, breastbone, ribs and the heart behind them." /></div>
     </figure>
   </section>
 
@@ -119,7 +121,7 @@ const N = 8;
       <p>Use it to compare places, layouts and bodies.</p>
     </div>
     <figure class="fig" data-kind="shot">
-      <div class="fig-media"><Pic name="strength-map" alt="A chest outline with a grid of squares coloured from green, weak, to red, strong, showing where the computed heartbeat is strongest." /></div>
+      <div class="fig-media"><FieldDiagram kind="strength" alt="The outline of a modelled chest with a grid of squares coloured from white, weaker, to a warm red, stronger, showing where the computed heartbeat is strongest. A dashed line marks the heart behind." /></div>
     </figure>
   </section>
 
@@ -131,7 +133,7 @@ const N = 8;
       <p>Other people's measured maps still predict a new person better than the model does, and the twin cannot yet predict one person's magnetic signal.</p>
     </div>
     <figure class="fig" data-kind="shot">
-      <div class="fig-media"><Pic name="twin-field" alt="The computed field over a modelled chest, drawn as a grid of blue and red squares: into the chest and out of it." /></div>
+      <div class="fig-media"><FieldDiagram kind="field" alt="The outline of a modelled chest with a grid of coloured squares over the heart: teal where the computed field points into the chest, a warm red where it points out of the chest. A dashed line marks the heart behind." /></div>
     </figure>
   </section>
 
@@ -153,7 +155,7 @@ const N = 8;
   <div class="wrap">
     <header class="sec-head" data-r>
       <p class="chip">In the research tools</p>
-      <h2 id="h-doors" class="h2 h2-xl">Five questions.<span class="teal">Five doors.</span></h2>
+      <h2 id="h-doors" class="h2">Five questions.<span class="teal">Five doors.</span></h2>
     </header>
     <div class="doors">
       <a class="door" href={LAB.watch} data-r>
