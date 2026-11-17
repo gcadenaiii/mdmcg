@@ -1,10 +1,12 @@
 ---
-// The 42 scanned chests, each as its own front outline at one common scale (src/data/chests42.json, from the CT scans).
-import data from '../data/chests42.json';
+// Forty-two bodies, one device. Each scanned chest is cut across at the height where the design sits and laid over the others,
+// lined up on the skin at the front. The device (32 mm wide, 9 mm thick, drawn to the same scale) rests on all of them; the
+// heart of each chest lies at its own depth beneath it. Data: src/data/sections42.json (from the CT scans; see its note).
+import data from '../data/sections42.json';
 const d = (pts: number[][]) => pts.map((p, i) => `${i ? 'L' : 'M'}${p[0]} ${p[1]}`).join('') + 'Z';
 ---
-<ul class="chests" role="img" aria-label={`The front outlines of the ${data.n} scanned chests, drawn at one scale. No two are the same shape.`}>
-  {data.chests.map((c) => (
-    <li><svg viewBox="-250 -195 500 350" aria-hidden="true" focusable="false"><path d={d(c.pts)} /></svg></li>
-  ))}
-</ul>
+<svg class="chests" viewBox="-235 -24 470 330" role="img" aria-label={`${data.n} scanned chests cut across at the height of the device and laid over one another. The same small device rests on the front of every chest; each heart lies at a different depth beneath it.`}>
+  <g class="chests-bodies">{data.chests.map((c) => <path d={d(c.body)} />)}</g>
+  <g class="chests-hearts">{data.chests.map((c) => c.heart && <path d={d(c.heart)} />)}</g>
+  <rect class="chests-device" x="-16" y="-10" width="32" height="9" rx="2.5" />
+</svg>

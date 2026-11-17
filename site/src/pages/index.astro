@@ -27,7 +27,6 @@ import { HERO_BEAT, LAB, OPTIONS, TEAM } from '../config';
         <a class="btn btn-primary" href="/device/">See the design</a>
         <LabLink href={LAB.home}>Open the research tools</LabLink>
       </div>
-      {HERO_BEAT && <HeroBeat />}
     </div>
     <figure class="fig fig-hero" data-kind="render">
       <div class="fig-media">
@@ -39,6 +38,7 @@ import { HERO_BEAT, LAB, OPTIONS, TEAM } from '../config';
               <path d="M318 352 L512 398"/><path d="M320 342 L316 362"/><path d="M514 388 L510 408"/>
               <path d="M286 262 L286 316"/><path d="M277 262 L295 262"/><path d="M277 316 L295 316"/>
             </g>
+            {HERO_BEAT && <HeroBeat />}
             <text x="672" y="208">60 mm</text>
             <text x="372" y="418">32 mm</text>
             <text x="216" y="295">9 mm</text>
@@ -133,13 +133,12 @@ import { HERO_BEAT, LAB, OPTIONS, TEAM } from '../config';
   <div class="wrap">
     <p class="chip">The evidence</p>
     <div class="score" data-r>
-      <h2 id="h-stands" class="numeral">42</h2>
+      <div class="score-n"><h2 id="h-stands" class="numeral">42</h2><Chests42 /></div>
       <div class="score-side">
         <p class="score-line">real chests, scanned. One virtual trial of the design on every one of them.</p>
         <p class="lead">Each chest shape comes from a CT scan. In each one a computer model of the heart beats, the design is set on the skin, and we work out what its sensors would pick up. That is the virtual trial.</p>
       </div>
     </div>
-    <div data-r><Chests42 /></div>
     <div class="verdicts">
       <div class="verdict verdict-yes" data-r>
         <h3>Size</h3>

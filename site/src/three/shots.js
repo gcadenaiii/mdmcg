@@ -1,8 +1,8 @@
 /* The camera positions and layouts shared by the live stage and the rendered stills, so the two cannot disagree. */
 export const VIEWS = {
-  hero: { tx: -2, ty: 0, tz: 10, az: 0.44, el: 0.74, dist: 238, fit: 1.5 },
+  hero: { tx: -2, ty: 0, tz: 8, az: 0.31, el: 0.86, dist: 186, fov: 32, fit: 1.5 },
   open: { tx: 0, ty: 27, tz: 4, az: 2.56, el: 0.36, dist: 400, fit: 0.9 },
-  wing: { tx: -4, ty: 0, tz: 12, az: -0.62, el: 0.5, dist: 262, fit: 1.4 },
+  wing: { tx: 4, ty: 0, tz: 12, az: -0.62, el: 0.5, dist: 286, fit: 1.4 },
   family: { tx: 73, ty: 0, tz: 70, az: 0, el: 0.74, dist: 800, fit: 1.05 },
 };
 /** the four options on one ground at true relative scale: two by two */

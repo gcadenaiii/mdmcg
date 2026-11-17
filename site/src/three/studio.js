@@ -1,8 +1,8 @@
 /* The studio: one WebGL canvas, a soft room, one key light, a baked contact shadow, and up to four devices.
    It draws only when asked. Used by the home page's stage, the viewer on /device/, and the script that renders the stills. */
 import {
-  BufferGeometry, DirectionalLight, DoubleSide, Float32BufferAttribute, HemisphereLight, Mesh, MeshBasicMaterial, NeutralToneMapping,
-  NoBlending, OrthographicCamera, PCFShadowMap, PerspectiveCamera, PlaneGeometry, PMREMGenerator, Scene, ShaderMaterial,
+  BufferGeometry, CustomBlending, DirectionalLight, DoubleSide, Float32BufferAttribute, HemisphereLight, Mesh, MeshBasicMaterial, NeutralToneMapping,
+  NoBlending, OneFactor, OneMinusSrcAlphaFactor, OrthographicCamera, PCFShadowMap, PerspectiveCamera, PlaneGeometry, PMREMGenerator, Scene, ShaderMaterial,
   ShadowMaterial, Vector3, WebGLRenderer, WebGLRenderTarget,
 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
@@ -21,6 +21,17 @@ const BLUR = {
       s += texture2D(map, vUv - step) * 0.1531; s += texture2D(map, vUv) * 0.1633; s += texture2D(map, vUv + step) * 0.1531;
       s += texture2D(map, vUv + 2.0 * step) * 0.12245; s += texture2D(map, vUv + 3.0 * step) * 0.0918; s += texture2D(map, vUv + 4.0 * step) * 0.051;
       gl_FragColor = s; }`,
+};
+
+/* the haze: a small, blurred copy of the picture laid lightly over the sharp one */
+const HAZE = {
+  vertexShader: BLUR.vertexShader,
+  fragmentShader: `uniform sampler2D map; uniform float amount; varying vec2 vUv;
+    void main(){ vec4 c = texture2D(map, vUv);
+      gl_FragColor = vec4(c.a > 0.001 ? c.rgb / c.a : vec3(0.0), 1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+      gl_FragColor = vec4(gl_FragColor.rgb * c.a * amount, c.a * amount); }`,
 };
 
 export { SPECS };
@@ -71,6 +82,15 @@ export class Studio {
     this.contact = new Mesh(this.contactGeo, new MeshBasicMaterial({ map: this.rtA.texture, transparent: true, opacity: 0.7, depthWrite: false, toneMapped: false }));
     this.contact.renderOrder = 2;
     this.scene.add(this.contact);
+    /* the soft haze over the whole picture (0 turns it off) */
+    this.haze = 0.14;
+    this.rtH1 = new WebGLRenderTarget(4, 4);
+    this.rtH2 = new WebGLRenderTarget(4, 4, { depthBuffer: false });
+    this.hazeQuad = new Mesh(this.quad.geometry, new ShaderMaterial({
+      ...HAZE, uniforms: { map: { value: this.rtH2.texture }, amount: { value: this.haze } }, transparent: true, depthTest: false, depthWrite: false,
+      blending: CustomBlending, blendSrc: OneFactor, blendDst: OneMinusSrcAlphaFactor, blendSrcAlpha: OneFactor, blendDstAlpha: OneMinusSrcAlphaFactor,
+    }));
+    this.hazeQuad.frustumCulled = false;
     this.frame = null;
     this.dirty = true;
     this.view = { tx: 0, ty: 0, tz: 0, az: 0.5, el: 0.6, dist: 360 };
@@ -159,6 +179,9 @@ export class Studio {
   }
   place(v = this.view) {
     this.view = v;
+    /* a view may name its own lens (fov, in degrees); the others use the studio's 24 */
+    const fov = v.fov || 24;
+    if (this.cam.fov !== fov) { this.cam.fov = fov; this.cam.updateProjectionMatrix(); }
     const d = v.dist * Math.max(1, this.fitAspect / this.cam.aspect);
     const ce = Math.cos(v.el);
     this.cam.position.set(v.tx + d * ce * Math.sin(v.az), v.ty + d * Math.sin(v.el), v.tz + d * ce * Math.cos(v.az));
@@ -168,7 +191,24 @@ export class Studio {
   draw(v) {
     this.place(v);
     if (this.dirty) this.bake();
-    this.renderer.render(this.scene, this.cam);
+    const r = this.renderer;
+    r.render(this.scene, this.cam);
+    if (!(this.haze > 0)) return;
+    /* the same picture at a quarter of the size, blurred, then mixed over the sharp one */
+    const W = Math.max(8, Math.round(r.domElement.width / 4)), Hh = Math.max(8, Math.round(r.domElement.height / 4));
+    if (this.rtH1.width !== W || this.rtH1.height !== Hh) { this.rtH1.setSize(W, Hh); this.rtH2.setSize(W, Hh); }
+    r.setRenderTarget(this.rtH1); r.clear(); r.render(this.scene, this.cam);
+    for (const reach of [0.0034, 0.0017]) {
+      this.blurMat.uniforms.map.value = this.rtH1.texture; this.blurMat.uniforms.step.value = [reach, 0];
+      r.setRenderTarget(this.rtH2); r.render(this.quad, this.up);
+      this.blurMat.uniforms.map.value = this.rtH2.texture; this.blurMat.uniforms.step.value = [0, reach * W / Hh];
+      r.setRenderTarget(this.rtH1); r.render(this.quad, this.up);
+    }
+    r.setRenderTarget(null);
+    this.hazeQuad.material.uniforms.map.value = this.rtH1.texture;
+    this.hazeQuad.material.uniforms.amount.value = this.haze;
+    const auto = r.autoClear;
+    r.autoClear = false; r.render(this.hazeQuad, this.up); r.autoClear = auto;
   }
   /** a point of the scene, in CSS pixels of the canvas */
   project(x, y, z) {
@@ -179,7 +219,7 @@ export class Studio {
   dispose() {
     this.devices.forEach((d) => d && d.dispose());
     for (const k in this.M) { const m = this.M[k]; if (m.map) m.map.dispose(); if (m.bumpMap) m.bumpMap.dispose(); m.dispose(); }
-    this.rtA.dispose(); this.rtB.dispose(); this.env.dispose();
+    this.rtA.dispose(); this.rtB.dispose(); this.rtH1.dispose(); this.rtH2.dispose(); this.hazeQuad.material.dispose(); this.env.dispose();
     this.renderer.dispose();
   }
 }

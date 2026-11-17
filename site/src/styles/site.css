@@ -406,23 +406,28 @@ picture { display: contents; }
 .spine.gl .stage-layers { pointer-events: none; }
 .stage-gl, .spine.gl .stage .dims { -webkit-user-select: none; user-select: none; }
 
-/* ---------- the heartbeat on the first screen: two thin traces of one beat, drawn once ---------- */
-.herobeat { display: block; width: 100%; max-width: 460px; height: auto; overflow: visible; margin-top: 44px; }
-.herobeat path { fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 0; }
+/* ---------- the heartbeat on the first screen: two thin lines that leave the device and become the two signals ---------- */
+.herobeat path { fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 0; }
 .herobeat .hb-ecg { stroke: var(--ink); }
 .herobeat .hb-mcg { stroke: var(--teal); }
-.herobeat text { font-size: 15px; fill: var(--ink-3); }
-.herobeat .hb-k { fill: var(--teal); }
+.herobeat .hb-ecg-dot { fill: var(--ink); }
+.herobeat .hb-mcg-dot { fill: var(--teal); }
+.dims .herobeat .hb-t { font-family: var(--sans); font-size: 13.5px; fill: var(--ink-3); }
+.dims .herobeat .hb-k { fill: var(--teal); }
 @media (prefers-reduced-motion: no-preference) {
-  .herobeat path { animation: hb-draw 1800ms cubic-bezier(0.4, 0, 0.2, 1) 500ms backwards; }
-  .herobeat .hb-mcg { animation-delay: 650ms; }
+  .herobeat path { animation: hb-draw 2200ms cubic-bezier(0.4, 0, 0.2, 1) 500ms backwards; }
+  .herobeat .hb-mcg { animation-delay: 700ms; }
+  .herobeat circle, .herobeat text { animation: hb-in 500ms ease-out 2500ms backwards; }
 }
-@keyframes hb-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
-@media (max-width: 900px) { .herobeat { margin-top: 28px; max-width: 340px; } .herobeat text { font-size: 20px; } }
+@keyframes hb-draw { from { stroke-dashoffset: -1; } to { stroke-dashoffset: 0; } }
+@keyframes hb-in { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 900px) { .herobeat { display: none; } }
 
-/* ---------- the 42 scanned chests as outlines, in the dark band ---------- */
-.chests { display: grid; grid-template-columns: repeat(21, minmax(0, 1fr)); gap: 10px 6px; margin-top: clamp(40px, 5vw, 72px); }
-.chests svg { display: block; width: 100%; height: auto; overflow: visible; }
-.chests path { fill: rgba(255, 255, 255, 0.04); stroke: rgba(255, 255, 255, 0.5); stroke-width: 1.2; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
-.chests + .verdicts, [data-r] + .verdicts { margin-top: clamp(32px, 4vw, 56px); }
-@media (max-width: 900px) { .chests { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px 8px; } }
+/* ---------- forty-two bodies, one device: the chests in cross-section, laid over each other beside the numeral ---------- */
+.score-n { position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; min-width: 0; }
+.chests { flex: 1 1 0; min-width: 0; max-width: 420px; display: block; height: auto; overflow: visible; margin-bottom: 1.2vw; }
+.chests path { fill: none; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.chests-bodies path { stroke: rgba(255, 255, 255, 0.3); stroke-width: 1; }
+.chests-hearts path { stroke: rgba(240, 122, 96, 0.62); stroke-width: 1; fill: rgba(240, 122, 96, 0.035); }
+.chests-device { fill: #5FD0D9; }
+@media (max-width: 900px) { .score-n { flex-direction: column; align-items: flex-start; gap: 28px; } .chests { flex: none; width: 100%; max-width: 360px; } }

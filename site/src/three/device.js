@@ -2,7 +2,7 @@
    (copied from the research tool's design data: core size, corner radius, pad thickness, sensor places, ring colour, cell).
    Units are millimetres. X across the chest, Y out of the chest, -Z toward the head. The pad's underside is y = -pad_t.
    Only named parts are drawn: soft pad, shell, ring, sensor board with its sensors, the cell, the self-test coil,
-   the flexible sheet (two wings and the top tab, each with its electrode), the lid and its charging pads. */
+   the flexible sheet (two wings and the top tab, each with its electrode), and the lid with its coloured corner and light. */
 import {
   BufferGeometry, CanvasTexture, CatmullRomCurve3, Color, CylinderGeometry, DoubleSide, Float32BufferAttribute, Group,
   LatheGeometry, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, RepeatWrapping, SRGBColorSpace, TubeGeometry, Vector2, Vector3,
@@ -81,7 +81,8 @@ function slab(w, l, r, y0, y1, e, out = 0) {
 export function wingPlan(core) {
   const dx = core.w / 2 - 16;
   const zr = 9 + (core.l - 60) / 4;
-  return { dx, zr, lobe: { x: 50 + dx, z: zr + 18.3, r: 11 }, tab: { z: -(core.l / 2 + 7.5), r: 5.3 }, pad: 8, tabPad: 3.3 };
+  /* strap: the width of a wing; root: where its head-side edge leaves the core. Set to the look of the opening picture. */
+  return { dx, zr, strap: 8.6, root: zr - 2, lobe: { x: 52 + dx, z: zr + 23, r: 10.5 }, tab: { z: -(core.l / 2 + 15), r: 6.3 }, pad: 6.9, tabPad: 3.4 };
 }
 const bez = (p0, c1, c2, p3, t) => {
   const m = 1 - t;
@@ -167,12 +168,20 @@ function sheetGeometry(core, plan, height, th) {
   S.edge(line, () => [0, 0], true);
   /* the wings: each edge is a curve from the core to the round end */
   const { dx, zr, lobe } = plan;
-  const a1 = Math.atan2(9.3, 9), a2 = Math.atan2(-6.7, 8.5);
+  /* each wing is a strap of one width along an S-shaped centre line, level where it leaves the core and where it meets its round end */
+  const hs = plan.strap / 2;
+  const endX = lobe.x - dx - Math.sqrt(lobe.r * lobe.r - hs * hs);
+  const zc = plan.root + hs;
+  const centre = (t) => bez([14, zc], [14 + (endX - 14) * 0.62, zc], [endX - (endX - 14) * 0.55, lobe.z], [endX, lobe.z], t);
   for (const sgn of [-1, 1]) {
     const X = (x) => sgn * (x + dx);
     const cx = sgn * lobe.x;
-    const upper = (t) => bez([X(14), zr], [X(27), zr], [X(34), zr + 4], [cx - sgn * lobe.r * Math.cos(a1), lobe.z - lobe.r * Math.sin(a1)], t);
-    const lower = (t) => bez([X(14), zr + 11.5], [X(22), zr + 11.5], [X(30), zr + 16.5], [cx - sgn * lobe.r * Math.cos(a2), lobe.z - lobe.r * Math.sin(a2)], t);
+    const edge = (t, s) => {
+      const a = centre(Math.max(0, t - 0.002)), b = centre(Math.min(1, t + 0.002)), c = centre(t);
+      const L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+      return [X(c[0] - s * hs * (b[1] - a[1]) / L), c[1] + s * hs * (b[0] - a[0]) / L];
+    };
+    const upper = (t) => edge(t, -1), lower = (t) => edge(t, 1);
     const NI = 44;
     S.grid(NI, 8, (u, v) => { const a = upper(u), b = lower(u); return [a[0] + (b[0] - a[0]) * v, a[1] + (b[1] - a[1]) * v]; });
     const U = [], Lo = [];
@@ -295,14 +304,41 @@ export function buildDevice(spec, M, { inside = false } = {}) {
   const crown = 0.22;
   const top = [];
   for (const f of [0.2, 0.42, 0.66, 0.86, 0.97]) top.push([-(inL + er + (hw - inL - er) * f), t + crown * (1 - (1 - f) * (1 - f))]);
-  lid.add(mesh(loft(w, l, r, [['C', yL], [-inL, yL], [-inL, yL], [-inL, yR + 0.1], ...arc(-inL - er, yR + 0.1, er, t - yR - 0.1, 0, H, 12), ...top, ['C', t + crown]], 14, 10), M.shell));
+  const lidGeo = loft(w, l, r, [['C', yL], [-inL, yL], [-inL, yL], [-inL, yR + 0.1], ...arc(-inL - er, yR + 0.1, er, t - yR - 0.1, 0, H, 12), ...top, ['C', t + crown]], 14, 10);
+  /* the lid's colours are painted from above: white, with the ring's colour in one corner at the foot end and a small light in it */
+  const lp = lidGeo.attributes.position, luv = [];
+  for (let i = 0; i < lp.count; i++) luv.push((lp.getX(i) + hw) / w, (lp.getZ(i) + hl) / l);
+  lidGeo.setAttribute('uv', new Float32BufferAttribute(luv, 2));
+  const lidMat = M.shell.clone();
+  const paint = (fill) => {
+    const k = 20, tex = canvasTexture(8, () => {}), c = tex.image, x = c.getContext('2d');
+    c.width = Math.round(w * k); c.height = Math.round(l * k);
+    fill(x, k, c.width, c.height, (hw + hw - inL) * k, (hl + hl - inL) * k);
+    tex.flipY = false; tex.colorSpace = SRGBColorSpace; tex.needsUpdate = true;
+    return tex;
+  };
+  const NA = 9, NB = 13; // how far the coloured corner runs along the foot edge and along the side
+  lidMat.map = paint((x, k, W, Hh, ax, az) => {
+    x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, Hh);
+    const A = [ax - NA * k, az], B = [ax, az - NB * k], mx = (A[0] + B[0]) / 2, mz = (A[1] + B[1]) / 2;
+    x.beginPath(); x.moveTo(A[0], A[1]); x.lineTo(A[0], Hh); x.lineTo(W, Hh); x.lineTo(W, B[1]); x.lineTo(B[0], B[1]);
+    x.quadraticCurveTo(ax + (mx - ax) * 0.8, az + (mz - az) * 0.8, A[0], A[1]); x.closePath();
+    x.fillStyle = spec.ring; x.fill();
+  });
+  lidMat.emissiveMap = paint((x, k, W, Hh, ax, az) => {
+    x.fillStyle = '#000000'; x.fillRect(0, 0, W, Hh);
+    const cx = ax - 3.6 * k, cz = az - 3.9 * k;
+    const g = x.createRadialGradient(cx, cz, 0, cx, cz, 2.6 * k);
+    g.addColorStop(0, 'rgba(60,220,215,0.5)'); g.addColorStop(1, 'rgba(60,220,215,0)');
+    x.fillStyle = g; x.fillRect(cx - 3 * k, cz - 3 * k, 6 * k, 6 * k);
+    x.lineCap = 'round'; x.lineWidth = 0.6 * k; x.strokeStyle = '#8ffbf3';
+    x.beginPath(); x.moveTo(cx - 0.9 * k, cz); x.lineTo(cx + 0.9 * k, cz); x.stroke();
+  });
+  lidMat.emissive = new Color('#ffffff');
+  lidMat.emissiveIntensity = 1;
+  lid.add(mesh(lidGeo, lidMat));
 
-  /* flat gold pads at the head end of the lid, which meet the spring pins of the charging case */
-  for (let k = 0; k < (spec.contacts || 0); k++) {
-    const c = new CylinderGeometry(0.95, 0.95, 0.16, 24, 1);
-    c.translate((k - (spec.contacts - 1) / 2) * 3.3, t + crown + 0.02, -(hl - 6.5));
-    lid.add(mesh(c, M.gold, false));
-  }
+  /* The charging pads (spec.contacts) are not drawn: they are not on the lid, and the model has no other face to show them on. */
 
   /* the flexible sheet: clamped in the core, two wings and the top tab draped to the surface it lies on */
   const th = 1.7;
@@ -325,7 +361,7 @@ export function buildDevice(spec, M, { inside = false } = {}) {
     rim.translate(x, y - 0.05, z);
     flex.add(mesh(rim, M.rim));
     const domeP = [];
-    const dh = padR * 0.3;
+    const dh = padR * 0.26;
     for (let k = 0; k <= 14; k++) { const a = (k / 14) * H; domeP.push(new Vector2(padR * Math.sin(a), dh * Math.cos(a))); }
     const dome = new LatheGeometry(domeP.reverse(), 56);
     dome.translate(x, y + 0.2, z);
@@ -370,6 +406,6 @@ export function buildDevice(spec, M, { inside = false } = {}) {
     /* how far each part rises when the device is fully opened */
     lift: { pad: -9, tray: 0, sensors: s0, coil: s0 + tall + 5, flex: s0 + tall + 22, lid: s0 + tall + 35 },
     explode(e) { for (const k in parts) parts[k].position.y = this.lift[k] * e; },
-    dispose() { group.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); ring.dispose(); },
+    dispose() { group.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); ring.dispose(); lidMat.map.dispose(); lidMat.emissiveMap.dispose(); lidMat.dispose(); },
   };
 }

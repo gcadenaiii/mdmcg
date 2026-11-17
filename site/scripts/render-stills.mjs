@@ -20,6 +20,7 @@ const JOBS = [
   ['wing', 'wing', [], 'device-wing', 2000, true],
   ['detail', 'detail', [], 'device-detail', 2000],
   ['wide', 'wide', [], 'device-wide', 2800, true],
+  ['inside', 'inside', [], 'device-inside', 2000],
   ['option-1', 'option', [0], 'option-1', 1600], ['option-2', 'option', [1], 'option-2', 1600],
   ['option-3', 'option', [2], 'option-3', 1600], ['option-4', 'option', [3], 'option-4', 1600],
   ['row', 'row', [], 'options-row', 3000],
@@ -57,7 +58,7 @@ for (const [name, fn, a, asset, width, whole] of want) {
   /* the masters are cut to the picture's own edge, with a small margin, so they fill their boxes on the pages */
   if (install && asset && whole) await sharp(png).webp({ quality: 92, alphaQuality: 100 }).toFile(path.resolve('src/assets/img', asset + '.webp'));
   else if (install && asset) {
-    const cut = await sharp(png).trim({ threshold: 4 }).toBuffer({ resolveWithObject: true });
+    const cut = await sharp(png).trim({ threshold: 1 }).toBuffer({ resolveWithObject: true });
     const m = Math.round(cut.info.width * 0.03);
     await sharp(cut.data).extend({ top: m, bottom: m, left: m, right: m, background: { r: 0, g: 0, b: 0, alpha: 0 } }).webp({ quality: 92, alphaQuality: 100 }).toFile(path.resolve('src/assets/img', asset + '.webp'));
   }
