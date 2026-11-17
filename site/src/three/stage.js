@@ -1,0 +1,242 @@
+/* The home page's live stage: one device, moved by the scroll. Loaded after first paint, only where it can run well.
+   Each scene has a camera position and a state of the parts; scrolling blends between neighbours.
+   Nothing is drawn unless something changed. The stills stay in the page underneath and return if this is removed. */
+import { Studio, SPECS } from './studio.js';
+import { VIEWS, FAMILY, FRAME_ONE, FRAME_FAMILY, sizeLines } from './shots.js';
+
+/* What the first scene shows while nothing moves.
+   'picture': the page's own hero picture stays; the live model takes over when the visitor scrolls or drags, and hands back.
+   'model': the live model from the start, with one settling move. */
+const HERO_AT_REST = 'picture';
+
+const TAU = Math.PI * 2;
+/* one row per scene on the page, in order. gl: 0 leaves the scene's still picture on the stage.
+   The camera goes once round the device over the six scenes. */
+const SCENES = [
+  { ...VIEWS.hero, explode: 0, family: 0, gl: 1, lines: 1 },
+  { ...VIEWS.open, explode: 1, family: 0, gl: 1, lines: 0 },
+  { ...VIEWS.wing, az: VIEWS.wing.az + TAU, explode: 0, family: 0, gl: 1, lines: 0 },
+  { ...VIEWS.wing, az: VIEWS.wing.az + TAU + 0.25, dist: VIEWS.wing.dist * 1.5, explode: 0, family: 0, gl: 0, lines: 0 },
+  { ...VIEWS.family, az: VIEWS.family.az + TAU - 0.2, dist: VIEWS.family.dist * 1.12, explode: 0, family: 0, gl: 0, lines: 0 },
+  { ...VIEWS.family, az: VIEWS.family.az + TAU, explode: 0, family: 1, gl: 1, lines: 0 },
+];
+const KEYS = ['tx', 'ty', 'tz', 'az', 'el', 'dist', 'fit', 'explode', 'family', 'gl', 'lines'];
+const ease = (t) => t * t * (3 - 2 * t);
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const NS = 'http://www.w3.org/2000/svg';
+
+export function mount(spine, { rest = HERO_AT_REST } = {}) {
+  const stage = spine.querySelector('.stage');
+  const scenes = Array.from(spine.querySelectorAll('.scene'));
+  if (!stage || scenes.length !== SCENES.length) return null;
+  const heroFig = rest === 'picture' ? stage.querySelector('.fig-hero') : null;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'stage-gl';
+  const canvas = document.createElement('canvas');
+  canvas.setAttribute('role', 'img');
+  canvas.setAttribute('aria-label', 'The option 1 device in three dimensions. It turns, opens and closes as the page scrolls.');
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('class', 'dims stage-lines');
+  svg.setAttribute('aria-hidden', 'true');
+  const marks = document.createElement('div');
+  marks.className = 'stage-marks';
+  marks.setAttribute('aria-hidden', 'true');
+  wrap.append(canvas, svg, marks);
+  stage.insertBefore(wrap, stage.firstChild);
+
+  let S;
+  try { S = new Studio(canvas, { pixelRatio: Math.min(window.devicePixelRatio || 1, 2) }); } catch { wrap.remove(); return null; }
+  S.arrange([{ i: 0, x: 0, z: 0 }], FRAME_ONE);
+
+  /* the three size lines, drawn over the canvas so the type matches the page */
+  const lines = sizeLines(SPECS[0].core).map((d) => {
+    const g = document.createElementNS(NS, 'g');
+    const path = document.createElementNS(NS, 'path');
+    path.setAttribute('pathLength', '1');
+    path.style.strokeDasharray = '1';
+    const text = document.createElementNS(NS, 'text');
+    text.textContent = d.text;
+    text.setAttribute('text-anchor', d.off[0] > 0 ? 'start' : d.off[0] < 0 ? 'end' : 'middle');
+    g.setAttribute('class', 'dim-line');
+    g.append(path);
+    svg.append(g, text);
+    return { d, path, text };
+  });
+  const badges = FAMILY.map((p) => {
+    const b = document.createElement('span');
+    b.className = 'ring r' + (p.i + 1);
+    b.textContent = String(p.i + 1);
+    marks.append(b);
+    return b;
+  });
+
+  const cur = { ...SCENES[0] };
+  const goal = { ...SCENES[0] };
+  const drag = { on: false, x: 0, y: 0, az: 0, el: 0, gaz: 0, gel: 0 };
+  let appear = 0;          // the canvas fading in for the first time
+  let veil = 1;            // dips to nothing while the ground is re-laid for another scene
+  let pos = 0;             // where the scroll is, in scenes
+  let family = false;      // whether the four are on the ground
+  let linesIn = heroFig ? 1 : 0; // the size lines draw in once, after the first settle
+  let raf = 0, last = 0, started = 0, frames = 0, owed = 1, dead = false, hold = false;
+
+  function target() {
+    const vh = window.innerHeight;
+    let p = 0;
+    for (let k = 1; k < scenes.length; k++) p += clamp((vh * 0.92 - scenes[k].getBoundingClientRect().top) / (vh * 0.46), 0, 1);
+    pos = p;
+    const i = Math.min(SCENES.length - 2, Math.floor(p));
+    const f = ease(p - i);
+    const a = SCENES[i], b = SCENES[i + 1];
+    for (const k of KEYS) goal[k] = a[k] + (b[k] - a[k]) * f;
+    /* the picture hands over a little before the camera has finished */
+    if (a.gl !== b.gl) goal.gl = a.gl > b.gl ? 1 - ease(clamp((p - i) / 0.7, 0, 1)) : ease(clamp((p - i - 0.3) / 0.7, 0, 1));
+    /* on the first scene the picture stays until the visitor scrolls, or turns the device by hand */
+    if (heroFig && i === 0) {
+      const turning = hold || drag.on || Math.abs(drag.az) > 0.004 || Math.abs(drag.el) > 0.004;
+      goal.gl = Math.max(turning ? 1 : 0, ease(clamp(p / 0.2, 0, 1)));
+    }
+  }
+  function draw() {
+    S.resize(wrap.clientWidth, wrap.clientHeight);
+    const A = S.device(0);
+    if (A.parts.lid.position.y !== A.lift.lid * cur.explode) { A.explode(cur.explode); S.touch(); }
+    S.catcher.material.opacity = 0.2 * (1 - cur.explode);
+    const fam = family ? cur.family : 0;
+    if (family) {
+      FAMILY.forEach((p) => {
+        const dev = S.device(p.i);
+        const out = (1 - cur.family) * 46;
+        const x = p.x + (p.x > 0 ? out : 0), z = p.z + (p.z > 0 ? out : 0);
+        if (dev.group.position.x !== x || dev.group.position.z !== z) { dev.group.position.set(x, 0, z); S.touch(); }
+      });
+    }
+    S.fitAspect = cur.fit;
+    S.draw({ tx: cur.tx, ty: cur.ty, tz: cur.tz, az: cur.az + drag.az, el: clamp(cur.el + drag.el, 0.12, 1.45), dist: cur.dist });
+    const shown = Math.round(cur.gl * appear * veil * 1000) / 1000;
+    wrap.style.opacity = String(shown);
+    wrap.style.pointerEvents = pos < 0.3 ? 'auto' : 'none';
+    if (heroFig) heroFig.style.opacity = heroFig.classList.contains('on') ? String(1 - shown) : '';
+    /* size lines */
+    const show = cur.lines * linesIn;
+    svg.style.opacity = String(Math.round(show * 1000) / 1000);
+    if (show > 0.01) {
+      svg.setAttribute('viewBox', `0 0 ${S.w} ${S.h}`);
+      const f = (v) => v.toFixed(1);
+      lines.forEach(({ d, path, text }, n) => {
+        const T = d.tick.map((v) => v * 2.2);
+        const P = (q, k) => S.project(q[0] + T[0] * k, q[1] + T[1] * k, q[2] + T[2] * k);
+        const a = P(d.a, 0), b = P(d.b, 0), a0 = P(d.a, -1), a1 = P(d.a, 1), b0 = P(d.b, -1), b1 = P(d.b, 1);
+        path.setAttribute('d', `M${f(a[0])} ${f(a[1])}L${f(b[0])} ${f(b[1])}M${f(a0[0])} ${f(a0[1])}L${f(a1[0])} ${f(a1[1])}M${f(b0[0])} ${f(b0[1])}L${f(b1[0])} ${f(b1[1])}`);
+        const grow = clamp(linesIn * 3 - n * 0.8, 0, 1);
+        path.style.strokeDashoffset = String(1 - grow);
+        text.setAttribute('x', f((a[0] + b[0]) / 2 + d.off[0] * 16));
+        text.setAttribute('y', f((a[1] + b[1]) / 2 + d.off[1] * 26 + 5));
+        text.style.opacity = String(clamp(grow * 2 - 1, 0, 1));
+      });
+    }
+    /* the four numbered rings */
+    marks.style.opacity = String(Math.round(fam * cur.gl * veil * 1000) / 1000);
+    if (family) {
+      FAMILY.forEach((p, n) => {
+        const dev = S.device(p.i), c = dev.spec.core;
+        const q = S.project(dev.group.position.x - c.w / 2 - 20, c.t, dev.group.position.z - c.l / 2 - 4);
+        badges[n].style.transform = `translate(${q[0].toFixed(1)}px, ${q[1].toFixed(1)}px) translate(-50%, -50%)`;
+      });
+    }
+  }
+  function frame(now) {
+    raf = 0;
+    if (dead) return;
+    const dt = Math.min(0.05, (now - (last || now)) / 1000);
+    last = now;
+    let moving = false;
+    /* the first second is also a test: a machine that cannot keep up keeps the stills */
+    if (document.hidden) started = -1;
+    if (started !== -1) {
+      if (now - started > 1000) { if (frames < 26) { unmount(); return; } started = -1; } else moving = true;
+    }
+    target();
+    const k = 1 - Math.exp(-dt / (started === -1 || heroFig ? 0.13 : 0.34));
+    for (const key of KEYS) {
+      const d = goal[key] - cur[key];
+      if (Math.abs(d) > (key === 'dist' ? 0.05 : 0.0006)) { cur[key] += d * k; moving = true; } else cur[key] = goal[key];
+    }
+    for (const [c, g] of [['az', 'gaz'], ['el', 'gel']]) {
+      const d = drag[g] - drag[c];
+      if (Math.abs(d) > 0.0006) { drag[c] += d * (1 - Math.exp(-dt / (drag.on ? 0.05 : 0.22))); moving = true; } else drag[c] = drag[g];
+    }
+    if (appear < 1) { appear = Math.min(1, appear + dt / 0.5); moving = true; }
+    /* one device or four: the ground is changed only while the canvas is not seen */
+    const want = pos > 3.5;
+    if (want !== family) {
+      if (cur.gl * veil > 0.02) veil = Math.max(0, veil - dt / 0.18);
+      else {
+        family = want;
+        if (family) S.arrange(FAMILY, FRAME_FAMILY); else S.arrange([{ i: 0, x: 0, z: 0 }], FRAME_ONE);
+      }
+      moving = true;
+    } else if (veil < 1) { veil = Math.min(1, veil + dt / 0.3); moving = true; }
+    if (linesIn < 1 && cur.lines > 0.5 && (linesIn > 0 || !moving)) { linesIn = Math.min(1, linesIn + dt / 1.1); moving = true; }
+    /* draw only if something changed (and once more after it stops, to land exactly) */
+    if (moving) owed = 2;
+    if (owed > 0) { owed--; frames++; draw(); }
+    if (moving || owed > 0) kick();
+  }
+  function kick() { if (!raf && !dead) raf = requestAnimationFrame(frame); }
+
+  /* a pointer may turn the device a little on the first scene; it goes back when let go */
+  function down(e) {
+    if (pos > 0.3 || e.button > 0) return;
+    drag.on = true; drag.x = e.clientX; drag.y = e.clientY;
+    wrap.classList.add('dragging');
+    try { wrap.setPointerCapture(e.pointerId); } catch { /* nothing to capture */ }
+    kick();
+  }
+  function move(e) {
+    if (!drag.on) return;
+    drag.gaz = clamp(drag.gaz - (e.clientX - drag.x) * 0.006, -0.9, 0.9);
+    drag.gel = clamp(drag.gel + (e.clientY - drag.y) * 0.004, -0.4, 0.4);
+    drag.x = e.clientX; drag.y = e.clientY;
+    kick();
+  }
+  function up() { if (!drag.on) return; drag.on = false; drag.gaz = 0; drag.gel = 0; wrap.classList.remove('dragging'); last = 0; kick(); }
+  const wake = () => { last = 0; owed = 1; kick(); };
+  wrap.addEventListener('pointerdown', down);
+  wrap.addEventListener('pointermove', move);
+  wrap.addEventListener('pointerup', up);
+  wrap.addEventListener('pointercancel', up);
+  window.addEventListener('scroll', kick, { passive: true });
+  window.addEventListener('resize', wake);
+  const ro = new ResizeObserver(wake);
+  ro.observe(wrap);
+  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); unmount(); });
+
+  function unmount() {
+    if (dead) return;
+    dead = true;
+    cancelAnimationFrame(raf);
+    window.removeEventListener('scroll', kick);
+    window.removeEventListener('resize', wake);
+    ro.disconnect();
+    spine.classList.remove('gl', 'gl-rest');
+    if (heroFig) heroFig.style.opacity = '';
+    wrap.remove();
+    S.dispose();
+  }
+
+  target();
+  Object.assign(cur, goal);
+  /* shown from the start: begin a little turned away and further back, then settle once */
+  if (!heroFig && pos < 0.5) { cur.az -= 0.42; cur.dist *= 1.07; cur.el += 0.06; } else linesIn = 1;
+  draw();
+  spine.classList.add('gl');
+  if (heroFig) spine.classList.add('gl-rest');
+  started = performance.now();
+  kick();
+  /* the other three options are built when the browser is idle, well before the last scene */
+  const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 600));
+  [1, 2, 3].forEach((i, n) => idle(() => { if (!dead) S.device(i); }, { timeout: 2500 + n * 600 }));
+  return { unmount, studio: S, /** how many pictures have been drawn so far */ frames: () => frames, /** keep the model on the first scene (for review pictures) */ hold(v) { hold = v; kick(); } };
+}

@@ -1,5 +1,6 @@
 /* mdmcg site script. Plain script, no library.
-   1. bar and phone menu  2. email buttons  3. scroll reveals  4. sticky stages (stills changed by scroll).
+   1. bar and phone menu  2. email buttons  3. scroll reveals  4. sticky stages (stills changed by scroll)
+   5. the live 3D device on the home page's stage, loaded afterwards and only where it can run well.
    With reduced motion, or without this script, everything is simply shown in place. */
 const root = document.documentElement;
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -98,3 +99,24 @@ function onScroll() { if (queued) return; queued = true; requestAnimationFrame((
 window.addEventListener('scroll', onScroll, { passive: true });
 window.addEventListener('resize', onScroll);
 tick();
+
+// 5. the live 3D device. The stills stay as they are unless all of this holds: motion allowed, a wide screen,
+// no data saving, a machine with some memory and cores, and WebGL 2 on real graphics hardware.
+const home = document.getElementById('spine');
+function canRun3d() {
+  if (!home || reduce || !spines.length || window.innerWidth <= 900) return false;
+  const n = navigator;
+  if ((n.connection && n.connection.saveData) || (n.deviceMemory && n.deviceMemory < 4) || (n.hardwareConcurrency && n.hardwareConcurrency < 4)) return false;
+  try {
+    const gl = document.createElement('canvas').getContext('webgl2', { failIfMajorPerformanceCaveat: true });
+    if (!gl) return false;
+    const lose = gl.getExtension('WEBGL_lose_context');
+    if (lose) lose.loseContext();
+    return true;
+  } catch { return false; }
+}
+if (canRun3d()) {
+  const start = () => import('../three/stage.js').then((m) => { window.__stage = m.mount(home); }).catch(() => {});
+  const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 300));
+  if (document.readyState === 'complete') idle(start); else window.addEventListener('load', () => idle(start));
+}

@@ -23,7 +23,7 @@ import { LAB, OPTIONS, TEAM } from '../config';
         <a class="btn btn-ghost" href={LAB.home}>Open the research tools</a>
       </div>
     </div>
-    <figure class="fig fig-hero" data-kind="render">
+    <figure class="fig fig-hero" data-kind="render" data-gl>
       <div class="fig-media">
         <div class="dimbox">
           <Pic name="device-hero" eager sizes="(max-width: 900px) 100vw, 60vw" alt="Option 1: a small white core with a teal ring and soft white wings that end in round electrode pads." />
@@ -55,7 +55,7 @@ import { LAB, OPTIONS, TEAM } from '../config';
       </div>
       <p><a class="textlink" href="/device/">Inside the device</a></p>
     </div>
-    <figure class="fig" data-kind="render">
+    <figure class="fig" data-kind="render" data-gl>
       <div class="fig-media"><Pic name="device-open" alt="Option 1 opened into layers: lid, flexible sheet with the wings, a flat coil, the sensor board with upright wire sensors, the shell and a soft pad." /></div>
     </figure>
   </section>
@@ -67,7 +67,7 @@ import { LAB, OPTIONS, TEAM } from '../config';
       <p class="lead">The wings carry ECG electrodes. The ECG marks each beat, and the magnetic beats are averaged on that mark.</p>
       <p class="pull">An ECG does not determine the magnetic field. That is the reason to record both.</p>
     </div>
-    <figure class="fig" data-kind="render">
+    <figure class="fig" data-kind="render" data-gl>
       <div class="fig-media"><Pic name="device-wing" class="fade-edges" alt="A soft white woven wing joining the white core beside its teal ring, with a round electrode pad at the end of the wing." /></div>
     </figure>
   </section>
@@ -106,7 +106,7 @@ import { LAB, OPTIONS, TEAM } from '../config';
       <p class="lead">Each is a white shell with its own coloured ring. This site follows option 1.</p>
       <p><a class="textlink" href="#sensor-row">Compare the four</a></p>
     </div>
-    <figure class="fig" data-kind="render">
+    <figure class="fig" data-kind="render" data-gl>
       <div class="fig-media">
         <ul class="quad">
           {OPTIONS.map((o) => <li><Pic name={o.img} alt={o.alt} sizes="(max-width: 900px) 40vw, 300px" widths={[320, 480, 640]} /><span class:list={['ring', o.ring]}>{o.n}</span></li>)}

@@ -13,6 +13,10 @@
     "@fontsource/hind": "5.3.0",
     "@fontsource/ibm-plex-mono": "5.3.0",
     "astro": "7.4.12",
-    "sharp": "0.35.5"
+    "sharp": "0.35.5",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "playwright-core": "1.56.1"
   }
 }

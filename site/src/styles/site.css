@@ -397,3 +397,18 @@ picture { display: contents; }
 
 /* hero render sits on a soft glow, no panel edge (owner, 2026-11-16) */
 .stage .dimbox img { mix-blend-mode: multiply; }
+
+/* ---------- the live 3D device on the stage (added by the script where it can run; see src/three) ---------- */
+.stage-gl { position: absolute; inset: -6% -12% -6% -18%; opacity: 0; pointer-events: none; touch-action: pan-y; cursor: grab; -webkit-mask-image: linear-gradient(90deg, transparent, var(--ink) 9%), linear-gradient(180deg, transparent, var(--ink) 6%, var(--ink) 94%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, transparent, var(--ink) 9%), linear-gradient(180deg, transparent, var(--ink) 6%, var(--ink) 94%, transparent); mask-composite: intersect; }
+.stage-gl.dragging { cursor: grabbing; }
+.stage-gl canvas { display: block; width: 100%; height: 100%; }
+.stage-marks { position: absolute; inset: 0; pointer-events: none; }
+.stage-marks .ring { position: absolute; left: 0; top: 0; box-shadow: var(--shadow-s); }
+.stage-lines { pointer-events: none; }
+.spine.gl .stage .fig[data-gl] { opacity: 0; visibility: hidden; transform: none; transition: opacity 500ms var(--ease), visibility 0s linear 500ms; }
+.spine.gl-rest .stage .fig-hero.on { visibility: visible; transition: none; }
+.scale-row { margin-top: clamp(32px, 5vw, 72px); }
+.scale-row img { width: 100%; }
+.scale-row figcaption { margin-top: 8px; text-align: center; margin-inline: auto; }
+.spine.gl .stage-layers { pointer-events: none; }
+.stage-gl, .spine.gl .stage .dims { -webkit-user-select: none; user-select: none; }
