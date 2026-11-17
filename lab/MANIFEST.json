@@ -1,8 +1,8 @@
 {
-  "imported_utc": "2026-11-17T08:16:17.956Z",
+  "imported_utc": "2026-11-17T08:34:52.810Z",
   "research_commit": "1aa04a9",
   "files": 125,
-  "bytes": 30455324,
+  "bytes": 30455667,
   "references_replaced": {
     "total": 60,
     "label": "internal study record",
@@ -15,26 +15,26 @@
   "leak_check": "passed",
   "list": [
     {
-      "path": "assets/SensorArea-CPIeTxUd.js",
+      "path": "assets/SensorArea-BEGQMvNa.js",
       "bytes": 140734,
-      "sha256": "3156021a8c588b9575758b3f623daf2ef90ea290470759049809b41f22ea2f70",
+      "sha256": "6531616e484b80d015ff525ae15b5e71bdd7b47afdd97c1cafc262810eb0460b",
       "references_replaced": 4
     },
     {
-      "path": "assets/SensorArea-DFPDqTwd.css",
-      "bytes": 34363,
-      "sha256": "cf9784b616d059b6f10bf16a10eed4df365b59dd146950fa53cfec846930119a"
+      "path": "assets/SensorArea-DwNk0GB4.css",
+      "bytes": 34416,
+      "sha256": "ca6f1d77019829e5778742e1dbb9e60377a51a582c5f1df7671853348e8add27"
     },
     {
-      "path": "assets/index-Boc1lK8Y.css",
-      "bytes": 29671,
-      "sha256": "fcba47324091cbaf8052e25b3ae9806582408e28769cb07201690dfc03c6f54a"
-    },
-    {
-      "path": "assets/index-C14mnSt6.js",
-      "bytes": 1342832,
-      "sha256": "d971f72003d4574dd69c745a070192a68223916c45a15a0ab7b9c5f7695959f5",
+      "path": "assets/index-BYEDajtm.js",
+      "bytes": 1343052,
+      "sha256": "9582a260e94fff66583715788c22ae71fa5d72af48c5ccd4bbab788bb250e1b5",
       "references_replaced": 1
+    },
+    {
+      "path": "assets/index-CC2iCvzo.css",
+      "bytes": 29741,
+      "sha256": "679926fd35049318be0e1b8e03276bfa6026530d9d5ddcc42b6fe9828e015a80"
     },
     {
       "path": "data/design/anatomy.json",
@@ -301,7 +301,7 @@
     {
       "path": "index.html",
       "bytes": 777,
-      "sha256": "dcae36118238390f00988c5e7e9f8a318e5d29964ec72d01fe70b354ddd8f2e4"
+      "sha256": "cedb62c5d1988d21e733d5732451dcc57e35a046778c092a6ea58496b0daa016"
     },
     {
       "path": "sensor-images/body__deepest_heart.webp",
