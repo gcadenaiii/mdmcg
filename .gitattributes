@@ -1,0 +1,5 @@
+# Finished builds and their checksums and patches: keep the exact bytes on every machine.
+v1/site/** -text
+platform/site/** -text
+*.patch -text
+SHA256SUMS -text
