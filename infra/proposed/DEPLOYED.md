@@ -26,3 +26,15 @@ pictures. Only the `current` link changed; no nginx change, no reload. Previous 
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261117T083926Z /var/www/mdmcg/current
+
+## 2026-11-18 03:27 UTC
+
+Release `20261118T032444Z` is live (`/var/www/mdmcg/current`), from commit `ea8f9f5` (master = redesign): one device look
+matched to the opening picture, lid contacts removed, redrawn diagrams, heartbeat lines leaving the device on the first
+screen, the 42 chests in cross-section, the opened device on Work with us. Only the `current` link changed; no nginx
+change, no reload. Checked after the switch: every page 200, unknown address 404, `/platform/health` 200, robots.txt
+still closed. Previous release kept: `20261117T160730Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261117T160730Z /var/www/mdmcg/current
