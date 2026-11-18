@@ -59,3 +59,15 @@ changed. Previous release kept: `20261118T060952Z`.
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261118T060952Z /var/www/mdmcg/current
+
+## 2026-11-18 14:58 UTC
+
+Release `20261118T145656Z` is live (`/var/www/mdmcg/current`): one colour per signal, the reading scene builds from one noisy beat to
+forty, A reading in the menu, Device page reordered, the model opens while seen, contact page at /contact/ (the old
+address redirects), bars at one pace, 42 chests drawn in with a count, closing band "Two signals from one heartbeat.",
+footer groups renamed. Uploaded as the site pages only; lab, v1 and platform were copied on the server from the previous
+release (identical, checked locally). Previous release kept: `20261118T070847Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261118T070847Z /var/www/mdmcg/current
