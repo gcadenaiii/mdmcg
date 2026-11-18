@@ -71,3 +71,17 @@ release (identical, checked locally). Previous release kept: `20261118T070847Z`.
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261118T070847Z /var/www/mdmcg/current
+
+## 2026-11-18 18:06 UTC
+
+Release `20261118T180414Z` is live (`/var/www/mdmcg/current`): email subject "mdmcg: a question about the device", an
+"Ask the founders about it" button at the end of the last home scene, Device and A reading, first-screen second button
+to A reading, phone fixes (scene dots and links to a scene land with the headline in view and add nothing to the Back
+button; the menu scrolls on a phone on its side), longer page titles, the field named once on Science, "typical chest"
+wording, favicon.ico. Uploaded as the site pages only; lab, v1 and platform were copied on the server from the previous
+release (identical, checked locally). Every link followed on the live site with `site/scripts/check-links.mjs`: 44
+destinations, 0 failures. Previous release kept: `20261118T145656Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261118T145656Z /var/www/mdmcg/current

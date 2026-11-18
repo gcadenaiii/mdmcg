@@ -15,7 +15,8 @@ function releaseParts() {
       const root = path.resolve('..', 'release');
       const newest = () => (existsSync(root) ? readdirSync(root).filter((d) => /^\d{8}T\d{6}Z$/.test(d) && existsSync(path.join(root, d, 'lab'))).sort().pop() : null);
       for (const part of ['lab', 'v1']) {
-        server.middlewares.use('/' + part, (req, res, next) => {
+        // put first in the stack: Astro's own handler would otherwise answer 404 before this is reached
+        server.middlewares.stack.unshift({ route: '/' + part, handle: (req, res, next) => {
           const rel = newest();
           if (!rel) return next();
           const base = path.join(root, rel, part);
@@ -25,7 +26,7 @@ function releaseParts() {
           if (!existsSync(file)) return next();
           res.setHeader('Content-Type', TYPES[path.extname(file).toLowerCase()] || 'application/octet-stream');
           res.end(readFileSync(file));
-        });
+        } });
       }
     },
   };
