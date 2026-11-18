@@ -38,3 +38,13 @@ still closed. Previous release kept: `20261117T160730Z`.
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261117T160730Z /var/www/mdmcg/current
+
+## 2026-11-18 06:11 UTC
+
+Release `20261118T060952Z` is live (`/var/www/mdmcg/current`): product-vision voice (present tense on the product pages), new second
+scene on Home ("The ECG shows half the picture", with the published comparison), new closing invitation. Only the
+`current` link changed. Previous release kept: `20261118T032444Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261118T032444Z /var/www/mdmcg/current
