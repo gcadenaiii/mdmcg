@@ -7,6 +7,7 @@ import Marks from '../components/Marks.astro';
 import WorkBand from '../components/WorkBand.astro';
 import LabLink from '../components/LabLink.astro';
 import { LAB } from '../config';
+import ProofBars from '../components/ProofBars.astro';
 ---
 <Base title="The science" description="The heart's currents make a voltage on the skin and a magnetic field outside the chest. Why the device records both.">
 
@@ -24,6 +25,19 @@ import { LAB } from '../config';
     <div class="phero-art">
       <FieldDiagram kind="strength" class="shot" alt="The outline of a modelled chest with a grid of squares coloured from white, weaker, to a warm red, stronger, showing where the computed heartbeat is strongest. A dashed line marks the heart behind." />
     </div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="h-half">
+  <div class="wrap split">
+    <div class="split-text" data-r>
+      <p class="chip">Why two signals</p>
+      <h2 id="h-half" class="h2">The ECG shows<span class="teal">half the picture.</span></h2>
+      <p class="lead">A normal ECG does not always rule out heart disease. The magnetic field shows the heart from a different side.</p>
+      <p>In a hospital study of 202 patients, a magnetic heart test found 68.4% of coronary disease. Exercise ECG found 40.5%. Adding the ECG to the magnetic test did not raise that figure further. <a class="textlink" href="https://doi.org/10.3233/CH-180485" rel="noopener">Shin and colleagues, 2019</a></p>
+      <p class="pull">That was a hospital test. mdmcg brings the same signal to your breastbone, in an ordinary room.</p>
+    </div>
+    <div class="split-media" data-r><ProofBars /></div>
   </div>
 </section>
 
@@ -70,7 +84,7 @@ import { LAB } from '../config';
       <p class="chip">Bodies differ</p>
       <h2 id="h-bodies" class="h2">No two chests<span class="teal">are alike.</span></h2>
       <p class="lead">Every heart in the trial gets the same settings, so the differences come from anatomy. They are large.</p>
-      <p>That is why the design is tried on many real chest shapes, not on one ideal body.</p>
+      <p>That is why the virtual trial uses many real chest shapes, not one ideal body.</p>
       <p><a class="textlink" href="/evidence/">The 42 chests</a></p>
     </div>
   </div>
@@ -126,7 +140,7 @@ import { LAB } from '../config';
       <p class="chip">When electrodes fail</p>
       <h2 id="h-fail" class="h2">The magnetic channel<span class="teal">does not touch the skin.</span></h2>
       <p class="lead">Electrodes can lift or dry out. A magnetic sensor has no contact to lose.</p>
-      <p>On a real recording with a modelled electrode failure, the ECG detector found 11 of 20 beats. The magnetic channel found all 20.</p>
+      <p>On a real recording with a modelled electrode failure, the ECG detector found 11 of 20 beats. The magnetic channel found all 20. The recording is a published one: both signals from one person, taken with a laboratory magnetometer in a shielded room.</p>
       <div class="actions"><LabLink class="btn btn-white" href={LAB.electrodes}>Open the electrode test</LabLink></div>
     </div>
     <div class="split-media" data-r>

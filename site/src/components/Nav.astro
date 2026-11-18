@@ -12,7 +12,7 @@ const path = Astro.url.pathname.replace(/\/?$/, '/');
       <ul>
         {NAV.map((l) => <li><a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a></li>)}
       </ul>
-      <a class="btn btn-primary btn-small" href="/work-with-us/" aria-current={path === '/work-with-us/' ? 'page' : undefined}>Work with us</a>
+      <a class="btn btn-primary btn-small" href="/work-with-us/" aria-current={path === '/work-with-us/' ? 'page' : undefined}>Contact</a>
     </nav>
   </div>
 </header>

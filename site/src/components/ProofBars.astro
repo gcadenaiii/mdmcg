@@ -1,0 +1,21 @@
+---
+// The published comparison behind "The ECG shows half the picture": two bars that fill when the scene comes into view.
+// Figures: Shin and colleagues, 2019 (doi 10.3233/CH-180485): 202 patients with suspected coronary artery disease,
+// coronary angiography as the reference; share of the disease found by the magnetic test and by exercise ECG.
+interface Props { class?: string; }
+const { class: cls } = Astro.props;
+---
+<div class:list={['proof', cls]} role="img" aria-label="Two bars from one hospital study of 202 patients: the magnetic heart test found 68.4 percent of coronary disease, exercise ECG found 40.5 percent.">
+  <p class="proof-k">Coronary disease found, same 202 patients</p>
+  <div class="proof-row">
+    <span class="proof-l">Magnetic heart test</span>
+    <span class="proof-t"><span class="proof-f" style="--w:68.4%"></span></span>
+    <span class="proof-v">68.4<small>%</small></span>
+  </div>
+  <div class="proof-row proof-dim">
+    <span class="proof-l">Exercise ECG</span>
+    <span class="proof-t"><span class="proof-f" style="--w:40.5%"></span></span>
+    <span class="proof-v">40.5<small>%</small></span>
+  </div>
+  <p class="proof-s">A hospital study. Shin and colleagues, 2019.</p>
+</div>

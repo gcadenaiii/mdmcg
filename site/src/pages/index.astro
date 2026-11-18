@@ -11,10 +11,12 @@ import LabLink from '../components/LabLink.astro';
 import HeroBeat from '../components/HeroBeat.astro';
 import Chests42 from '../components/Chests42.astro';
 import { HERO_BEAT, LAB, TEAM } from '../config';
+import ProofBars from '../components/ProofBars.astro';
+import Traces from '../components/Traces.astro';
 ---
 <Base title="mdmcg" description="A small sensor for the breastbone that records the heart's magnetic signal alongside its ECG.">
 
-<!-- ============ THE SPINE: five scenes, one stage. Why (scenes 1 and 2), then the device (scenes 3 to 5).
+<!-- ============ THE SPINE: six scenes, one stage. Why (scenes 1 and 2), the device (scenes 3 to 5), a reading (scene 6).
      The order of the scenes here must match SCENES in src/three/stage.js. ============ -->
 <div class="wrap spine" id="spine">
 
@@ -55,17 +57,13 @@ import { HERO_BEAT, LAB, TEAM } from '../config';
     <div class="scene-text">
       <p class="chip">Why two signals</p>
       <h2 id="h-why" class="h2">The ECG shows<span class="teal">half the picture.</span></h2>
-      <p class="lead">A normal ECG does not always mean a quiet heart. Every beat also makes a magnetic field outside the chest, and it carries what the ECG reads poorly.</p>
-      <div class="stats">
-        <div class="stat"><b>68.4<small>%</small></b><span>of coronary disease found by the magnetic test</span></div>
-        <div class="stat stat-dim"><b>40.5<small>%</small></b><span>found by exercise ECG in the same 202 patients</span></div>
-      </div>
-      <p class="note">A published hospital study. <a class="textlink" href="https://doi.org/10.3233/CH-180485" rel="noopener">Shin and colleagues, 2019</a></p>
-      <p class="pull">mdmcg records both signals, from the same beat, wherever you are.</p>
+      <p class="lead">A normal ECG does not always rule out heart disease. Every beat also makes a magnetic field outside the chest, and it shows the heart from a different side.</p>
+      <p>In a hospital study of 202 patients, a magnetic heart test found 68.4% of coronary disease. Exercise ECG found 40.5%. <a class="textlink" href="https://doi.org/10.3233/CH-180485" rel="noopener">Shin and colleagues, 2019</a></p>
+      <p class="pull">That was a hospital test. mdmcg brings the same signal to your breastbone, in an ordinary room.</p>
       <p><a class="textlink" href="/science/">Read the science</a></p>
     </div>
     <figure class="fig" data-kind="shot">
-      <div class="fig-media"><FieldDiagram kind="field" alt="The outline of a modelled chest with a grid of coloured squares over the heart: teal where the computed field points into the chest, a warm red where it points out of the chest. A dashed line marks the heart behind." /></div>
+      <div class="fig-media"><ProofBars /></div>
     </figure>
   </section>
 
@@ -108,10 +106,23 @@ import { HERO_BEAT, LAB, TEAM } from '../config';
         <div class="stat stat-dim"><b>1<small>cm</small></b><span>to the right costs 1.4 times the beats in the virtual trial</span></div>
       </div>
       <p>The place is a zone, not a point: forgiving toward the wearer's left, and a little up or down.</p>
-      <p><a class="textlink" href="/reading/">How a reading goes</a></p>
     </div>
     <figure class="fig" data-kind="shot">
       <div class="fig-media"><ChestDiagram variant="zone" alt="The lower breastbone of a chest outlined from a scan, seen from the front: a mark where the bone stops, 3 cm up from it the core of the device on the midline, and a dashed outline of the zone it may sit in, which reaches toward the wearer's left." /></div>
+    </figure>
+  </section>
+
+  <section class="scene" id="record" data-scene="A reading" aria-labelledby="h-record">
+    <div class="scene-text">
+      <p class="chip">A reading</p>
+      <h2 id="h-record" class="h2">Sit still.<span class="teal">Forty beats. One record.</span></h2>
+      <p class="lead">The ECG marks each beat. The magnetic beats are lined up on that mark and added, until the faint signal is clear.</p>
+      <p class="pull">Two signals from the same heartbeats, on one clock. A record for you and your doctor.</p>
+      <p class="note">About 40 beats for the middle person in the virtual trial.</p>
+      <p><a class="textlink" href="/reading/">How a reading goes</a></p>
+    </div>
+    <figure class="fig" data-kind="shot">
+      <div class="fig-media"><Traces label="One record: the ECG above and the magnetic signal below, from the same computed heartbeat on the same clock." /></div>
     </figure>
   </section>
 
@@ -142,6 +153,7 @@ import { HERO_BEAT, LAB, TEAM } from '../config';
         <p>The wearing place is a zone, not a point, with 3 cm of freedom to the wearer's left.</p>
       </div>
     </div>
+    <div class="actions" data-r><a class="btn btn-white" href="/evidence/">Read the evidence</a></div>
   </div>
 </section>
 
@@ -160,42 +172,6 @@ import { HERO_BEAT, LAB, TEAM } from '../config';
       <h2 id="h-ht" class="h2">A heart you can stop<span class="teal">and look inside.</span></h2>
       <p class="lead">The Heart Twin is a computer model: a simulated heart in a scanned chest. It shows one beat spreading, and the two signals it makes.</p>
       <div class="actions"><a class="btn btn-primary" href="/heart-twin/">How the Heart Twin works</a><LabLink href={LAB.watch}>Open the Heart Twin</LabLink></div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ EVIDENCE ============ -->
-<section class="band" id="evidence" aria-labelledby="h-ev">
-  <div class="wrap know">
-    <div class="know-head" data-r>
-      <p class="chip">Evidence</p>
-      <h2 id="h-ev" class="h2">The evidence,<span class="teal">set out in full.</span></h2>
-      <p class="lead">The figures for size, place and fit come from one simulation study on 42 scanned chests. The evidence page sets it out, and the full research tools are open to try.</p>
-      <div class="actions"><a class="btn btn-primary" href="/evidence/">Read the evidence</a></div>
-    </div>
-    <div class="know-cards">
-      <div class="kcard" data-r>
-        <p class="kcard-n">21<small>to</small>59</p>
-        <Marks n={42} women={25} label="42 scanned chests: 25 women shown as circles, 17 men shown as squares." />
-        <h3>Ages in the scanned set</h3>
-        <p>25 women and 17 men. Real anatomy from CT scans, with one heart model in every chest.</p>
-      </div>
-      <div class="kcard kcard-open" data-r>
-        <p class="kcard-n">89</p>
-        <Marks n={89} open label="89 older chests, drawn as empty marks: the run is in progress." />
-        <h3>Older chests, next</h3>
-        <p>A second run on 89 older chests, aged 61 to 94, is under way.</p>
-      </div>
-      <div class="kcard kcard-wide" data-r>
-        <div>
-          <h3>What the study uses</h3>
-          <ul><li>Real chest shapes from CT scans</li><li>The same heart model in every chest</li><li>The sensor resting on the skin</li></ul>
-        </div>
-        <div>
-          <h3>What it compares</h3>
-          <ul><li>Places to wear the device</li><li>Sensor layouts and sizes</li><li>One body against another</li></ul>
-        </div>
-      </div>
     </div>
   </div>
 </section>

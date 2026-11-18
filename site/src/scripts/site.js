@@ -67,6 +67,7 @@ const spines = Array.from(document.querySelectorAll('.spine')).map((spine) => {
     return f;
   });
   stage.hidden = false;
+  if (window.innerWidth <= 900) spine.insertBefore(stage, scenes[0]); // phone: the picture comes before the headline on the opening screen
   spine.classList.add('live');
   spine.style.setProperty('--n', scenes.length);
   return { stage, scenes, figs, links: Array.from(dots.querySelectorAll('a')), current: -1 };

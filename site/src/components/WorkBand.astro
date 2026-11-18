@@ -3,19 +3,19 @@
 import EmailButton from './EmailButton.astro';
 import { HAS_CONTACT } from '../contact';
 interface Props { title?: string; }
-const { title = 'Build the future of heart sensing with us.' } = Astro.props;
+const { title = "The heart's second signal, wherever you are." } = Astro.props;
 ---
 <section class="band band-teal" aria-labelledby="h-work">
   <div class="wrap">
     <div class="close" data-r>
       <div class="close-head">
         <h2 id="h-work" class="h2">{title}</h2>
-        <p class="close-for">For sensor makers, people with unshielded recordings, clinicians and funders.</p>
+        <p class="close-for">Questions, ideas, introductions. The founders read every email.</p>
       </div>
       <div class="close-cta">
         <EmailButton />
         {HAS_CONTACT && <p>Opens your email program. Nothing is stored on this site.</p>}
-        <a class="onteal-link" href="/work-with-us/">Who we want to hear from</a>
+        <a class="onteal-link" href="/work-with-us/">Contact</a>
       </div>
     </div>
   </div>

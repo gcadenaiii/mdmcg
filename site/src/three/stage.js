@@ -19,6 +19,7 @@ const SCENES = [
   { ...VIEWS.open, explode: 1, family: 0, gl: 1, lines: 0 },
   { ...VIEWS.wing, az: VIEWS.wing.az + TAU, explode: 0, family: 0, gl: 1, lines: 0 },
   { ...VIEWS.wing, az: VIEWS.wing.az + TAU + 0.25, dist: VIEWS.wing.dist * 1.5, explode: 0, family: 0, gl: 0, lines: 0 },
+  { ...VIEWS.wing, az: VIEWS.wing.az + TAU + 0.5, dist: VIEWS.wing.dist * 1.5, explode: 0, family: 0, gl: 0, lines: 0 },
 ];
 /* the scene that shows the four options, and the scroll position past which the four are laid on the ground:
    inside the scene before it, whose picture covers the stage (gl: 0) */

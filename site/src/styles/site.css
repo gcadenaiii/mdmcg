@@ -432,3 +432,20 @@ picture { display: contents; }
 .chests-hearts path { stroke: rgba(240, 122, 96, 0.62); stroke-width: 1; fill: rgba(240, 122, 96, 0.035); }
 .chests-device { fill: #5FD0D9; }
 @media (max-width: 900px) { .score-n { flex-direction: column; align-items: flex-start; gap: 28px; } .chests { flex: none; width: 100%; max-width: 360px; } }
+
+/* the published comparison: two bars that fill when their scene is shown */
+.proof { width: 100%; max-width: 520px; margin-inline: auto; display: grid; gap: 26px; }
+.proof-k { font-size: 15px; color: var(--ink-3); margin: 0 0 4px; }
+.proof-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 20px; align-items: end; }
+.proof-l { font-size: 17px; color: var(--ink); grid-column: 1; }
+.proof-v { grid-column: 2; grid-row: 1 / span 2; font-size: 56px; font-weight: 300; line-height: 0.9; letter-spacing: -0.02em; color: var(--teal); }
+.proof-v small { font-size: 0.4em; margin-left: 4px; color: var(--ink-3); }
+.proof-t { grid-column: 1; height: 14px; border-radius: 7px; background: var(--line); overflow: hidden; }
+.proof-f { display: block; height: 100%; width: var(--w); border-radius: 7px; background: var(--teal); transition: width 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) 200ms; }
+.proof-dim .proof-f { background: var(--ink-3); opacity: 0.45; }
+.proof-dim .proof-v { color: var(--ink-3); }
+.proof-s { font-size: 14px; color: var(--ink-3); margin: 0; }
+.spine.live .fig:not(.on) .proof-f { width: 0; }
+@media (max-width: 900px) {
+  .proof { gap: 16px; } .proof-k { display: none; } .proof-l { font-size: 15px; } .proof-v { font-size: 40px; } .proof-t { height: 10px; }
+}
