@@ -27,7 +27,7 @@ import BeatBuild from '../components/BeatBuild.astro';
       <p class="lead">A small device for the breastbone. It records the heart's magnetic signal alongside its ECG, from the same beat.</p>
       <div class="actions">
         <a class="btn btn-primary" href="/device/">See the device</a>
-        <LabLink href={LAB.home}>Open the research tools</LabLink>
+        <a class="btn btn-ghost" href="/reading/">How a reading goes</a>
       </div>
     </div>
     <figure class="fig fig-hero" data-kind="render">
@@ -59,7 +59,7 @@ import BeatBuild from '../components/BeatBuild.astro';
       <h2 id="h-why" class="h2">The ECG shows<span class="teal">half the picture.</span></h2>
       <p class="lead">A normal ECG does not always rule out heart disease. Every beat also makes a magnetic field outside the chest, and it shows the heart from a different side.</p>
       <p class="pull">That was a hospital test. mdmcg brings the same signal to your breastbone, in an ordinary room.</p>
-      <p><a class="textlink" href="/science/">Read the science</a></p>
+      <p><a class="textlink" href="/science/#room">Read the science</a></p>
     </div>
     <figure class="fig" data-kind="shot">
       <div class="fig-media"><ProofBars /></div>
@@ -114,8 +114,11 @@ import BeatBuild from '../components/BeatBuild.astro';
       <h2 id="h-record" class="h2">Sit still.<span class="teal">Forty beats. One record.</span></h2>
       <p class="lead">One beat is too faint to read. The ECG marks each beat, and the magnetic beats are lined up on that mark and added, until the signal is clear.</p>
       <p class="pull">Two signals from the same heartbeats, on one clock. A record for you and your doctor.</p>
-      <p class="note">About 8 beats for the main spike, about 40 for the slower wave that follows: the middle person in the virtual trial.</p>
-      <p><a class="textlink" href="/reading/">How a reading goes</a></p>
+      <p class="note">About 8 beats for the main spike, about 40 for the slower wave that follows, for a typical chest in the virtual trial.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/contact/">Ask the founders about it</a>
+        <a class="textlink" href="/reading/">How a reading goes</a>
+      </div>
     </div>
     <figure class="fig" data-kind="shot">
       <div class="fig-media"><BeatBuild /></div>

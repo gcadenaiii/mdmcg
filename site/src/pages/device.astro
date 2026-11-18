@@ -7,7 +7,7 @@ import WorkBand from '../components/WorkBand.astro';
 import LabLink from '../components/LabLink.astro';
 import { LAB } from '../config';
 ---
-<Base title="The device" description="A small stiff core with six magnetic sensors, two soft ECG wings, and its place on the breastbone.">
+<Base title="The device: six magnetic sensors, its own ECG" description="A small stiff core with six magnetic sensors, two soft ECG wings, and its place on the breastbone.">
 
 <section class="phero" aria-labelledby="h-page">
   <div class="wrap phero-in">
@@ -131,7 +131,10 @@ import { LAB } from '../config';
           <div class="stat stat-dim"><b>1<small>cm</small></b><span>to the right costs 1.4 times the beats in the virtual trial</span></div>
         </div>
         <p>In the virtual trial the place is forgiving toward the wearer's left, and a little up or down. On the scans, the middle gap under the core at this place is about 5 mm.</p>
-        <p><a class="textlink" href="/reading/">How a reading goes</a></p>
+        <div class="actions">
+          <a class="btn btn-primary" href="/contact/">Ask the founders about it</a>
+          <a class="textlink" href="/reading/">How a reading goes</a>
+        </div>
       </div>
     </div>
   </div>

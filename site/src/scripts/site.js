@@ -64,6 +64,7 @@ const spines = Array.from(document.querySelectorAll('.spine')).map((spine) => {
     a.href = '#' + sc.id;
     a.setAttribute('aria-label', 'Scene ' + (i + 1) + ' of ' + scenes.length + ': ' + sc.dataset.scene);
     a.dataset.label = sc.dataset.scene;
+    a.addEventListener('click', (e) => { e.preventDefault(); goScene(spine, sc); history.replaceState(null, '', '#' + sc.id); });
     li.appendChild(a); dots.appendChild(li);
     return f;
   });
@@ -73,6 +74,17 @@ const spines = Array.from(document.querySelectorAll('.spine')).map((spine) => {
   spine.style.setProperty('--n', scenes.length);
   return { stage, scenes, figs, links: Array.from(dots.querySelectorAll('a')), current: -1 };
 }).filter(Boolean);
+
+/* Bring a scene's text into view. Wide: its top a little below the bar. Phone: just under the picture pinned at the top,
+   so the headline is not hidden behind it. */
+function goScene(spine, sc) {
+  const stage = spine.querySelector('.stage');
+  const phone = window.innerWidth <= 900;
+  const first = sc === spine.querySelector('.scene');
+  const under = phone && !first ? stage.getBoundingClientRect().height + (bar ? bar.offsetHeight : 0) - 12 : (bar ? bar.offsetHeight : 0) + 8;
+  const y = first ? 0 : sc.getBoundingClientRect().top + window.scrollY - under;
+  window.scrollTo({ top: Math.max(0, y), behavior: reduce ? 'auto' : 'smooth' });
+}
 
 function show(s, i) {
   if (i === s.current) return;
@@ -106,6 +118,12 @@ function onScroll() { if (queued) return; queued = true; requestAnimationFrame((
 window.addEventListener('scroll', onScroll, { passive: true });
 window.addEventListener('resize', onScroll);
 tick();
+// a link straight to a scene (for example /#record): land the same way a dot does
+if (location.hash.length > 1) {
+  const sc = document.getElementById(location.hash.slice(1));
+  const sp = sc && sc.classList.contains('scene') && spines.find((s) => s.scenes.includes(sc));
+  if (sp) window.addEventListener('load', () => setTimeout(() => goScene(sp.stage.closest('.spine'), sc), 60));
+}
 
 // 5. the live 3D device. The stills stay as they are unless all of this holds: motion allowed, a wide screen,
 // no data saving, a machine with some memory and cores, and WebGL 2 on real graphics hardware.

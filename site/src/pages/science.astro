@@ -9,14 +9,14 @@ import LabLink from '../components/LabLink.astro';
 import { LAB } from '../config';
 import ProofBars from '../components/ProofBars.astro';
 ---
-<Base title="The science" description="The heart's currents make a voltage on the skin and a magnetic field outside the chest. Why the device records both.">
+<Base title="The science: the heart's magnetic signal beside its ECG" description="The heart's currents make a voltage on the skin and a magnetic field outside the chest. Why the device records both.">
 
 <section class="phero" aria-labelledby="h-page">
   <div class="wrap phero-in">
     <div class="phero-text">
       <p class="chip">The science</p>
       <h1 id="h-page" class="display display-m">A second signal<span class="teal">from the same heartbeat.</span></h1>
-      <p class="lead">Every heartbeat is an electric current. That current makes a voltage on the skin, the ECG, and a magnetic field outside the chest.</p>
+      <p class="lead">Every heartbeat is an electric current. That current makes a voltage on the skin, the ECG, and a magnetic field outside the chest. Recording that field is called magnetocardiography, MCG for short.</p>
       <div class="actions">
         <a class="btn btn-primary" href="/heart-twin/">Meet the Heart Twin</a>
         <a class="btn btn-ghost" href="/device/">See the device</a>
@@ -34,7 +34,7 @@ import ProofBars from '../components/ProofBars.astro';
       <p class="chip">In hospital</p>
       <h2 id="h-half" class="h2">The magnetic test<span class="teal">found more.</span></h2>
       <p class="lead">In a hospital study of 202 patients, a magnetic heart test found 68.4% of coronary disease. Exercise ECG found 40.5%.</p>
-      <p><a class="textlink" href="https://doi.org/10.3233/CH-180485" rel="noopener">Shin and colleagues, 2019</a></p>
+      <p><a class="textlink" href="https://doi.org/10.3233/CH-180485" target="_blank" rel="noopener">Shin and colleagues, 2019</a></p>
     </div>
     <div class="split-media" data-r><ProofBars /></div>
   </div>
@@ -96,7 +96,7 @@ import ProofBars from '../components/ProofBars.astro';
       <h2 id="h-avg" class="h2">One beat is faint.<span class="teal">Many are clear.</span></h2>
       <p class="lead">It sits still and adds up beats. Its own ECG marks each one, and the magnetic beats are lined up on that mark.</p>
       <div class="stats">
-        <div class="stat"><b>8<small>beats</small></b><span>is about what the main spike needs for the middle person in the virtual trial</span></div>
+        <div class="stat"><b>8<small>beats</small></b><span>is about what the main spike needs for a typical chest in the virtual trial</span></div>
         <div class="stat stat-dim"><b>40<small>beats</small></b><span>is about what the slower recovery wave needs</span></div>
       </div>
       <p><a class="textlink" href="/reading/">How a reading goes</a></p>
@@ -107,7 +107,7 @@ import ProofBars from '../components/ProofBars.astro';
   </div>
 </section>
 
-<section class="band band-tint" aria-labelledby="h-room">
+<section class="band band-tint" id="room" aria-labelledby="h-room">
   <div class="wrap">
     <header class="sec-head" data-r>
       <p class="chip">Outside a shielded room</p>

@@ -9,7 +9,7 @@ import WorkBand from '../components/WorkBand.astro';
 import LabLink from '../components/LabLink.astro';
 import { LAB } from '../config';
 ---
-<Base title="The evidence" description="One virtual trial of the device on 42 real, scanned chests: what was compared, what was planned in advance, and what it found.">
+<Base title="The evidence: one virtual trial on 42 scanned chests" description="One virtual trial of the device on 42 real, scanned chests: what was compared, what was planned in advance, and what it found.">
 
 <section class="band band-night phero-night" aria-labelledby="h-page">
   <div class="wrap">
@@ -71,7 +71,7 @@ import { LAB } from '../config';
   <div class="wrap split">
     <div class="split-media" data-r>
       <div class="panel">
-        <p class="panel-k">Beats for the recovery wave, middle person, by place worn</p>
+        <p class="panel-k">Beats for the recovery wave, typical chest, by place worn</p>
         <Bars class="bars-big" label="Beats needed by place worn: 39.9 at the breastbone, 99.5 at the left chest pocket, 106.9 under the left breast." rows={[{ label: 'Breastbone', value: 39.9 }, { label: 'Chest pocket', value: 99.5 }, { label: 'Under left breast', value: 106.9 }]} />
         <p class="panel-cap">Six-sensor core, virtual trial on 42 scanned chests.</p>
       </div>
@@ -136,7 +136,7 @@ import { LAB } from '../config';
       <article class="tile" data-r>
         <p class="tile-k">Hospital study, 202 patients</p>
         <h3>68.4% against 40.5%.</h3>
-        <p>In patients with suspected coronary disease, a magnetic heart test found 68.4% of the disease. Exercise ECG found 40.5%. <a class="textlink" href="https://doi.org/10.3233/CH-180485" rel="noopener">Shin and colleagues, 2019</a></p>
+        <p>In patients with suspected coronary disease, a magnetic heart test found 68.4% of the disease. Exercise ECG found 40.5%. <a class="textlink" href="https://doi.org/10.3233/CH-180485" target="_blank" rel="noopener">Shin and colleagues, 2019</a></p>
       </article>
       <article class="tile" data-r>
         <p class="tile-k">Real recording, modelled electrode failure</p>
@@ -156,7 +156,7 @@ import { LAB } from '../config';
   <div class="wrap">
     <p id="h-vow" class="vow vow-top" data-r>We'll make the claim when the evidence does.</p>
     <div class="actions vow-actions" data-r>
-      <LabLink class="btn btn-white" href={LAB.trust}>See every check</LabLink>
+      <LabLink class="btn btn-white" href={LAB.trust}>Every check, pass or fail</LabLink>
       <a class="onteal-link" href="/heart-twin/">How the Heart Twin works</a>
     </div>
   </div>

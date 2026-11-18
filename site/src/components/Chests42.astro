@@ -2,7 +2,7 @@
 // Forty-two bodies, one device. Each scanned chest is cut across at the height where the device sits and laid over the others,
 // lined up on the skin at the front. The device (32 mm wide, 9 mm thick, drawn to the same scale) rests on all of them; the
 // heart of each chest lies at its own depth beneath it. Data: src/data/sections42.json (from the CT scans; see its note).
-// The chests are drawn in one by one when the band is first seen, while the numeral beside them counts up to the same number.
+// The chests are drawn in one by one when the band is first seen.
 import data from '../data/sections42.json';
 const d = (pts: number[][]) => pts.map((p, i) => `${i ? 'L' : 'M'}${p[0]} ${p[1]}`).join('') + 'Z';
 ---
@@ -13,22 +13,16 @@ const d = (pts: number[][]) => pts.map((p, i) => `${i ? 'L' : 'M'}${p[0]} ${p[1]
 </svg>
 
 <script>
-  // count the numeral up in step with the chests being drawn (55 ms apiece), once, when the artwork is first seen
+  // draw the chests in one by one (55 ms apiece), once, when the artwork is first seen
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.querySelectorAll<SVGSVGElement>('svg.chests').forEach((svg) => {
     const n = Number(svg.dataset.n);
-    const box = svg.closest('.score-n');
-    const num = box && box.querySelector('.numeral');
-    const node = num && Array.from(num.childNodes).find((c) => c.nodeType === 3 && c.textContent && c.textContent.trim() === String(n));
     if (reduce || !n) { svg.classList.add('drawn'); return; }
     new IntersectionObserver((es, io) => {
       for (const e of es) {
         if (!e.isIntersecting) continue;
         io.disconnect();
         svg.classList.add('drawn');
-        if (!node) return;
-        let k = 1; node.textContent = '1';
-        const t = window.setInterval(() => { k++; node.textContent = String(k); if (k >= n) window.clearInterval(t); }, 55);
       }
     }, { threshold: 0.35 }).observe(svg);
   });

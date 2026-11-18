@@ -320,7 +320,7 @@ picture { display: contents; }
   :root { --pad: 20px; --bar-h: 64px; --fs-body: 16px; --card-pad: 24px 22px 22px; }
   .band-teal::before, .hero-teal::before { display: none; }
   .menu-btn { display: inline-flex; }
-  .nav { display: none; position: absolute; left: 0; right: 0; top: var(--bar-h); background: var(--paper); border-bottom: 1px solid var(--line); padding: 8px 20px 28px; flex-direction: column; align-items: stretch; gap: 20px; box-shadow: var(--shadow-l); }
+  .nav { display: none; position: absolute; left: 0; right: 0; top: var(--bar-h); background: var(--paper); border-bottom: 1px solid var(--line); padding: 8px 20px 28px; flex-direction: column; align-items: stretch; gap: 20px; box-shadow: var(--shadow-l); max-height: calc(100dvh - var(--bar-h)); overflow-y: auto; overscroll-behavior: contain; }
   .nav.open { display: flex; }
   .nav ul { flex-direction: column; gap: 0; margin: 0; }
   .nav li a { font-size: 26px; font-weight: 300; letter-spacing: -0.01em; color: var(--ink); padding: 14px 0 10px; border-radius: 0; border-bottom: 1px solid var(--line); }

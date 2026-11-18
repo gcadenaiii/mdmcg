@@ -9,7 +9,7 @@ import WorkBand from '../components/WorkBand.astro';
 import LabLink from '../components/LabLink.astro';
 import { LAB } from '../config';
 ---
-<Base title="A reading" description="How a reading goes: take it from its case, place it on the breastbone, sit still, and let it average the beats.">
+<Base title="How a reading goes: sit still, forty beats" description="How a reading goes: take it from its case, place it on the breastbone, sit still, and let it average the beats.">
 
 <section class="phero" aria-labelledby="h-page">
   <div class="wrap phero-in">
@@ -53,7 +53,7 @@ import { LAB } from '../config';
       <h2 id="h-place" class="h2">One landmark.<span class="teal">One finger.</span></h2>
       <p class="lead">Slide a finger down the middle of your chest until the bone stops. Centre it 3 cm above that.</p>
       <p>In the virtual trial the place is a zone, not a point. It is forgiving toward the wearer's left, and a little up or down. Not toward the right.</p>
-      <p><a class="textlink" href="/device/">Where and how it is worn</a></p>
+      <p><a class="textlink" href="/device/#wear">Where and how it is worn</a></p>
     </div>
   </div>
 </section>
@@ -70,7 +70,7 @@ import { LAB } from '../config';
         <h3>The main spike.</h3>
         <p>The tall, sharp part of each beat. In the virtual trial it clears after a handful of beats.</p>
         <div class="pair">
-          <div><b>8</b><span>beats, about, for the middle person in the virtual trial</span></div>
+          <div><b>8</b><span>beats, about, for a typical chest in the virtual trial</span></div>
         </div>
       </article>
       <article class="tile" data-r>
@@ -78,7 +78,7 @@ import { LAB } from '../config';
         <h3>Adds the recovery wave.</h3>
         <p>The slower, smaller wave that follows the spike. In the virtual trial it asks for more beats.</p>
         <div class="pair">
-          <div><b>40</b><span>beats, about, for the middle person in the virtual trial</span></div>
+          <div><b>40</b><span>beats, about, for a typical chest in the virtual trial</span></div>
         </div>
       </article>
     </div>
@@ -95,7 +95,7 @@ import { LAB } from '../config';
     </div>
     <div class="split-media" data-r>
       <div class="panel">
-        <p class="panel-k">Beats for the recovery wave, middle person, by place worn</p>
+        <p class="panel-k">Beats for the recovery wave, typical chest, by place worn</p>
         <Bars class="bars-big" label="Beats needed by place worn: 39.9 at the breastbone, 99.5 at the left chest pocket, 106.9 under the left breast." rows={[{ label: 'Breastbone', value: 39.9 }, { label: 'Chest pocket', value: 99.5 }, { label: 'Under left breast', value: 106.9 }]} />
       </div>
     </div>
@@ -130,7 +130,10 @@ import { LAB } from '../config';
       <p class="chip">Afterwards</p>
       <h2 id="h-after" class="h2">Back in<span class="teal">its case.</span></h2>
       <p class="lead">The device charges in its case, ready for the next reading.</p>
-      <p><a class="textlink" href="/device/">More about the device</a></p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/contact/">Ask the founders about it</a>
+        <a class="textlink" href="/device/">More about the device</a>
+      </div>
     </div>
   </div>
 </section>

@@ -12,7 +12,7 @@ import { NOINDEX, SITE_NAME } from '../config';
 
 interface Props { title: string; description: string; }
 const { title, description } = Astro.props;
-const full = title === SITE_NAME ? `${SITE_NAME}: your heart, finally heard` : `${title} | ${SITE_NAME}`;
+const full = title === SITE_NAME ? `${SITE_NAME}: a wearable heart sensor. Your heart, finally heard` : `${title} | ${SITE_NAME}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 <!doctype html>
@@ -31,6 +31,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 <meta property="og:description" content={description}>
 <meta property="og:url" content={canonical}>
 <meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 </head>
 <body>
