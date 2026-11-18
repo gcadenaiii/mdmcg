@@ -74,6 +74,7 @@ export function mount(spine) {
     const b = document.createElement('span');
     b.className = 'ring r' + (p.i + 1);
     b.textContent = String(p.i + 1);
+    b.setAttribute('aria-hidden', 'true');
     marks.append(b);
     return b;
   });
@@ -97,6 +98,8 @@ export function mount(spine) {
     const f = ease(p - i);
     const b = SCENES[i + 1], a = b.enter ? { ...SCENES[i], ...b.enter } : SCENES[i];
     for (const k of KEYS) goal[k] = a[k] + (b[k] - a[k]) * f;
+    /* a device that opens does so late in the hand-over, while the model is already seen, so the visitor watches it open */
+    if (b.explode > a.explode) goal.explode = a.explode + (b.explode - a.explode) * ease(clamp((p - i - 0.68) / 0.32, 0, 1));
     /* gl runs 0..1 across a hand-over. Below one half only the picture is seen (fading out as gl rises), above one half
        only the model. The page puts the next scene's picture on the stage at 0.8 of the way (src/scripts/site.js), so a
        model that is leaving reaches one half exactly there. */

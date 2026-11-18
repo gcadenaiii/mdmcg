@@ -392,7 +392,7 @@ picture { display: contents; }
 .stage .dimbox img { mix-blend-mode: multiply; }
 
 /* ---------- the live 3D device on the stage (added by the script where it can run; see src/three) ---------- */
-.stage-gl { position: absolute; inset: -6% -12% -6% -18%; opacity: 0; pointer-events: none; touch-action: pan-y; cursor: grab; -webkit-mask-image: linear-gradient(90deg, transparent, var(--ink) 9%), linear-gradient(180deg, transparent, var(--ink) 6%, var(--ink) 94%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, transparent, var(--ink) 9%), linear-gradient(180deg, transparent, var(--ink) 6%, var(--ink) 94%, transparent); mask-composite: intersect; }
+.stage-gl { position: absolute; inset: -6% -12% -6% -18%; opacity: 0; pointer-events: none; touch-action: pan-y; -webkit-mask-image: linear-gradient(90deg, transparent, var(--ink) 9%), linear-gradient(180deg, transparent, var(--ink) 6%, var(--ink) 94%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, transparent, var(--ink) 9%), linear-gradient(180deg, transparent, var(--ink) 6%, var(--ink) 94%, transparent); mask-composite: intersect; }
 .stage-gl.dragging { cursor: grabbing; }
 .stage-gl canvas { display: block; width: 100%; height: 100%; }
 .stage-marks { position: absolute; inset: 0; pointer-events: none; }
@@ -449,3 +449,24 @@ picture { display: contents; }
 @media (max-width: 900px) {
   .proof { gap: 16px; } .proof-k { display: none; } .proof-l { font-size: 15px; } .proof-v { font-size: 40px; } .proof-t { height: 10px; }
 }
+
+/* one colour for each signal on every page: the magnetic signal is teal, the ECG is ink (see also .trace in pages.css) */
+.trace { display: block; width: 100%; height: auto; overflow: visible; }
+.trace path { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.trace .t-ecg { stroke: var(--ink); stroke-width: 2.5; }
+.trace .t-mcg { stroke: var(--teal); stroke-width: 2.5; }
+.trace .t-base { stroke: var(--line); stroke-width: 1; }
+.trace .t-mark { stroke: var(--teal); stroke-width: 1.5; stroke-dasharray: 3 5; }
+.trace text { font-family: var(--sans); font-size: 22px; fill: var(--ink-2); }
+.trace .t-key { font-weight: 500; fill: var(--ink); }
+/* the reading scene: the magnetic line is grey while beats are still being added, teal when the record is made */
+.build .b-line { stroke: var(--ink-3); stroke-width: 1.8; transition: stroke 400ms ease-out; }
+.build.done .b-line, html:not(.reveal) .build .b-line { stroke: var(--teal); stroke-width: 2.5; }
+.build .b-count { font-variant-numeric: tabular-nums; fill: var(--teal); font-weight: 500; }
+.build .b-note { font-size: 24px; fill: var(--ink); opacity: 0; transition: opacity 500ms ease-out; }
+.build.done .b-note { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .build .b-line { stroke: var(--teal); stroke-width: 2.5; } .build .b-note { opacity: 1; } }
+.verdicts + .actions { margin-top: 44px; }
+.menu-ico, .menu-ico::before { transition: transform 180ms ease-out; }
+.menu-btn[aria-expanded="true"] .menu-ico { transform: rotate(45deg); }
+.menu-btn[aria-expanded="true"] .menu-ico::before { transform: rotate(-90deg); }

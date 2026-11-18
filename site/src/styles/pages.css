@@ -104,15 +104,15 @@
 /* traces and drawings */
 .trace { display: block; width: 100%; height: auto; overflow: visible; }
 .trace path { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
-.trace .t-ecg { stroke: var(--teal); stroke-width: 2.5; }
-.trace .t-mcg { stroke: var(--ink); stroke-width: 2.5; }
+.trace .t-ecg { stroke: var(--ink); stroke-width: 2.5; }
+.trace .t-mcg { stroke: var(--teal); stroke-width: 2.5; }
 .trace .t-faint { stroke: var(--line-2); stroke-width: 1.2; }
 .trace .t-base { stroke: var(--line); stroke-width: 1; }
 .trace .t-mark { stroke: var(--teal); stroke-width: 1.5; stroke-dasharray: 3 5; }
 .trace text { font-family: var(--sans); font-size: 22px; fill: var(--ink-2); }
 .trace .t-key { font-weight: 500; fill: var(--ink); }
-.trace-night .t-mcg { stroke: var(--on-dark); }
-.trace-night .t-ecg { stroke: #5FD0D9; }
+.trace-night .t-mcg { stroke: #5FD0D9; }
+.trace-night .t-ecg { stroke: var(--on-dark); }
 .trace-night .t-base { stroke: var(--night-line); }
 .trace-night text { fill: var(--on-dark-2); }
 .trace-night .t-key { fill: var(--on-dark); }

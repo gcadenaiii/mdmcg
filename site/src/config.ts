@@ -11,6 +11,7 @@ export const SITE_TAGLINE = 'Two signals from one heartbeat.';
 
 export const NAV = [
   { href: '/device/', label: 'Device' },
+  { href: '/reading/', label: 'A reading' },
   { href: '/science/', label: 'Science' },
   { href: '/heart-twin/', label: 'Heart Twin' },
   { href: '/evidence/', label: 'Evidence' },

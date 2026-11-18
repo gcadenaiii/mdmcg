@@ -4,7 +4,7 @@ import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 const out = process.argv[2];
 const base = process.env.SHOTS_BASE || 'https://mdmcg.com';
-const pages = ['/', '/device/', '/science/', '/reading/', '/heart-twin/', '/sensors/', '/evidence/', '/team/', '/work-with-us/'];
+const pages = ['/', '/device/', '/science/', '/reading/', '/heart-twin/', '/sensors/', '/evidence/', '/team/', '/contact/'];
 const b = await chromium.launch({ channel: 'msedge', headless: true });
 const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
 for (const u of pages) {

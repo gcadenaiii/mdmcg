@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import EmailButton from '../components/EmailButton.astro';
+import { HAS_CONTACT } from '../contact';
+---
+<Base title="Contact" description="Talk to the founders of mdmcg, the wearable that records the heart's magnetic signal alongside its ECG.">
+
+<section class="hero-teal" aria-labelledby="h-page">
+  <div class="wrap hero-teal-in">
+    <p class="chip">Contact</p>
+    <h1 id="h-page" class="display">Talk to us.</h1>
+    <p class="lead">The three founders read every email and answer it.</p>
+    <div class="close-cta" id="contact">
+      {HAS_CONTACT ? <EmailButton /> : <a class="btn btn-white" href="/team/">Meet the founders</a>}
+      {HAS_CONTACT && <p>Opens your email program. Nothing is stored on this site.</p>}
+    </div>
+  </div>
+</section>
+
+<section class="band band-tint" aria-labelledby="h-open">
+  <div class="wrap">
+    <header class="sec-head" data-r>
+      <p class="chip">Before you write</p>
+      <h2 id="h-open" class="h2">Three places<span class="teal">to look.</span></h2>
+    </header>
+    <div class="tiles">
+      <article class="tile" data-r>
+        <p class="tile-k">The product</p>
+        <h3>The device</h3>
+        <p>One piece on the breastbone: six magnetic sensors, its own ECG on two soft wings, the battery inside.</p>
+        <a class="textlink" href="/device/">See the device</a>
+      </article>
+      <article class="tile" data-r>
+        <p class="tile-k">The proof</p>
+        <h3>The evidence</h3>
+        <p>One virtual trial of the device on 42 real, scanned chests, and what it found.</p>
+        <a class="textlink" href="/evidence/">Read the evidence</a>
+      </article>
+      <article class="tile" data-r>
+        <p class="tile-k">The people</p>
+        <h3>The team</h3>
+        <p>Three founders, all with Caltech in their story.</p>
+        <a class="textlink" href="/team/">Meet the team</a>
+      </article>
+    </div>
+  </div>
+</section>
+</Base>

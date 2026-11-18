@@ -31,11 +31,10 @@ import ProofBars from '../components/ProofBars.astro';
 <section class="band" aria-labelledby="h-half">
   <div class="wrap split">
     <div class="split-text" data-r>
-      <p class="chip">Why two signals</p>
-      <h2 id="h-half" class="h2">The ECG shows<span class="teal">half the picture.</span></h2>
-      <p class="lead">A normal ECG does not always rule out heart disease. The magnetic field shows the heart from a different side.</p>
-      <p>In a hospital study of 202 patients, a magnetic heart test found 68.4% of coronary disease. Exercise ECG found 40.5%. Adding the ECG to the magnetic test did not raise that figure further. <a class="textlink" href="https://doi.org/10.3233/CH-180485" rel="noopener">Shin and colleagues, 2019</a></p>
-      <p class="pull">That was a hospital test. mdmcg brings the same signal to your breastbone, in an ordinary room.</p>
+      <p class="chip">In hospital</p>
+      <h2 id="h-half" class="h2">The magnetic test<span class="teal">found more.</span></h2>
+      <p class="lead">In a hospital study of 202 patients, a magnetic heart test found 68.4% of coronary disease. Exercise ECG found 40.5%.</p>
+      <p><a class="textlink" href="https://doi.org/10.3233/CH-180485" rel="noopener">Shin and colleagues, 2019</a></p>
     </div>
     <div class="split-media" data-r><ProofBars /></div>
   </div>
@@ -141,7 +140,6 @@ import ProofBars from '../components/ProofBars.astro';
       <h2 id="h-fail" class="h2">The magnetic channel<span class="teal">does not touch the skin.</span></h2>
       <p class="lead">Electrodes can lift or dry out. A magnetic sensor has no contact to lose.</p>
       <p>On a real recording with a modelled electrode failure, the ECG detector found 11 of 20 beats. The magnetic channel found all 20. The recording is a published one: both signals from one person, taken with a laboratory magnetometer in a shielded room.</p>
-      <div class="actions"><LabLink class="btn btn-white" href={LAB.electrodes}>Open the electrode test</LabLink></div>
     </div>
     <div class="split-media" data-r>
       <div class="specs specs-2">

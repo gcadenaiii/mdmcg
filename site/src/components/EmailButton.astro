@@ -2,9 +2,9 @@
 // An email button. The address comes from SITE_CONTACT_EMAIL at build time and is never written to the page in plain text:
 // it is stored scrambled in data-m and the mailto link, with this button's subject line, is assembled on click
 // (see src/contact.ts and scripts/site.js).
-// If the variable is unset the button is an ordinary link to `fallback` (the contact block of /work-with-us/).
+// If the variable is unset the button is an ordinary link to `fallback` (the contact block of /contact/).
 import { HAS_CONTACT, CONTACT_SCRAMBLED } from '../contact';
 interface Props { label?: string; class?: string; subject?: string; fallback?: string; }
-const { label = 'Email us', class: cls = 'btn btn-white', subject = 'mdmcg: working together', fallback = '/work-with-us/#contact' } = Astro.props;
+const { label = 'Email us', class: cls = 'btn btn-white', subject = 'mdmcg: working together', fallback = '/contact/#contact' } = Astro.props;
 ---
 <a class={cls} href={fallback} data-m={CONTACT_SCRAMBLED} data-s={HAS_CONTACT ? subject : undefined}>{label}</a>
