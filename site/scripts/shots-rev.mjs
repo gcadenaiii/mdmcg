@@ -6,7 +6,7 @@ import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 
 const [out, tag, ...jobs] = process.argv.slice(2);
-const base = 'http://127.0.0.1:5174';
+const base = process.env.SHOTS_BASE || 'http://127.0.0.1:5174';
 const PATHS = { home: '/', device: '/device/', science: '/science/', reading: '/reading/', 'heart-twin': '/heart-twin/', sensors: '/sensors/', evidence: '/evidence/', team: '/team/', 'work-with-us': '/work-with-us/' };
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ channel: 'msedge', headless: true, args: ['--use-angle=d3d11', '--enable-gpu', '--ignore-gpu-blocklist'] });

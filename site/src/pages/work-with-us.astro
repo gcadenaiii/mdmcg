@@ -9,18 +9,18 @@ import { HAS_CONTACT } from '../contact';
 // The four groups. Each card has its own email button, with a subject line that tells the founders who is writing.
 const GROUPS = [
   { name: 'Sensor makers', text: 'Wind the wire sensor and make its drive with us.', label: 'Email us about sensors', subject: 'Sensor makers: the wire sensor' },
-  { name: 'Unshielded recordings', text: 'Share recordings taken close to the chest, outside a shielded room.', label: 'Email us about recordings', subject: 'Unshielded recordings' },
-  { name: 'Clinicians', text: 'Tell us what a short record of both signals would have to show to be worth looking at.', label: 'Email us as a clinician', subject: 'Clinicians: what the record should show' },
+  { name: 'Unshielded recordings', text: 'Bring recordings taken close to the chest, outside a shielded room, and test the twin against them with us.', label: 'Email us about recordings', subject: 'Unshielded recordings' },
+  { name: 'Clinicians', text: 'Shape the record with us. Tell us what a short record of both signals has to show.', label: 'Email us as a clinician', subject: 'Clinicians: what the record should show' },
   { name: 'Funders and reviewers', text: 'Read the evidence and meet the team on this site. The full research tools are open to try.', label: 'Email us about funding', subject: 'Funding and review' },
 ];
 ---
-<Base title="Work with us" description="Sensor makers, groups with unshielded recordings, clinicians, funders and reviewers: help us take the design from simulation to the bench.">
+<Base title="Work with us" description="Sensor makers, groups with unshielded recordings, clinicians, funders and reviewers: build the future of heart sensing with us.">
 
 <section class="hero-teal" aria-labelledby="h-page">
   <div class="wrap hero-teal-in">
     <p class="chip">Work with us</p>
-    <h1 id="h-page" class="display">Help us take it from simulation to the bench.</h1>
-    <p class="lead">The design is drawn, and tried in a virtual trial on 42 scanned chests. The next step is hardware, and we are looking for the people to take it with.</p>
+    <h1 id="h-page" class="display">Build the future of heart sensing with us.</h1>
+    <p class="lead">A wearable that records the heart's magnetic signal alongside its ECG. We are bringing together the people who will make it.</p>
     <div class="close-cta" id="contact">
       {HAS_CONTACT ? <EmailButton /> : <a class="btn btn-white" href="/team/">Meet the founders</a>}
       <p class="cta-who">The three founders read these emails and answer them. Say who you are, and what you make, measure or fund.</p>
@@ -51,7 +51,7 @@ const GROUPS = [
 <section class="band" aria-labelledby="h-what">
   <div class="wrap split split-wide-media">
     <div class="split-text" data-r>
-      <p class="chip">What you would work on</p>
+      <p class="chip">What you will work on</p>
       <h2 id="h-what" class="h2">One piece.<span class="teal">Six sensors.</span></h2>
       <p class="lead">Option 1: a small stiff core with six wound wire sensors, its own ECG on two soft wings, and the battery inside.</p>
       <div class="actions"><a class="btn btn-primary" href="/device/">See the device</a><a class="textlink" href="/sensors/">How we compared four options</a></div>
@@ -66,7 +66,7 @@ const GROUPS = [
   <div class="wrap">
     <header class="sec-head" data-r>
       <p class="chip">Before you write</p>
-      <h2 id="h-open" class="h2">Read the evidence.<span class="teal">Ask for the tools.</span></h2>
+      <h2 id="h-open" class="h2">Read the evidence.<span class="teal">Try the tools.</span></h2>
     </header>
     <div class="tiles">
       <article class="tile" data-r>
@@ -84,7 +84,7 @@ const GROUPS = [
       <article class="tile" data-r>
         <p class="tile-k">Research tool</p>
         <h3>Sensor tool</h3>
-        <p>Pick a body, a place and a device, and see what a reading would need.</p>
+        <p>Pick a body, a place and a device, and see what a reading needs.</p>
         <LabLink class="textlink" href={LAB.explore}>Try the sensor tool</LabLink>
       </article>
     </div>

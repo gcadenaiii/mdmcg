@@ -20,8 +20,10 @@ const RULES = [
   ['plain mailto or address', /mailto:|[\w.+-]+@[\w-]+\.[a-z]{2,}/i],
   // one name for the research tools (committee change brief, 2026-11-17)
   ['"the lab"', /\b(the|in the|into the) lab\b/i],
-  // sentences removed on 2026-11-17: they described a working device, or said more than the facts sheet supports
-  ['device described as working', /sensors read the heart|sensor reads the room|The device records and reports|The device sits still and adds up beats|The device lives in a charging case|The device charges in its case|Built for\s*(<[^>]+>\s*)*an ordinary room/i],
+  // 2026-11-17, owner's direction: the site speaks as the finished product, so the rule against describing a working device is withdrawn.
+  // What stays ruled out: figures from the virtual trial shown without their source, medical claims, and availability.
+  ['availability', /(buy now|order now|pre-?order|in stock|available now|add to cart)/i],
+  ['medical claim', /(detects?|screens? for|monitors? for|prevents?|treats?)\s+(heart|cardiac|coronary|arrhythm|atrial|ischemi|disease|attack)/i],
   ['"written down in advance" without the count', /<li>Results written down in advance/i],
   ['"39 of 42 rounds" without what followed', /39 of 42 rounds when each chest was left out in turn\.\s*<\/p>/i],
   ['"Checked against real recordings"', /Checked against\s*(<[^>]+>\s*)*real recordings|Every check is open/i],
