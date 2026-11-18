@@ -48,3 +48,14 @@ scene on Home ("The ECG shows half the picture", with the published comparison),
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261118T032444Z /var/www/mdmcg/current
+
+## 2026-11-18 07:10 UTC
+
+Release `20261118T070847Z` is live (`/var/www/mdmcg/current`): sensor study and four-options sections removed (one device), second
+scene with the bridge sentence and bars, a reading scene, evidence told once on Home, Contact in place of Work with us,
+the study on Science, heartbeat lines fade on scroll, phone picture before the headline. Only the `current` link
+changed. Previous release kept: `20261118T060952Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261118T060952Z /var/www/mdmcg/current
