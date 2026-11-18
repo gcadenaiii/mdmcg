@@ -470,3 +470,29 @@ picture { display: contents; }
 .menu-ico, .menu-ico::before { transition: transform 180ms ease-out; }
 .menu-btn[aria-expanded="true"] .menu-ico { transform: rotate(45deg); }
 .menu-btn[aria-expanded="true"] .menu-ico::before { transform: rotate(-90deg); }
+
+/* bars: same pace for both, so the grey one stops and the teal one runs on */
+.proof-rows { display: grid; gap: 26px; }
+.proof-f { transition: width var(--d, 1100ms) linear 250ms; }
+.proof-s a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.proof-s a:hover { color: var(--teal); }
+@media (max-width: 900px) { .proof-rows { gap: 16px; } }
+/* the 42 chests are drawn in one by one */
+html.reveal .chests path { opacity: 0; }
+html.reveal .chests-device { opacity: 0; transition: opacity 500ms ease-out 2400ms; }
+html.reveal .chests.drawn path { animation: chest-in 420ms ease-out calc(var(--i) * 55ms) forwards; }
+html.reveal .chests.drawn .chests-device { opacity: 1; }
+@keyframes chest-in { from { opacity: 0; } to { opacity: 1; } }
+.numeral { font-variant-numeric: tabular-nums; }
+/* the first screen's two dots keep time, about once a second, the magnetic one a moment behind */
+@media (prefers-reduced-motion: no-preference) {
+  .herobeat .hb-ecg-dot { animation: hb-in 500ms ease-out 2500ms backwards, hb-pulse 1050ms ease-in-out 3200ms infinite; }
+  .herobeat .hb-mcg-dot { animation: hb-in 500ms ease-out 2500ms backwards, hb-pulse 1050ms ease-in-out 3400ms infinite; }
+}
+@keyframes hb-pulse { 0%, 55%, 100% { r: 3.2px; opacity: 1; } 18% { r: 6px; opacity: 0.55; } }
+/* scene dots: larger targets, and the scene's name on hover or focus */
+.stage-dots a { position: relative; padding: 12px 7px; }
+.stage-dots a::after { content: attr(data-label); position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); white-space: nowrap; font-size: 13px; color: var(--ink-2);
+  background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px 3px; opacity: 0; pointer-events: none; transition: opacity 160ms ease-out; }
+.stage-dots a:hover::after, .stage-dots a:focus-visible::after { opacity: 1; }
+@media (max-width: 900px) { .stage-dots a { padding: 10px 5px; } .stage-dots a::after { display: none; } }

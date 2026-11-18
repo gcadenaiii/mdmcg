@@ -63,6 +63,7 @@ const spines = Array.from(document.querySelectorAll('.spine')).map((spine) => {
     const a = document.createElement('a');
     a.href = '#' + sc.id;
     a.setAttribute('aria-label', 'Scene ' + (i + 1) + ' of ' + scenes.length + ': ' + sc.dataset.scene);
+    a.dataset.label = sc.dataset.scene;
     li.appendChild(a); dots.appendChild(li);
     return f;
   });
