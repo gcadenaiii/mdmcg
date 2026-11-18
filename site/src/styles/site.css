@@ -408,6 +408,7 @@ picture { display: contents; }
 
 /* ---------- the heartbeat on the first screen: two thin lines that leave the device and become the two signals ---------- */
 .herobeat path { fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.herobeat { transition: opacity 180ms ease-out; }
 .herobeat .hb-ecg { stroke: var(--ink); }
 .herobeat .hb-mcg { stroke: var(--teal); }
 .herobeat .hb-ecg-dot { fill: var(--ink); }

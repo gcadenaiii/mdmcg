@@ -125,3 +125,11 @@ if (canRun3d()) {
   const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 300));
   if (document.readyState === 'complete') idle(start); else window.addEventListener('load', () => idle(start));
 }
+
+// 6. the heartbeat lines on the first screen fade out as soon as the page moves, so they never cross the next scene's words.
+const beat = document.querySelector('.herobeat');
+if (beat) {
+  const fade = () => { beat.style.opacity = String(Math.max(0, 1 - window.scrollY / 110)); };
+  window.addEventListener('scroll', fade, { passive: true });
+  fade();
+}

@@ -19,13 +19,11 @@ const SCENES = [
   { ...VIEWS.open, explode: 1, family: 0, gl: 1, lines: 0 },
   { ...VIEWS.wing, az: VIEWS.wing.az + TAU, explode: 0, family: 0, gl: 1, lines: 0 },
   { ...VIEWS.wing, az: VIEWS.wing.az + TAU + 0.25, dist: VIEWS.wing.dist * 1.5, explode: 0, family: 0, gl: 0, lines: 0 },
-  { ...VIEWS.family, az: VIEWS.family.az + TAU, explode: 0, family: 1, gl: 1, lines: 0,
-    enter: { ...VIEWS.family, az: VIEWS.family.az + TAU - 0.2, dist: VIEWS.family.dist * 1.12 } },
 ];
 /* the scene that shows the four options, and the scroll position past which the four are laid on the ground:
    inside the scene before it, whose picture covers the stage (gl: 0) */
 const FAMILY_AT = SCENES.findIndex((s) => s.family === 1);
-const FAMILY_FROM = FAMILY_AT - 1;
+const FAMILY_FROM = FAMILY_AT < 0 ? Infinity : FAMILY_AT - 1;   // no four-options scene on the page: the ground never changes
 const KEYS = ['tx', 'ty', 'tz', 'az', 'el', 'dist', 'fit', 'explode', 'family', 'gl', 'lines'];
 const ease = (t) => t * t * (3 - 2 * t);
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -252,6 +250,6 @@ export function mount(spine) {
   kick();
   /* the other three options are built when the browser is idle, well before the last scene */
   const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 600));
-  [1, 2, 3].forEach((i, n) => idle(() => { if (!dead) S.device(i); }, { timeout: 2500 + n * 600 }));
+  if (FAMILY_AT >= 0) [1, 2, 3].forEach((i, n) => idle(() => { if (!dead) S.device(i); }, { timeout: 2500 + n * 600 }));
   return { unmount, studio: S, /** how many pictures have been drawn so far */ frames: () => frames, /** keep the model on the first scene (for review pictures) */ hold(v) { hold = v; kick(); } };
 }

@@ -10,11 +10,11 @@ import WorkBand from '../components/WorkBand.astro';
 import LabLink from '../components/LabLink.astro';
 import HeroBeat from '../components/HeroBeat.astro';
 import Chests42 from '../components/Chests42.astro';
-import { HERO_BEAT, LAB, OPTIONS, TEAM } from '../config';
+import { HERO_BEAT, LAB, TEAM } from '../config';
 ---
 <Base title="mdmcg" description="A small sensor for the breastbone that records the heart's magnetic signal alongside its ECG.">
 
-<!-- ============ THE SPINE: six scenes, one stage. Why (scenes 1 and 2), then the design (scenes 3 to 6).
+<!-- ============ THE SPINE: five scenes, one stage. Why (scenes 1 and 2), then the device (scenes 3 to 5).
      The order of the scenes here must match SCENES in src/three/stage.js. ============ -->
 <div class="wrap spine" id="spine">
 
@@ -31,7 +31,7 @@ import { HERO_BEAT, LAB, OPTIONS, TEAM } from '../config';
     <figure class="fig fig-hero" data-kind="render">
       <div class="fig-media">
         <div class="dimbox">
-          <Pic name="device-hero" eager sizes="(max-width: 900px) 100vw, 60vw" alt="Option 1: a small white core with a teal ring and soft white wings that end in round electrode pads." />
+          <Pic name="device-hero" eager sizes="(max-width: 900px) 100vw, 60vw" alt="The device: a small white core with a teal ring and soft white wings that end in round electrode pads." />
           <svg class="dims" viewBox="0 0 830 523" aria-hidden="true" focusable="false">
             <g class="dim-line">
               <path d="M655 104 L574 326"/><path d="M645 100 L665 108"/><path d="M564 322 L584 330"/>
@@ -82,7 +82,7 @@ import { HERO_BEAT, LAB, OPTIONS, TEAM } from '../config';
       <p><a class="textlink" href="/device/">Inside the device</a></p>
     </div>
     <figure class="fig" data-kind="render" data-gl>
-      <div class="fig-media"><Pic name="device-open" alt="Option 1 opened into layers: lid, flexible sheet with the wings, a flat coil, the sensor board with upright wire sensors, the shell and a soft pad." /></div>
+      <div class="fig-media"><Pic name="device-open" alt="The device opened into layers: lid, flexible sheet with the wings, a flat coil, the sensor board with upright wire sensors, the shell and a soft pad." /></div>
     </figure>
   </section>
 
@@ -112,22 +112,6 @@ import { HERO_BEAT, LAB, OPTIONS, TEAM } from '../config';
     </div>
     <figure class="fig" data-kind="shot">
       <div class="fig-media"><ChestDiagram variant="zone" alt="The lower breastbone of a chest outlined from a scan, seen from the front: a mark where the bone stops, 3 cm up from it the core of the device on the midline, and a dashed outline of the zone it may sit in, which reaches toward the wearer's left." /></div>
-    </figure>
-  </section>
-
-  <section class="scene" id="options" data-scene="Four designs" aria-labelledby="h-options">
-    <div class="scene-text">
-      <p class="chip">Four designs</p>
-      <h2 id="h-options" class="h2">Four designs.<span class="teal">One we recommend.</span></h2>
-      <p class="lead">Each is a white shell with its own coloured ring. This site follows option 1.</p>
-      <p><a class="textlink" href="/device/#options">Compare the four</a></p>
-    </div>
-    <figure class="fig" data-kind="render" data-gl>
-      <div class="fig-media">
-        <ul class="quad">
-          {OPTIONS.map((o) => <li><Pic name={o.img} alt={o.alt} sizes="(max-width: 900px) 40vw, 300px" widths={[320, 480, 640]} /><span class:list={['ring', o.ring]}>{o.n}</span></li>)}
-        </ul>
-      </div>
     </figure>
   </section>
 
@@ -176,27 +160,6 @@ import { HERO_BEAT, LAB, OPTIONS, TEAM } from '../config';
       <h2 id="h-ht" class="h2">A heart you can stop<span class="teal">and look inside.</span></h2>
       <p class="lead">The Heart Twin is a computer model: a simulated heart in a scanned chest. It shows one beat spreading, and the two signals it makes.</p>
       <div class="actions"><a class="btn btn-primary" href="/heart-twin/">How the Heart Twin works</a><LabLink href={LAB.watch}>Open the Heart Twin</LabLink></div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ THE TOOLS: SENSOR STUDY ============ -->
-<section class="band band-tint feature feature-flip" id="sensors" aria-labelledby="h-se">
-  <div class="wrap feature-in">
-    <div class="feature-text" data-r>
-      <p class="chip">Sensor study</p>
-      <h2 id="h-se" class="h2">Will it read<span class="teal">my heart?</span></h2>
-      <p class="lead">Pick a body from the 42 scanned chests, a place to wear it and a device. The sensor tool shows how many beats a reading needs, as a range.</p>
-      <p>The card here shows the recovery wave: the slower, smaller wave that follows the main spike of each beat.</p>
-      <div class="actions"><a class="btn btn-primary" href="/sensors/">How the study works</a><LabLink href={LAB.explore}>Try the sensor tool</LabLink></div>
-    </div>
-    <div class="feature-art art-ask" data-r>
-      <FieldDiagram kind="strength" compact class="ask-chest ask-map" alt="The outline of a modelled chest with a grid of squares coloured from white, weaker, to a warm red, stronger, showing where the computed heartbeat is strongest. A dashed line marks the heart behind." />
-      <div class="ask-card">
-        <p class="ask-q">The middle person, lower breastbone, option 1, recovery wave</p>
-        <p class="ask-n"><span>about</span> 40 <span>beats</span></p>
-        <Bars label="Beats needed by place worn: 39.9 at the breastbone rule, 99.5 at the left chest pocket, 106.9 under the left breast." rows={[{ label: 'Breastbone', value: 39.9 }, { label: 'Chest pocket', value: 99.5 }, { label: 'Under left breast', value: 106.9 }]} />
-      </div>
     </div>
   </div>
 </section>
