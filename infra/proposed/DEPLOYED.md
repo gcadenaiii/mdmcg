@@ -171,3 +171,19 @@ followed on the live site: 43 destinations, 0 failures. Previous release kept: `
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261119T094009Z /var/www/mdmcg/current
+
+## 2026-11-19 16:05 UTC
+
+Release `20261119T160252Z` is live (`/var/www/mdmcg/current`): fixes from the final readiness review. Device page wearing place
+(2 cm above, 2 cm to your left; zone; 1 cm to the right costs 1.2 times; gap about 5 mm, 4.8 mm at the spot); the opening
+picture on Home stays on screen from first paint (no hide and fade) and the scene dots start hidden; caption "Computed
+heartbeats, averaged" under the averaging figure; A reading states "with sensor noise only" and labels its bar as the tested
+spot; on a phone the hospital-study figure comes before the sentence that refers to it. Research tools: tolerance table around
+the new spot, side view cut through the device, number check re-pointed. Content check passed as its own gate. Uploaded as
+the site pages and lab; v1 and platform copied from the previous release (identical). Live checks: 43 link destinations, 0
+failures; the opening picture sampled on every frame for 3.5 s on three loads, never hidden once shown. Previous release kept:
+`20261119T102322Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261119T102322Z /var/www/mdmcg/current
