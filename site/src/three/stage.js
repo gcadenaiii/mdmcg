@@ -52,8 +52,11 @@ export function mount(spine) {
   stage.insertBefore(wrap, stage.firstChild);
 
   let S;
-  try { S = new Studio(canvas, { pixelRatio: Math.min(window.devicePixelRatio || 1, 2) }); } catch { wrap.remove(); return null; }
+  performance.mark('gl-a');
+  try { S = new Studio(canvas, { pixelRatio: Math.min(window.devicePixelRatio || 1, 2), deferEnv: true }); } catch { wrap.remove(); return null; }
+  performance.mark('gl-b');
   S.arrange([{ i: 0, x: 0, z: 0 }], FRAME_ONE);
+  performance.mark('gl-c');
 
   /* the three size lines, drawn over the canvas so the type matches the page */
   const lines = sizeLines(SPECS[0].core).map((d) => {
@@ -203,7 +206,8 @@ export function mount(spine) {
     if (owed > 0) { owed--; frames++; draw(); }
     if (moving || owed > 0) kick();
   }
-  function kick() { if (!raf && !dead) raf = requestAnimationFrame(frame); }
+  let ready = false;       // the materials are compiled; until then nothing is drawn
+  function kick() { if (ready && !raf && !dead) raf = requestAnimationFrame(frame); }
 
   /* a pointer may turn the device a little on the first scene; it goes back when let go */
   function down(e) {
@@ -246,13 +250,55 @@ export function mount(spine) {
   Object.assign(cur, goal);
   /* shown from the start: begin a little turned away and further back, then settle once */
   if (!heroFig && pos < 0.5) { cur.az -= 0.42; cur.dist *= 1.07; cur.el += 0.06; } else linesIn = 1;
-  draw();
-  spine.classList.add('gl');
-  if (heroFig) spine.classList.add('gl-rest');
-  started = performance.now();
-  kick();
-  /* the other three options are built when the browser is idle, well before the last scene */
-  const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 600));
-  if (FAMILY_AT >= 0) [1, 2, 3].forEach((i, n) => idle(() => { if (!dead) S.device(i); }, { timeout: 2500 + n * 600 }));
+  /* The first picture needs every material compiled. Done in one go that stops the page for seconds on a first visit, so it is
+     handed to the browser's background compile (WebGLRenderer.compileAsync) and the first draw waits for it. The still picture
+     of the opening scene stays on the screen meanwhile. */
+  const first = () => {
+    if (dead) return;
+    /* the ground shadow is baked in a task of its own, so the two halves of the first picture do not add up to one long stop */
+    performance.mark('gl-d0');
+    if (S.dirty) S.bake();
+    performance.mark('gl-d1');
+    setTimeout(firstPicture, 0);
+  };
+  const firstPicture = () => {
+    if (dead) return;
+    ready = true;
+    target();
+    Object.assign(cur, goal);
+    if (!heroFig && pos < 0.5) { cur.az -= 0.42; cur.dist *= 1.07; cur.el += 0.06; } else linesIn = 1;
+    performance.mark('gl-d');
+    draw();
+    performance.mark('gl-e');
+    spine.classList.add('gl');
+    if (heroFig) spine.classList.add('gl-rest');
+    started = performance.now();
+    kick();
+    /* the other three options are built when the browser is idle, well before the last scene */
+    const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 600));
+    if (FAMILY_AT >= 0) [1, 2, 3].forEach((i, n) => idle(() => { if (!dead) S.device(i); }, { timeout: 2500 + n * 600 }));
+  };
+  S.resize(wrap.clientWidth, wrap.clientHeight);
+  S.device(0).group.visible = true;
+  setTimeout(() => {
+    if (dead) return;
+    performance.mark('gl-env0');
+    S.makeEnv();
+    performance.mark('gl-env1');
+    setTimeout(compileAll, 0);
+  }, 0);
+  const compileAll = () => {
+    if (dead) return;
+    const r = S.renderer;
+    if (!r.compileAsync) { first(); return; }
+    /* the scene's own materials, then the shadow passes' (the depth pass through the ground camera, the blur and the haze) */
+    r.compileAsync(S.scene, S.cam)
+      .then(() => { S.scene.overrideMaterial = S.depthMat; return r.compileAsync(S.scene, S.up); })
+      .then(() => { S.scene.overrideMaterial = null; return r.compileAsync(S.quad, S.up); })
+      .then(() => (S.hazeQuad ? r.compileAsync(S.hazeQuad, S.up) : null))
+      /* the haze pass draws the scene into a texture, which needs its own variant of every material */
+      .then(() => { if (!S.rtH1) return null; r.setRenderTarget(S.rtH1); const q = r.compileAsync(S.scene, S.cam); r.setRenderTarget(null); return q; })
+      .then(first, () => { S.scene.overrideMaterial = null; first(); });
+  };
   return { unmount, studio: S, /** how many pictures have been drawn so far */ frames: () => frames, /** keep the model on the first scene (for review pictures) */ hold(v) { hold = v; kick(); } };
 }

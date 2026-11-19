@@ -37,7 +37,7 @@ const HAZE = {
 export { SPECS };
 
 export class Studio {
-  constructor(canvas, { pixelRatio = 1, shadowSize = 1024 } = {}) {
+  constructor(canvas, { pixelRatio = 1, shadowSize = 1024, deferEnv = false } = {}) {
     const r = this.renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
     r.setPixelRatio(pixelRatio);
     r.toneMapping = NeutralToneMapping;
@@ -48,11 +48,8 @@ export class Studio {
     r.setClearColor(0x000000, 0);
     this.scene = new Scene();
     this.cam = new PerspectiveCamera(24, 1, 5, 6000);
-    const pm = new PMREMGenerator(r);
-    this.env = pm.fromScene(new RoomEnvironment(), 0.035);
-    pm.dispose();
-    this.scene.environment = this.env.texture;
     this.scene.environmentIntensity = 0.42;
+    if (!deferEnv) this.makeEnv();
     this.scene.add(new HemisphereLight(0xffffff, 0xd2d2d0, 0.3));
     const key = this.key = new DirectionalLight(0xffffff, 1.5);
     key.castShadow = true;
@@ -97,6 +94,15 @@ export class Studio {
     this.fitAspect = 1;
     this.w = 1; this.h = 1;
     this.v3 = new Vector3();
+  }
+  /** the soft room the device reflects. Made in the constructor unless deferEnv was asked for (the home page makes it in a
+      task of its own, so that starting the studio does not stop the page in one long piece). */
+  makeEnv() {
+    if (this.env) return;
+    const pm = new PMREMGenerator(this.renderer);
+    this.env = pm.fromScene(new RoomEnvironment(), 0.035);
+    pm.dispose();
+    this.scene.environment = this.env.texture;
   }
   /** the device of option i (0 to 3), built the first time it is asked for */
   device(i) {

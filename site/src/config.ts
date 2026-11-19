@@ -57,7 +57,7 @@ export const TEAM = [
     name: 'George Cadena', role: 'Co-Founder', photo: 'george-cadena',
     bio: [
       'Engineering leader with 15+ years taking products from concept to market across software, hardware, and regulated medical devices.',
-      'Inventor of a wearable multi-lead ECG patch (US-D972736-S); led the company through FDA audit and ISO 13485 certification.',
+      'At an earlier company, inventor of a wearable multi-lead ECG patch (US-D972736-S); led that company through an FDA audit and ISO 13485 certification.',
       'Director at ShotSpotter, leading end-to-end delivery of weapons-detection systems for multi-lane commercial deployment. M.S. Electrical Engineering, Caltech.',
     ],
   },
