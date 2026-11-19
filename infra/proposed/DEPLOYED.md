@@ -131,3 +131,19 @@ Previous release kept: `20261119T080106Z`.
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261119T080106Z /var/www/mdmcg/current
+
+## 2026-11-19 09:37 UTC
+
+Release `20261119T093547Z` is live (`/var/www/mdmcg/current`): homepage direction A. First screen with the device alone, the
+size as one text line and one main button; the two traces moved to the "ECG shows half the picture" scene, labelled "One
+computed heartbeat"; the two device scenes merged ("Two soft wings. Its own ECG."); menu Device, A reading, Evidence, Team,
+Research (Heart Twin, Science, Research tools), Contact, and the same Research group in the footer; the "42" band as a headline
+with three plain rows; the Heart Twin block replaced by a one-line Research row; on a phone each picture scrolls with its
+text; first paint matches the final layout. The content check was run as its own gate and passed before the release was
+assembled. Uploaded as the site pages only; lab, v1 and platform copied on the server from the previous release (identical,
+checked locally). Every link followed on the live site: 43 destinations, 0 failures. robots.txt still closed. Previous release
+kept: `20261119T084915Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261119T084915Z /var/www/mdmcg/current
