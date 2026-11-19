@@ -33,6 +33,12 @@ const RULES = [
   ['old menu label', />Sensors<\/a>|Sensor evaluation/],
 ];
 
+/* Sentences the owner approved by name. Each is taken out of the page before the rules are applied, so only this exact wording
+   passes. 2026-11-19: the ordinary-room reading times on A reading (the 'reading time' rule stands for everything else). */
+const ALLOWED = [
+  'In an ordinary room, the virtual trial gives about 25 seconds for the main spike and about 5.7 minutes for the recovery wave on a typical chest.',
+];
+
 const files = [];
 (function walk(dir) {
   for (const f of readdirSync(dir)) {
@@ -45,7 +51,8 @@ let bad = 0;
 for (const f of files) {
   // visible text and attributes only: scripts and styles are checked separately for the address rules
   const html = readFileSync(f, 'utf8');
-  const text = html.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<style[\s\S]*?<\/style>/g, ' ');
+  const text = html.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<style[\s\S]*?<\/style>/g, ' ')
+    .split(ALLOWED[0]).join(' ');
   for (const [name, re] of RULES) {
     const m = text.match(re);
     if (m) { bad++; console.log(`${f}: ${name}: "${text.slice(Math.max(0, m.index - 40), m.index + 60).replace(/\s+/g, ' ')}"`); }
