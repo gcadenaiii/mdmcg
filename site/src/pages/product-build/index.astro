@@ -1,0 +1,34 @@
+---
+// Product Build: the internal program workspace. This file holds no internal figure. Everything shown after the access
+// code is entered comes from the encrypted file beside it (payload.json) and is drawn by src/product-build/app.js.
+import Base from '../../layouts/Base.astro';
+import '../../styles/product-build.css';
+const dev = import.meta.env.DEV && !(import.meta.env.PRODUCT_BUILD_CODE ?? process.env.PRODUCT_BUILD_CODE);
+---
+<Base title="Product Build" description="The internal workspace for the device build program. Opens with an access code.">
+
+<section class="pb-top" aria-labelledby="h-page">
+  <div class="wrap">
+    <p class="chip">Research</p>
+    <h1 id="h-page" class="h2">Product Build<span class="teal">The program, in one place.</span></h1>
+  </div>
+</section>
+
+<section class="pb-gate" id="pb-gate" aria-label="Access">
+  <div class="wrap">
+    <form class="pb-gate-form" id="pb-form" autocomplete="off">
+      <label for="pb-code">Access code</label>
+      <div class="pb-gate-row">
+        <input id="pb-code" name="code" type="password" autocomplete="off" spellcheck="false" required>
+        <button class="btn btn-primary" type="submit">Open</button>
+      </div>
+      <p class="pb-gate-msg" id="pb-msg" role="status" aria-live="polite">This workspace is for the team. Enter the access code to open it.</p>
+      {dev && <p class="pb-gate-dev">Development copy. The code here is <code>local-preview</code>.</p>}
+    </form>
+  </div>
+</section>
+
+<section class="pb-app" id="pb-app" hidden aria-label="Product Build workspace"></section>
+
+<script src="../../product-build/app.js"></script>
+</Base>

@@ -7,7 +7,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check:content": "node scripts/check-content.mjs"
+    "check:content": "node scripts/check-content.mjs",
+    "test": "node --test tests/"
   },
   "dependencies": {
     "@fontsource/hind": "5.3.0",
