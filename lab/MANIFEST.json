@@ -1,8 +1,8 @@
 {
-  "imported_utc": "2026-11-17T08:34:52.810Z",
-  "research_commit": "1aa04a9",
+  "imported_utc": "2026-11-19T06:42:25.477Z",
+  "research_commit": "8c3eec5",
   "files": 125,
-  "bytes": 30455667,
+  "bytes": 30456403,
   "references_replaced": {
     "total": 60,
     "label": "internal study record",
@@ -15,9 +15,9 @@
   "leak_check": "passed",
   "list": [
     {
-      "path": "assets/SensorArea-BEGQMvNa.js",
-      "bytes": 140734,
-      "sha256": "6531616e484b80d015ff525ae15b5e71bdd7b47afdd97c1cafc262810eb0460b",
+      "path": "assets/SensorArea-DOJh4zFp.js",
+      "bytes": 140730,
+      "sha256": "95b3391de7d4600804fd25deb372b98f6a0294cef7ebbc9066389cad41b27644",
       "references_replaced": 4
     },
     {
@@ -26,15 +26,15 @@
       "sha256": "ca6f1d77019829e5778742e1dbb9e60377a51a582c5f1df7671853348e8add27"
     },
     {
-      "path": "assets/index-BYEDajtm.js",
-      "bytes": 1343052,
-      "sha256": "9582a260e94fff66583715788c22ae71fa5d72af48c5ccd4bbab788bb250e1b5",
-      "references_replaced": 1
+      "path": "assets/index-ClGHkwXd.css",
+      "bytes": 29853,
+      "sha256": "b28c00f7b797baa569cb6625112771dca9fe74412aa8986b5a8e6e500bbd4023"
     },
     {
-      "path": "assets/index-CC2iCvzo.css",
-      "bytes": 29741,
-      "sha256": "679926fd35049318be0e1b8e03276bfa6026530d9d5ddcc42b6fe9828e015a80"
+      "path": "assets/index-D4Wyq_T6.js",
+      "bytes": 1343680,
+      "sha256": "9a31263af4afa90958f0458946b3db537e1b88430f50c87b70605237ff209d8f",
+      "references_replaced": 1
     },
     {
       "path": "data/design/anatomy.json",
@@ -301,7 +301,7 @@
     {
       "path": "index.html",
       "bytes": 777,
-      "sha256": "cedb62c5d1988d21e733d5732451dcc57e35a046778c092a6ea58496b0daa016"
+      "sha256": "d1329246a7239bba961e39dafeedadd668a09809382621b4557cbfbbdf60d8cd"
     },
     {
       "path": "sensor-images/body__deepest_heart.webp",

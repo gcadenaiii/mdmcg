@@ -380,3 +380,57 @@ picture > source { display: none; }
   .btn:has(.gate) { flex-wrap: wrap; row-gap: 0; padding-block: 12px 10px; border-radius: 30px; }
   .btn .gate { flex-basis: 100%; justify-content: center; margin-left: 0; padding: 2px 0 0; border-left: 0; }
 }
+
+/* ---------- the six research tools, as one list (Heart Twin page) ---------- */
+.band-tools { padding-block: clamp(36px, 4vw, 56px); }
+.band-tools .sec-head { margin-bottom: 20px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 48px; align-items: end; }
+.band-tools .sec-head .chip { grid-column: 1 / -1; justify-self: start; }
+.band-tools .sec-head .chip + .h2 { margin-top: 12px; }
+.band-tools .sec-head .h2 { font-size: clamp(30px, 3.2vw, 46px); }
+.band-tools .sec-head .h2 .teal { display: inline; margin-left: 0.25em; }
+.band-tools .sec-head .lead { margin: 0 0 6px; max-width: 30em; }
+.tools { display: grid; gap: 18px; }
+.tools-k { font-size: var(--fs-small); font-weight: 500; color: var(--teal); margin-bottom: 8px; }
+.tools-rows { list-style: none; margin: 0; padding: 0; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-m); box-shadow: var(--shadow-s); overflow: hidden; }
+.tools-rows li + li { border-top: 1px solid var(--line); }
+.tool { display: grid; grid-template-columns: 32px minmax(0, 1.05fr) minmax(0, 1.25fr) minmax(0, 1.9fr) auto; gap: 4px 24px; align-items: baseline; padding: 11px 24px; text-decoration: none; color: var(--ink); transition: background 200ms var(--ease); }
+.tool:hover { background: var(--mist); }
+.tool-n { font-weight: 300; font-size: 24px; line-height: 1; color: var(--teal); }
+.tool-name { font-size: 18px; font-weight: 500; line-height: 1.25; }
+.tool-does, .tool-shows { font-size: 15px; line-height: 1.4; color: var(--ink-2); }
+.tool-does b, .tool-shows b { display: block; font-size: 11px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.tool-go { color: var(--teal); font-weight: 500; white-space: nowrap; }
+.tool-go::after { content: "\2192"; display: inline-block; margin-left: 8px; }
+
+/* ---------- how the parts relate (Heart Twin page): scans, then the twin, then two branches ---------- */
+.tmap { --tc: var(--teal); max-width: 900px; margin-inline: auto; }
+.tmap-row { display: flex; flex-direction: column; align-items: center; }
+.tbox { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-s); padding: 14px 22px; text-align: center; }
+.tbox b { display: block; font-weight: 500; font-size: 18px; }
+.tbox span { display: block; font-size: var(--fs-small); color: var(--ink-2); margin-top: 2px; }
+.tbox-main { border: 2px solid var(--tc); }
+.tarrow { display: block; width: 2px; height: 30px; background: var(--tc); position: relative; }
+.tarrow::after { content: ""; position: absolute; left: -4px; bottom: 0; border-top: 8px solid var(--tc); border-left: 5px solid transparent; border-right: 5px solid transparent; }
+.tmap-row::after { content: ""; display: block; width: 2px; height: 24px; background: var(--tc); }
+.tmap-split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; position: relative; }
+.tmap-split::before { content: ""; position: absolute; top: 0; left: calc(25% - 6px); right: calc(25% - 6px); height: 2px; background: var(--tc); }
+.tbranch { display: flex; flex-direction: column; align-items: center; }
+.tlist { margin: 14px 0 0; padding-left: 22px; font-size: 16px; line-height: 1.5; color: var(--ink); align-self: center; }
+ul.tlist { list-style: disc; }
+.tlist li + li { margin-top: 6px; }
+.tlist em { display: block; font-style: normal; font-size: var(--fs-small); color: var(--ink-2); }
+#map .actions { margin-top: 40px; justify-content: center; }
+
+@media (max-width: 900px) {
+  .band-tools .sec-head { grid-template-columns: 1fr; }
+  .band-tools .sec-head .lead { margin-top: 8px; }
+  .tool { grid-template-columns: 26px minmax(0, 1fr) auto; padding: 12px 14px; gap: 4px 10px; }
+  .tool-does, .tool-shows { grid-column: 2 / -1; }
+  .tool-does b, .tool-shows b { display: inline; margin-right: 6px; }
+  .tool-go { grid-column: 3; grid-row: 1; }
+  .tmap-split { gap: 12px; }
+  .tbox { padding: 10px 10px; }
+  .tbox b { font-size: 16px; }
+  .tlist { font-size: 14px; padding-left: 18px; }
+  .tlist em { font-size: 12.5px; }
+}

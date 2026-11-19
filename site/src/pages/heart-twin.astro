@@ -7,11 +7,11 @@ import Traces from '../components/Traces.astro';
 import Marks from '../components/Marks.astro';
 import Stage from '../components/Stage.astro';
 import WorkBand from '../components/WorkBand.astro';
-import LabLink from '../components/LabLink.astro';
-import { LAB } from '../config';
+import ToolList from '../components/ToolList.astro';
+import ToolMap from '../components/ToolMap.astro';
 const N = 8;
 ---
-<Base title="Heart Twin" description="The Heart Twin is a simulated heart in a scanned chest. Eight steps from a chest scan to two signals, then the five tools you can open yourself.">
+<Base title="Heart Twin" description="The Heart Twin is a simulated heart in a scanned chest. Eight steps from a chest scan to two signals, and the six research tools you can open yourself.">
 
 <section class="phero" aria-labelledby="h-page">
   <div class="wrap phero-in">
@@ -21,7 +21,7 @@ const N = 8;
       <p class="lead">A simulated heart in a scanned chest. Built to test a heart sensor on many real bodies.</p>
       <div class="actions">
         <a class="btn btn-primary" href="#step-1">See how it works</a>
-        <a class="btn btn-ghost" href="#doors">Five ways in</a>
+        <a class="btn btn-ghost" href="#tools">The six tools</a>
       </div>
     </div>
     <div class="phero-art">
@@ -29,6 +29,17 @@ const N = 8;
         <Pic name="heart-only" eager sizes="(max-width: 900px) 92vw, 52vw" alt="The Heart Twin: a simulated heart coloured from deep blue, resting, to yellow, fired, half way through one beat." />
       </div>
     </div>
+  </div>
+</section>
+
+<section class="band band-mist band-tools" id="tools" aria-labelledby="h-tools">
+  <div class="wrap">
+    <header class="sec-head" data-r>
+      <p class="chip">The research tools</p>
+      <h2 id="h-tools" class="h2">Six tools.<span class="teal">Two groups.</span></h2>
+      <p class="lead">Five tools work on one adult heart. The sixth compares 42 scanned chests.</p>
+    </header>
+    <ToolList />
   </div>
 </section>
 
@@ -83,7 +94,7 @@ const N = 8;
     <div class="scene-text">
       <p class="step-k"><span class="ring">4</span><span>Step 4 of {N}</span></p>
       <h2 id="h-s4" class="h2">Two signals<span class="teal">from one source.</span></h2>
-      <p class="lead">From that one beat the twin works out the ECG at pads on the skin, and the magnetic signal near the chest.</p>
+      <p class="lead">From that one beat the twin works out the ECG at electrodes on the skin, and the magnetic signal near the chest.</p>
       <p class="pull">An ECG does not determine the magnetic field. Neither signal is made from the other.</p>
     </div>
     <figure class="fig" data-kind="chart">
@@ -96,7 +107,7 @@ const N = 8;
       <p class="step-k"><span class="ring">5</span><span>Step 5 of {N}</span></p>
       <h2 id="h-s5" class="h2">Now do it<span class="teal">for many people.</span></h2>
       <p class="lead">42 scanned chests, 17 men and 25 women, aged 21 to 59. Every heart gets the same settings, so the differences come from anatomy.</p>
-      <p>They are large. At the same spot, the computed signal is about five times stronger in one chest than in another.</p>
+      <p>The differences are large. At the same spot, the computed signal is about five times stronger in one chest than in another.</p>
     </div>
     <figure class="fig" data-kind="chart">
       <div class="fig-media">
@@ -118,7 +129,7 @@ const N = 8;
       <p class="step-k"><span class="ring">6</span><span>Step 6 of {N}</span></p>
       <h2 id="h-s6" class="h2">Place a sensor.<span class="teal">Anywhere.</span></h2>
       <p class="lead">Put a virtual sensor on any spot of the chest and see what it reads. Where is the signal strong? How much does it change from body to body?</p>
-      <p>Use it to compare places, layouts and bodies.</p>
+      <p>Use it to compare places and sensor layouts on one adult heart. To compare scanned chests, open Sensor exploration.</p>
     </div>
     <figure class="fig" data-kind="shot">
       <div class="fig-media"><FieldDiagram kind="strength" alt="The outline of a modelled chest with a grid of squares coloured from white, weaker, to a warm red, stronger, showing where the computed heartbeat is strongest. A dashed line marks the heart behind." /></div>
@@ -130,7 +141,7 @@ const N = 8;
       <p class="step-k"><span class="ring">7</span><span>Step 7 of {N}</span></p>
       <h2 id="h-s7" class="h2">Compared with<span class="teal">real recordings.</span></h2>
       <p class="lead">We compare the twin with magnetic maps recorded from seven real people. It matches them moderately.</p>
-      <p>Other people's measured maps still predict a new person better than the model does, and the twin cannot yet predict one person's magnetic signal.</p>
+      <p>Other people's measured maps still predict a new person better than the twin does. The twin cannot yet predict one person's magnetic signal.</p>
     </div>
     <figure class="fig" data-kind="shot">
       <div class="fig-media"><FieldDiagram kind="field" alt="The outline of a modelled chest with a grid of coloured squares over the heart: teal where the computed field points into the chest, a warm red where it points out of the chest. A dashed line marks the heart behind." /></div>
@@ -142,7 +153,7 @@ const N = 8;
       <p class="step-k"><span class="ring">8</span><span>Step 8 of {N}</span></p>
       <h2 id="h-s8" class="h2">Then cut it open<span class="teal">and look inside.</span></h2>
       <p class="lead">Lift the front half away and watch when each part of the two lower chambers fires.</p>
-      <div class="actions"><a class="btn btn-primary" href="#doors">Five ways in</a></div>
+      <div class="actions"><a class="btn btn-primary" href="#tools">The six tools</a></div>
     </div>
     <figure class="fig" data-kind="shot">
       <div class="fig-media"><Pic name="heart-open" alt="The simulated heart with its front half lifted away, showing the left and right ventricles, coloured by when each part fires." /></div>
@@ -151,44 +162,14 @@ const N = 8;
 
 </div>
 
-<section class="band band-mist" id="doors" aria-labelledby="h-doors">
+<section class="band band-mist" id="map" aria-labelledby="h-map">
   <div class="wrap">
     <header class="sec-head" data-r>
-      <p class="chip">In the research tools</p>
-      <h2 id="h-doors" class="h2">Five questions.<span class="teal">Five doors.</span></h2>
+      <p class="chip">How the parts relate</p>
+      <h2 id="h-map" class="h2">One twin.<span class="teal">Two ways to use it.</span></h2>
     </header>
-    <div class="doors">
-      <a class="door" href={LAB.watch} data-r>
-        <span class="door-n">1</span>
-        <h3>Watch the heart</h3>
-        <p>One heartbeat, three views on one clock: the heart, an ECG lead, a magnetic channel.</p>
-        <span class="door-foot"><span class="door-go">Open</span></span>
-      </a>
-      <a class="door" href={LAB.sensor} data-r>
-        <span class="door-n">2</span>
-        <h3>Where should the sensor go?</h3>
-        <p>Tap anywhere on the chest and see what a sensor there reads.</p>
-        <span class="door-foot"><span class="door-go">Open</span></span>
-      </a>
-      <a class="door" href={LAB.noise} data-r>
-        <span class="door-n">3</span>
-        <h3>How much noise can it take?</h3>
-        <p>Slide the noise up and watch the heartbeat sink into it.</p>
-        <span class="door-foot"><span class="door-go">Open</span></span>
-      </a>
-      <a class="door" href={LAB.electrodes} data-r>
-        <span class="door-n">4</span>
-        <h3>When electrodes fail</h3>
-        <p>Compare what each detector finds after the pads come loose.</p>
-        <span class="door-foot"><span class="door-go">Open</span></span>
-      </a>
-      <a class="door" href={LAB.trust} data-r>
-        <span class="door-n">5</span>
-        <h3>Can I trust it?</h3>
-        <p>Every check of the twin against real people, in one place.</p>
-        <span class="door-foot"><span class="door-go">Open</span></span>
-      </a>
-    </div>
+    <ToolMap />
+    <div class="actions" data-r><a class="btn btn-primary" href="#tools">The six tools</a></div>
   </div>
 </section>
 

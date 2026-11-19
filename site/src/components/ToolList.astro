@@ -1,0 +1,39 @@
+---
+// The six research tools in one list: name, what you do, what it shows, link. Two groups, because the two groups answer
+// different questions: five tools work on one adult heart; Sensor exploration compares scanned chests.
+import { LAB } from '../config';
+const onOneHeart = [
+  { n: 1, href: LAB.watch, name: 'Watch the heart', does: 'Play one heartbeat and stop it at any moment.', shows: 'One heartbeat, three views on one clock: the heart, an ECG lead, a magnetic channel.' },
+  { n: 2, href: LAB.sensor, name: 'Where should the sensor go?', does: 'Tap anywhere on the chest.', shows: 'What a sensor at that spot reads. Compare sensor layouts.' },
+  { n: 3, href: LAB.noise, name: 'How much noise can it take?', does: 'Slide the noise up.', shows: 'The heartbeat sinking into the noise, and which beats are still found.' },
+  { n: 4, href: LAB.electrodes, name: 'When electrodes fail', does: 'Follow one minute in which the electrodes come loose.', shows: 'What each detector finds after the electrodes come loose.' },
+  { n: 5, href: LAB.trust, name: 'Can I trust it?', does: 'Read each check and its result.', shows: 'Every check of the twin against real people, in one place.' },
+];
+const onManyChests = [
+  { n: 6, href: LAB.sensors, name: 'Sensor exploration', does: 'Choose a design option, a scanned chest, a wearing place and a room.', shows: 'Four design options for the device on 42 scanned chests, with sources.' },
+];
+const groups = [
+  { title: 'On one adult heart', rows: onOneHeart },
+  { title: 'On 42 scanned chests', rows: onManyChests },
+];
+---
+<div class="tools" data-r>
+  {groups.map((g) => (
+    <div class="tools-group">
+      <h3 class="tools-k">{g.title}</h3>
+      <ul class="tools-rows">
+        {g.rows.map((t) => (
+          <li>
+            <a class="tool" href={t.href}>
+              <span class="tool-n">{t.n}</span>
+              <span class="tool-name">{t.name}</span>
+              <span class="tool-does"><b>You do</b>{t.does}</span>
+              <span class="tool-shows"><b>It shows</b>{t.shows}</span>
+              <span class="tool-go">Open</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</div>
