@@ -203,3 +203,21 @@ previous release (identical). 43 link destinations, 0 failures. Previous release
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261119T160252Z /var/www/mdmcg/current
+
+## 2026-11-19 18:56 UTC
+
+Release `20261119T185349Z` is live (`/var/www/mdmcg/current`): the Product Build page at `/product-build/`, under Research in
+the menu and the footer. It is the internal program workspace: schedule with dependencies and critical path, labor and budget
+with three scenarios, sourcing and lifecycle table, requirements and traceability, risks, stage gates, security plan. Its data
+is published only as an encrypted file (`/product-build/payload.json`, AES-256-GCM, key from the owner's access code set in
+`site/.env`); the page shows one access code field. Gates before upload, each on its own: 51 tests passed (they include a
+search of the built site for internal text), content check "11 pages checked, 0 problem(s)". Site pages only; lab, v1 and
+platform copied from the previous release (identical). Live checks: 44 link destinations, 0 failures; the data file is the
+encrypted envelope; a wrong code is refused on desktop and phone and the workspace stays empty; the page and its script files
+were searched for internal figures and names, none found (the status label names are part of the public page code).
+Nothing on the server was changed apart from the new release folder and the `current` link. Previous release kept:
+`20261119T164431Z`. Not pushed to the remote repository: the commits hold the program's rates and budget in plain source.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261119T164431Z /var/www/mdmcg/current
