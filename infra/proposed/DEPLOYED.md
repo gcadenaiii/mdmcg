@@ -112,3 +112,22 @@ live site: 44 destinations, 0 failures. robots.txt still closed. Previous releas
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261119T072512Z /var/www/mdmcg/current
+
+## 2026-11-19 08:50 UTC
+
+Release `20261119T084915Z` is live (`/var/www/mdmcg/current`): the wearing place moved to the spot tested in the second run
+(2 cm above where the bone stops, 2 cm to the wearer's left) on Home and A reading, with the zone redrawn; "Sit still. Thirty
+beats. One record."; beat figures at that spot (about 5 for the main spike, about 30 for the recovery wave; 28.3 in the bar
+chart of A reading); Evidence says the device is centred at the tested spot. Uploaded as the site pages only; lab, v1 and
+platform were copied on the server from the previous release (identical, checked locally). The research tools still use the
+earlier midline spot. Every link followed on the live site: 44 destinations, 0 failures. robots.txt still closed.
+
+Note: release `20261119T084735Z` was live for about two minutes before this one. The site's content check had failed on it (the
+word "first" on the Evidence page, which the check forbids) and the publish command did not stop on that failure. The wording
+was changed and this release published; the content check passes on it. Publish commands must stop when the content check fails.
+
+Previous release kept: `20261119T080106Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261119T080106Z /var/www/mdmcg/current
