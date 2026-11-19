@@ -100,3 +100,15 @@ server from the previous release (identical, checked locally). Every link follow
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261118T180414Z /var/www/mdmcg/current
+
+## 2026-11-19 08:03 UTC
+
+Release `20261119T080106Z` is live (`/var/www/mdmcg/current`): the Evidence page reports the second run's results (1.16 times
+at the tested spot, 74 of 84 chests better than the midline, 1.48 times across the zone, 0.81 kept per centimetre of depth;
+the expectation that was not supported and the repaired-model values in one line). Uploaded as the site pages only; lab, v1
+and platform were copied on the server from the previous release (identical, checked locally). Every link followed on the
+live site: 44 destinations, 0 failures. robots.txt still closed. Previous release kept: `20261119T072512Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261119T072512Z /var/www/mdmcg/current
