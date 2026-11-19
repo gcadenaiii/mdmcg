@@ -158,3 +158,16 @@ the live site: 0 failures. Previous release kept: `20261119T093547Z`.
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261119T093547Z /var/www/mdmcg/current
+
+## 2026-11-19 10:25 UTC
+
+Release `20261119T102322Z` is live (`/var/www/mdmcg/current`): the research tools moved to the wearing spot tested in the second run
+(2 cm above the lower end of the breastbone, 2 cm to the wearer's left). Their data were recomputed at that spot for the 42
+chests (`exploration/pocket_card/app_*_spot_2026_11_19.py`); the wire-sensor values equal the placement run's saved table at
+that position chest by chest, and the pocket and under-the-breast places equal the earlier data exactly. Content check passed
+as its own gate. Uploaded as the site pages and lab; v1 and platform copied from the previous release (identical). Every link
+followed on the live site: 43 destinations, 0 failures. Previous release kept: `20261119T094009Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261119T094009Z /var/www/mdmcg/current
