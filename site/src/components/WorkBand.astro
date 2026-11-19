@@ -1,11 +1,12 @@
 ---
-// The closing teal band, shared by every page. It names who the ask is for.
+// The closing band, shared by every page. It names who the ask is for.
+// tone: teal on the inner pages; "night" on the home page, where the lower half keeps to two background tones.
 import EmailButton from './EmailButton.astro';
 import { HAS_CONTACT } from '../contact';
-interface Props { title?: string; }
-const { title = 'Two signals from one heartbeat.' } = Astro.props;
+interface Props { title?: string; tone?: 'teal' | 'night'; }
+const { title = 'Two signals from one heartbeat.', tone = 'teal' } = Astro.props;
 ---
-<section class="band band-teal" aria-labelledby="h-work">
+<section class:list={['band', tone === 'night' ? 'band-night band-close' : 'band-teal']} aria-labelledby="h-work">
   <div class="wrap">
     <div class="close" data-r>
       <div class="close-head">

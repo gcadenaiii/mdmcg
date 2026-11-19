@@ -1,0 +1,18 @@
+---
+// A small strip under the hospital-study bars: the two signals of one computed heartbeat, on one clock. It stands on its own:
+// no device is drawn with it, and nothing leads from a device to it. Shapes come from the research tool's export
+// (src/data/traces.json), each scaled to its own peak; no units are drawn.
+import data from '../data/traces.json';
+const W = 640, H = 172, X0 = 132, amp = 46, ECG_Y = 62, MCG_Y = 146;
+const path = (arr: number[], base: number) => arr.map((v, i) => `${i ? 'L' : 'M'}${(X0 + (i / (arr.length - 1)) * (W - X0)).toFixed(1)} ${(base - v * amp).toFixed(1)}`).join(' ');
+---
+<figure class="beatstrip">
+  <svg class="trace" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Two traces of one computed heartbeat on the same clock: the ECG above and the magnetic signal below.">
+    <path class="t-base" d={`M${X0} ${ECG_Y} H${W}`} /><path class="t-base" d={`M${X0} ${MCG_Y} H${W}`} />
+    <path class="t-ecg" d={path(data.ecg, ECG_Y)} />
+    <path class="t-mcg" d={path(data.mcg, MCG_Y)} />
+    <text class="t-key" x="0" y={ECG_Y + 7}>ECG</text>
+    <text class="t-key t-teal" x="0" y={MCG_Y + 7}>Magnetic</text>
+  </svg>
+  <figcaption>One computed heartbeat</figcaption>
+</figure>

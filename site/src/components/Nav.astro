@@ -9,8 +9,19 @@ const path = Astro.url.pathname.replace(/\/?$/, '/');
       <span class="menu-ico" aria-hidden="true"></span><span class="sr">Menu</span>
     </button>
     <nav id="nav" class="nav" aria-label="Main">
-      <ul>
-        {NAV.map((l) => <li><a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a></li>)}
+      <ul class="nav-list">
+        {NAV.map((l, i) => l.sub ? (
+          <li class="nav-group">
+            {/* wide: a button that opens the small menu. phone: a plain label over the same links (see site.css) */}
+            <button class:list={['nav-sub-btn', l.sub.some((s) => s.href === path) && 'current']} type="button" aria-expanded="false" aria-controls={`nav-sub-${i}`}>{l.label}</button>
+            <span class="nav-sub-label" id={`nav-sub-label-${i}`}>{l.label}</span>
+            <ul class="nav-sub" id={`nav-sub-${i}`} aria-labelledby={`nav-sub-label-${i}`}>
+              {l.sub.map((s) => <li><a href={s.href} aria-current={path === s.href ? 'page' : undefined}>{s.label}</a></li>)}
+            </ul>
+          </li>
+        ) : (
+          <li><a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a></li>
+        ))}
       </ul>
       <a class="btn btn-primary btn-small" href="/contact/" aria-current={path === '/contact/' ? 'page' : undefined}>Contact</a>
     </nav>

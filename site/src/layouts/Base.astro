@@ -33,6 +33,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script is:inline>
+/* before the first paint: where the sticky stage will run (motion allowed, wide window), lay the home page out as the stage
+   does, so nothing jumps when the page script takes over (see "stage-pre" in site.css) */
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches && innerWidth > 900) document.documentElement.classList.add('stage-pre');
+</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to the content</a>

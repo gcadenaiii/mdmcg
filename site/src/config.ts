@@ -3,19 +3,20 @@
 /** Private preview: true adds <meta name="robots" content="noindex, nofollow"> to every page. Set to false at launch. */
 export const NOINDEX = true;
 
-/** the pair of heartbeat traces under the home page's first screen (owner's choice; false gives the first screen without it) */
-export const HERO_BEAT = true;
-
 export const SITE_NAME = 'mdmcg';
 export const SITE_TAGLINE = 'Two signals from one heartbeat.';
 
-export const NAV = [
+/** The menu. An entry with `sub` is a small menu of its own (a labelled group in the phone menu). */
+export const NAV: { label: string; href?: string; sub?: { href: string; label: string }[] }[] = [
   { href: '/device/', label: 'Device' },
   { href: '/reading/', label: 'A reading' },
-  { href: '/science/', label: 'Science' },
-  { href: '/heart-twin/', label: 'Heart Twin' },
   { href: '/evidence/', label: 'Evidence' },
   { href: '/team/', label: 'Team' },
+  { label: 'Research', sub: [
+    { href: '/heart-twin/', label: 'Heart Twin' },
+    { href: '/science/', label: 'Science' },
+    { href: '/heart-twin/#tools', label: 'Research tools' },
+  ] },
 ];
 
 /** The research tools live outside this site, at /lab/ (built and deployed separately). They open with an access code:

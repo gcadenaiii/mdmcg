@@ -10,6 +10,26 @@ const bar = document.querySelector('.bar');
 const btn = document.querySelector('.menu-btn');
 const nav = document.getElementById('nav');
 function closeMenu() { nav.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+/* the small menus inside the bar (Research): a button opens each one. Hover opens it too; Escape, a click elsewhere or
+   focus moving away closes it. In the phone menu the button is not shown and the links are simply listed under a label. */
+const groups = Array.from(document.querySelectorAll('.nav-group')).map((el) => ({ el, b: el.querySelector('.nav-sub-btn'), by: '' }));
+function setGroup(g, open, by) {
+  g.by = open ? by : '';
+  g.el.classList.toggle('open', open);
+  g.b.setAttribute('aria-expanded', String(open));
+}
+function closeGroups(except) { groups.forEach((g) => { if (g !== except) setGroup(g, false); }); }
+groups.forEach((g) => {
+  g.b.addEventListener('click', () => {
+    const open = g.el.classList.contains('open');
+    closeGroups(g);
+    if (open && g.by === 'hover') g.by = 'click'; else setGroup(g, !open, 'click');   // a click on a menu the pointer opened keeps it open
+  });
+  g.el.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' && !g.el.classList.contains('open')) { closeGroups(g); setGroup(g, true, 'hover'); } });
+  g.el.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && g.by === 'hover') setGroup(g, false); });
+  g.el.addEventListener('focusout', (e) => { if (!g.el.contains(e.relatedTarget)) setGroup(g, false); });
+});
+document.addEventListener('click', (e) => { if (!e.target.closest('.nav-group') || e.target.closest('.nav-sub a')) closeGroups(); });
 if (btn && nav) {
   btn.addEventListener('click', () => {
     const open = nav.classList.toggle('open');
@@ -17,7 +37,10 @@ if (btn && nav) {
   });
   nav.addEventListener('click', (e) => { if (e.target.closest('a')) closeMenu(); });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && nav.classList.contains('open')) { closeMenu(); btn.focus(); }
+    if (e.key !== 'Escape') return;
+    const g = groups.find((x) => x.el.classList.contains('open'));
+    if (g) { const inside = g.el.contains(document.activeElement); setGroup(g, false); if (inside) g.b.focus(); return; }
+    if (nav.classList.contains('open')) { closeMenu(); btn.focus(); }
   });
 }
 
@@ -54,6 +77,8 @@ const spines = Array.from(document.querySelectorAll('.spine')).map((spine) => {
   const stage = spine.querySelector('.stage');
   const scenes = Array.from(spine.querySelectorAll('.scene'));
   if (!stage || !scenes.length || reduce) return null;
+  /* home page on a phone: no pinned picture. Each scene's picture stays with its own words and scrolls with them. */
+  if (spine.id === 'spine' && window.innerWidth <= 900) return null;
   const layers = stage.querySelector('.stage-layers');
   const dots = stage.querySelector('.stage-dots');
   const figs = scenes.map((sc, i) => {
@@ -89,6 +114,7 @@ function goScene(spine, sc) {
 function show(s, i) {
   if (i === s.current) return;
   s.current = i;
+  s.stage.dataset.scene = String(i);   // the scene dots are not shown on the opening scene (site.css)
   s.figs.forEach((f, k) => f.classList.toggle('on', k === i));
   s.links.forEach((a, k) => {
     a.classList.toggle('on', k === i);
@@ -144,12 +170,4 @@ if (canRun3d()) {
   const start = () => import('../three/stage.js').then((m) => { window.__stage = m.mount(home); }).catch(() => {});
   const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 300));
   if (document.readyState === 'complete') idle(start); else window.addEventListener('load', () => idle(start));
-}
-
-// 6. the heartbeat lines on the first screen fade out as soon as the page moves, so they never cross the next scene's words.
-const beat = document.querySelector('.herobeat');
-if (beat) {
-  const fade = () => { beat.style.opacity = String(Math.max(0, 1 - window.scrollY / 110)); };
-  window.addEventListener('scroll', fade, { passive: true });
-  fade();
 }

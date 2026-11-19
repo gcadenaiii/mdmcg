@@ -109,7 +109,7 @@ a { color: inherit; }
 .wordmark { font-weight: 300; font-size: 34px; line-height: 1; letter-spacing: -0.03em; text-decoration: none; color: var(--ink); padding-top: 2px; }
 .wordmark-night { color: var(--on-dark); font-size: clamp(64px, 9vw, 128px); letter-spacing: -0.04em; }
 .nav { display: flex; align-items: center; gap: 40px; flex: 1; justify-content: flex-end; }
-.nav ul { display: flex; gap: 6px; margin-inline: auto; }
+.nav-list { display: flex; gap: 6px; margin-inline: auto; }
 .nav li a { display: block; font-size: 15.5px; text-decoration: none; color: var(--ink-2); padding: 9px 14px 7px; border-radius: 999px; transition: background-color 200ms var(--ease), color 200ms var(--ease); }
 .nav li a:hover { background: var(--mist); color: var(--ink); }
 .menu-btn { display: none; width: 44px; height: 44px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--paper); cursor: pointer; align-items: center; justify-content: center; }
@@ -277,7 +277,6 @@ picture { display: contents; }
 
 /* ---------- closing ---------- */
 .band-teal { overflow: hidden; }
-.band-teal::before { content: ""; position: absolute; right: -15%; top: -52%; width: 36%; aspect-ratio: 32 / 60; border: 2px solid var(--glass-line); border-radius: 18% / 10%; transform: rotate(24deg); pointer-events: none; }
 .band-teal .wrap { position: relative; }
 .close { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--gap); align-items: end; }
 .close .h2 { max-width: 11em; }
@@ -318,11 +317,11 @@ picture { display: contents; }
 
 @media (max-width: 900px) {
   :root { --pad: 20px; --bar-h: 64px; --fs-body: 16px; --card-pad: 24px 22px 22px; }
-  .band-teal::before, .hero-teal::before { display: none; }
+  .hero-teal::before { display: none; }
   .menu-btn { display: inline-flex; }
   .nav { display: none; position: absolute; left: 0; right: 0; top: var(--bar-h); background: var(--paper); border-bottom: 1px solid var(--line); padding: 8px 20px 28px; flex-direction: column; align-items: stretch; gap: 20px; box-shadow: var(--shadow-l); max-height: calc(100dvh - var(--bar-h)); overflow-y: auto; overscroll-behavior: contain; }
   .nav.open { display: flex; }
-  .nav ul { flex-direction: column; gap: 0; margin: 0; }
+  .nav-list { flex-direction: column; gap: 0; margin: 0; }
   .nav li a { font-size: 26px; font-weight: 300; letter-spacing: -0.01em; color: var(--ink); padding: 14px 0 10px; border-radius: 0; border-bottom: 1px solid var(--line); }
   .nav .btn { align-self: flex-start; padding: 14px 28px 12px; font-size: 16px; }
 
@@ -406,23 +405,6 @@ picture { display: contents; }
 .spine.gl .stage-layers { pointer-events: none; }
 .stage-gl, .spine.gl .stage .dims { -webkit-user-select: none; user-select: none; }
 
-/* ---------- the heartbeat on the first screen: two thin lines that leave the device and become the two signals ---------- */
-.herobeat path { fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 0; }
-.herobeat { transition: opacity 180ms ease-out; }
-.herobeat .hb-ecg { stroke: var(--ink); }
-.herobeat .hb-mcg { stroke: var(--teal); }
-.herobeat .hb-ecg-dot { fill: var(--ink); }
-.herobeat .hb-mcg-dot { fill: var(--teal); }
-.dims .herobeat .hb-t { font-family: var(--sans); font-size: 13.5px; fill: var(--ink-3); }
-.dims .herobeat .hb-k { fill: var(--teal); }
-@media (prefers-reduced-motion: no-preference) {
-  .herobeat path { animation: hb-draw 2200ms cubic-bezier(0.4, 0, 0.2, 1) 500ms backwards; }
-  .herobeat .hb-mcg { animation-delay: 700ms; }
-  .herobeat circle, .herobeat text { animation: hb-in 500ms ease-out 2500ms backwards; }
-}
-@keyframes hb-draw { from { stroke-dashoffset: -1; } to { stroke-dashoffset: 0; } }
-@keyframes hb-in { from { opacity: 0; } to { opacity: 1; } }
-@media (max-width: 900px) { .herobeat { display: none; } }
 
 /* ---------- forty-two bodies, one device: the chests in cross-section, laid over each other beside the numeral ---------- */
 .score-n { position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; min-width: 0; }
@@ -484,15 +466,104 @@ html.reveal .chests.drawn path { animation: chest-in 420ms ease-out calc(var(--i
 html.reveal .chests.drawn .chests-device { opacity: 1; }
 @keyframes chest-in { from { opacity: 0; } to { opacity: 1; } }
 .numeral { font-variant-numeric: tabular-nums; }
-/* the first screen's two dots keep time, about once a second, the magnetic one a moment behind */
-@media (prefers-reduced-motion: no-preference) {
-  .herobeat .hb-ecg-dot { animation: hb-in 500ms ease-out 2500ms backwards, hb-pulse 1050ms ease-in-out 3200ms infinite; }
-  .herobeat .hb-mcg-dot { animation: hb-in 500ms ease-out 2500ms backwards, hb-pulse 1050ms ease-in-out 3400ms infinite; }
-}
-@keyframes hb-pulse { 0%, 55%, 100% { r: 3.2px; opacity: 1; } 18% { r: 6px; opacity: 0.55; } }
 /* scene dots: larger targets, and the scene's name on hover or focus */
 .stage-dots a { position: relative; padding: 12px 7px; }
 .stage-dots a::after { content: attr(data-label); position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); white-space: nowrap; font-size: 13px; color: var(--ink-2);
   background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px 3px; opacity: 0; pointer-events: none; transition: opacity 160ms ease-out; }
 .stage-dots a:hover::after, .stage-dots a:focus-visible::after { opacity: 1; }
 @media (max-width: 900px) { .stage-dots a { padding: 10px 5px; } .stage-dots a::after { display: none; } }
+
+/* ================= home page, direction A (2026-11-19) ================= */
+
+/* ---------- the menu: a small menu of its own under "Research" ---------- */
+.nav-group { position: relative; }
+.nav-sub-btn { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 15.5px; line-height: 1.6; color: var(--ink-2); background: none; border: 0; padding: 9px 14px 7px; border-radius: 999px; cursor: pointer; transition: background-color 200ms var(--ease), color 200ms var(--ease); }
+.nav-sub-btn::after { content: ""; width: 6px; height: 6px; margin-top: -4px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); transition: transform 200ms var(--ease); }
+.nav-sub-btn:hover, .nav-group.open .nav-sub-btn, .nav-sub-btn.current { background: var(--mist); color: var(--ink); }
+.nav-group.open .nav-sub-btn::after { transform: translateY(3px) rotate(225deg); }
+.nav-sub-label { display: none; }
+.nav-sub { display: none; position: absolute; right: 0; top: calc(100% + 10px); z-index: 60; min-width: 208px; padding: 8px; background: var(--paper); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow-m); }
+.nav-sub::before { content: ""; position: absolute; left: 0; right: 0; top: -12px; height: 12px; }
+.nav-group.open .nav-sub { display: block; }
+.nav .nav-sub a { border-radius: 12px; padding: 10px 14px 8px; white-space: nowrap; }
+
+/* ---------- first screen: one object, one message ---------- */
+.scene-hero .hero-size { margin-top: 20px; font-family: var(--mono); font-size: 15px; letter-spacing: 0.01em; color: var(--ink-3); }
+.scene-hero .actions { gap: 16px 28px; }
+#spine .stage .dimbox { width: 118%; margin-left: -11%; }
+.stage-dots { transition: opacity 300ms var(--ease), visibility 0s; }
+#spine .stage[data-scene="0"] .stage-dots { opacity: 0; visibility: hidden; transition: opacity 200ms var(--ease), visibility 0s linear 200ms; }
+#spine .h2 .teal { text-wrap: balance; }
+
+/* the first paint already has the live layout (the class comes from the small script in the page head), so the page does
+   not jump when the stage takes over */
+@media (min-width: 901px) and (min-height: 561px) {
+  html.stage-pre #spine:not(.live) { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--gap); position: relative; }
+  html.stage-pre #spine:not(.live) .scene { grid-column: 1; display: flex; flex-direction: column; align-items: stretch; justify-content: center; min-height: 96svh; padding-block: 48px; }
+  html.stage-pre #spine:not(.live) .scene-hero { min-height: calc(100svh - var(--bar-h)); padding-block: 24px 72px; }
+  html.stage-pre #spine:not(.live) .scene:not(.scene-hero) .fig { display: none; }
+  html.stage-pre #spine:not(.live) .fig-hero { position: absolute; top: 16px; right: var(--pad); width: calc((100% - 2 * var(--pad) - var(--gap)) * 7 / 12); height: calc(100svh - var(--bar-h) - 40px); min-height: 480px; }
+  html.stage-pre #spine:not(.live) .fig-hero::before { content: ""; position: absolute; inset: -6% -12% -6% -18%; border-radius: 50%; background: radial-gradient(closest-side, var(--teal-10), rgba(255,255,255,0) 100%); }
+  html.stage-pre #spine:not(.live) .fig-hero .fig-media { height: 100%; min-height: 0; padding: 0; background: none; border-radius: 0; overflow: visible; }
+  html.stage-pre #spine:not(.live) .dimbox { width: 118%; flex: none; margin-left: -11%; filter: drop-shadow(0 48px 48px rgba(10, 14, 20, 0.14)); }
+  html.stage-pre #spine:not(.live) .dimbox img { width: 100%; mix-blend-mode: multiply; }
+}
+
+/* ---------- why two signals: the hospital-study bars, and under them one computed heartbeat ---------- */
+.fig-media.fig-why { flex-direction: column; gap: 32px; }
+.beatstrip { width: 100%; max-width: 520px; margin-inline: auto; padding-top: 28px; border-top: 1px solid var(--line-2); }
+.beatstrip .trace text { font-size: 21px; }
+.beatstrip .trace .t-teal { fill: var(--teal); }
+.beatstrip figcaption { margin-top: 12px; font-size: 14px; color: var(--ink-3); }
+
+/* ---------- the device scene: six sensors, and the two wings, in one ---------- */
+.scene-part { max-width: 34em; padding-top: 28px; border-top: 1px solid var(--line); }
+.scene-text > .scene-part { margin-top: 32px; }
+.h3s { font-weight: 300; font-size: clamp(26px, 2.5vw, 36px); line-height: 1.1; letter-spacing: -0.015em; }
+.h3s .teal { color: var(--teal); }
+.scene-part .lead { margin-top: 12px; }
+
+/* ---------- the evidence band, calmer ---------- */
+.band-calm { padding-block: clamp(64px, 7vw, 112px); }
+.calm { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--gap); align-items: center; }
+.calm-text > * + * { margin-top: 20px; }
+.calm-text .chip + * { margin-top: 28px; }
+.calm-n { font-variant-numeric: tabular-nums; }
+.calm-text .score-line { margin: 10px 0 0; max-width: 21em; }
+.calm-art .chests { width: 100%; max-width: 400px; margin: 0 auto; }
+.facts { margin: clamp(40px, 5vw, 64px) 0 0; border-top: 1px solid var(--night-line); }
+.facts > div { display: grid; grid-template-columns: 7em minmax(0, 1fr); gap: 4px 24px; align-items: baseline; padding: 18px 0 15px; border-bottom: 1px solid var(--night-line); }
+.facts dt { font-weight: 500; font-size: 15px; color: var(--on-dark-2); }
+.facts dd { margin: 0; font-weight: 300; font-size: clamp(18px, 1.5vw, 22px); line-height: 1.35; }
+.calm-more { margin-top: 32px; }
+.band-night .textlink, .band-night .textlink:hover { color: var(--on-dark); }
+
+/* ---------- research: one quiet row; then the team on white; then one dark close that runs into the footer ---------- */
+.quiet-row p { padding-block: 28px 26px; border-bottom: 1px solid var(--line); font-size: 17px; color: var(--ink-2); }
+.quiet-row a { color: var(--teal); font-weight: 500; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.quiet-row a:hover { color: var(--teal-deep); text-decoration-thickness: 2px; }
+.band-plain { background: var(--paper); padding-block: clamp(56px, 6vw, 96px); }
+.band-plain .crew-card { background: var(--mist); box-shadow: none; }
+.band-plain .crew-card:hover { box-shadow: var(--shadow-m); }
+.band-close { border-bottom: 1px solid var(--night-line); }
+.band-close::before { display: none; }
+
+@media (max-width: 900px) {
+  /* the phone menu: "Research" is a label, with its three links under a divider */
+  .nav-sub-btn { display: none; }
+  .nav-sub-label { display: block; padding: 26px 0 10px; font-size: 14px; font-weight: 500; color: var(--ink-3); border-bottom: 1px solid var(--line-2); }
+  .nav-sub { display: block; position: static; min-width: 0; padding: 0; border: 0; border-radius: 0; box-shadow: none; }
+  .nav-sub::before { display: none; }
+  .nav .nav-sub a { border-radius: 0; padding: 14px 0 10px; white-space: normal; }
+
+  /* home on a phone: no pinned picture; each scene's picture follows its own words */
+  #spine .scene-hero .fig { order: -1; }
+  #spine .scene-hero .fig-media { padding: 8px 0 0; background: none; }
+  #spine .scene-hero .dimbox img { mix-blend-mode: multiply; }
+  #spine .proof-k { display: block; }
+  .fig-media.fig-why { gap: 24px; }
+  .beatstrip { padding-top: 20px; }
+  .beatstrip .trace text { font-size: 26px; }
+  .calm { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  .facts > div { grid-template-columns: minmax(0, 1fr); }
+}

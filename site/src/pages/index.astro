@@ -7,16 +7,15 @@ import Marks from '../components/Marks.astro';
 import Bars from '../components/Bars.astro';
 import Stage from '../components/Stage.astro';
 import WorkBand from '../components/WorkBand.astro';
-import LabLink from '../components/LabLink.astro';
-import HeroBeat from '../components/HeroBeat.astro';
+import BeatStrip from '../components/BeatStrip.astro';
 import Chests42 from '../components/Chests42.astro';
-import { HERO_BEAT, LAB, TEAM } from '../config';
+import { TEAM } from '../config';
 import ProofBars from '../components/ProofBars.astro';
 import BeatBuild from '../components/BeatBuild.astro';
 ---
 <Base title="mdmcg" description="A small device for the breastbone that records the heart's magnetic signal alongside its ECG.">
 
-<!-- ============ THE SPINE: six scenes, one stage. Why (scenes 1 and 2), the device (scenes 3 to 5), a reading (scene 6).
+<!-- ============ THE SPINE: five scenes, one stage. Why (scenes 1 and 2), the device (scenes 3 and 4), a reading (scene 5).
      The order of the scenes here must match SCENES in src/three/stage.js. ============ -->
 <div class="wrap spine" id="spine">
 
@@ -25,26 +24,16 @@ import BeatBuild from '../components/BeatBuild.astro';
       <p class="chip">Wearable heart sensor</p>
       <h1 id="h-hero" class="display">Your heart,<span class="teal">finally heard.</span></h1>
       <p class="lead">A small device for the breastbone. It records the heart's magnetic signal alongside its ECG, from the same beat.</p>
+      <p class="hero-size">60 x 32 x 9 mm</p>
       <div class="actions">
         <a class="btn btn-primary" href="/device/">See the device</a>
-        <a class="btn btn-ghost" href="/reading/">How a reading goes</a>
+        <a class="textlink" href="/reading/">How a reading goes</a>
       </div>
     </div>
     <figure class="fig fig-hero" data-kind="render">
       <div class="fig-media">
         <div class="dimbox">
           <Pic name="device-hero" eager sizes="(max-width: 900px) 100vw, 60vw" alt="The device: a small white core with a teal ring and soft white wings that end in round electrode pads." />
-          <svg class="dims" viewBox="0 0 830 523" aria-hidden="true" focusable="false">
-            <g class="dim-line">
-              <path d="M655 104 L574 326"/><path d="M645 100 L665 108"/><path d="M564 322 L584 330"/>
-              <path d="M318 352 L512 398"/><path d="M320 342 L316 362"/><path d="M514 388 L510 408"/>
-              <path d="M286 262 L286 316"/><path d="M277 262 L295 262"/><path d="M277 316 L295 316"/>
-            </g>
-            {HERO_BEAT && <HeroBeat />}
-            <text x="672" y="208">60 mm</text>
-            <text x="372" y="418">32 mm</text>
-            <text x="216" y="295">9 mm</text>
-          </svg>
         </div>
       </div>
     </figure>
@@ -62,7 +51,7 @@ import BeatBuild from '../components/BeatBuild.astro';
       <p><a class="textlink" href="/science/#room">Read the science</a></p>
     </div>
     <figure class="fig" data-kind="shot">
-      <div class="fig-media"><ProofBars /></div>
+      <div class="fig-media fig-why"><ProofBars /><BeatStrip /></div>
     </figure>
   </section>
 
@@ -72,22 +61,14 @@ import BeatBuild from '../components/BeatBuild.astro';
       <p class="chip">Inside</p>
       <h2 id="h-inside" class="h2">It opens to<span class="teal">six sensors.</span></h2>
       <p class="lead">One piece, with the battery inside. Six magnetic sensors sit in a small stiff core. Small is the point: it sits closer to the chest.</p>
-      <p><a class="textlink" href="/device/">Inside the device</a></p>
-    </div>
-    <figure class="fig" data-kind="render" data-gl>
-      <div class="fig-media"><Pic name="device-open" alt="The device opened into layers: lid, flexible sheet with the wings, a flat coil, the sensor board with upright wire sensors, the shell and a soft pad." /></div>
-    </figure>
-  </section>
-
-  <section class="scene" id="ecg" data-scene="Its own ECG" aria-labelledby="h-ecg">
-    <div class="scene-text">
-      <p class="chip">Its own ECG</p>
-      <h2 id="h-ecg" class="h2">Two soft wings.<span class="teal">Two signals.</span></h2>
-      <p class="lead">The wings carry the ECG electrodes. The ECG marks each beat.</p>
+      <div class="scene-part">
+        <h3 class="h3s">Two soft wings. <span class="teal">Its own ECG.</span></h3>
+        <p class="lead">The wings carry the ECG electrodes. The ECG marks each beat.</p>
+      </div>
       <p><a class="textlink" href="/device/">See the device</a></p>
     </div>
     <figure class="fig" data-kind="render" data-gl>
-      <div class="fig-media"><Pic name="device-wing" class="fade-edges" alt="A soft white woven wing joining the white core beside its teal ring, with a round electrode pad at the end of the wing." /></div>
+      <div class="fig-media"><Pic name="device-open" alt="The device opened into layers: lid, flexible sheet with the wings, a flat coil, the sensor board with upright wire sensors, the shell and a soft pad." /></div>
     </figure>
   </section>
 
@@ -127,56 +108,34 @@ import BeatBuild from '../components/BeatBuild.astro';
 
 </div>
 
-<!-- ============ THE SCIENCE BEHIND IT: the one dark band opens it ============ -->
-<section class="band band-night" id="stands" aria-labelledby="h-stands">
+<!-- ============ THE EVIDENCE: the one dark band ============ -->
+<section class="band band-night band-calm" id="stands" aria-labelledby="h-stands">
   <div class="wrap">
-    <p class="chip">The science behind it</p>
-    <div class="score" data-r>
-      <div class="score-n"><h2 id="h-stands" class="numeral">42</h2><Chests42 /></div>
-      <div class="score-side">
+    <div class="calm" data-r>
+      <div class="calm-text">
+        <p class="chip">The evidence</p>
+        <h2 id="h-stands" class="h2 calm-n">42</h2>
         <p class="score-line">real chests, scanned. One virtual trial of the device on every one of them.</p>
         <p class="lead">Each chest shape comes from a CT scan. In each one a computer model of the heart beats, the device rests on the skin, and we work out what its sensors pick up. That is the virtual trial.</p>
       </div>
+      <div class="calm-art"><Chests42 /></div>
     </div>
-    <div class="verdicts">
-      <div class="verdict verdict-yes" data-r>
-        <h3>Size</h3>
-        <p>A small stiff core sits closer to the chest than a bank-card-sized one.</p>
-      </div>
-      <div class="verdict" data-r>
-        <h3>Place</h3>
-        <p>In the trial, the breastbone needs fewer beats than the chest pocket or under the left breast.</p>
-      </div>
-      <div class="verdict" data-r>
-        <h3>Fit</h3>
-        <p>The wearing place is a zone, not a point, with 3 cm of freedom to the wearer's left.</p>
-      </div>
-    </div>
-    <div class="actions" data-r><a class="btn btn-white" href="/evidence/">Read the evidence</a></div>
+    <dl class="facts" data-r>
+      <div><dt>Size</dt><dd>A small stiff core sits closer to the chest than a bank-card-sized one.</dd></div>
+      <div><dt>Place</dt><dd>In the trial, the breastbone needs fewer beats than the chest pocket or under the left breast.</dd></div>
+      <div><dt>Fit</dt><dd>The wearing place is a zone, not a point, with 3 cm of freedom to the wearer's left.</dd></div>
+    </dl>
+    <p class="calm-more" data-r><a class="textlink" href="/evidence/">Read the evidence</a></p>
   </div>
 </section>
 
-<!-- ============ THE TOOLS: HEART TWIN ============ -->
-<section class="band band-mist feature" id="heart-twin" aria-labelledby="h-ht">
-  <div class="wrap feature-in">
-    <div class="feature-art art-night" data-r>
-      <Pic name="heart-only" sizes="(max-width: 900px) 92vw, 56vw" alt="The Heart Twin: a simulated heart coloured from deep blue, resting, to yellow, fired, half way through one beat." />
-      <div class="float float-br">
-        <p class="float-k">One heartbeat, three views</p>
-        <ul><li>The heart</li><li>An ECG lead</li><li>A magnetic channel</li></ul>
-      </div>
-    </div>
-    <div class="feature-text" data-r>
-      <p class="chip">Heart Twin</p>
-      <h2 id="h-ht" class="h2">A heart you can stop<span class="teal">and look inside.</span></h2>
-      <p class="lead">The Heart Twin is a computer model: a simulated heart in a scanned chest. It shows one beat spreading, and the two signals it makes.</p>
-      <div class="actions"><a class="btn btn-primary" href="/heart-twin/">How the Heart Twin works</a><LabLink href={LAB.watch}>Open the Heart Twin tools</LabLink></div>
-    </div>
-  </div>
+<!-- ============ RESEARCH: one quiet row ============ -->
+<section class="wrap quiet-row" id="research" aria-label="Research">
+  <p>Research: <a href="/heart-twin/">Heart Twin</a>, <a href="/science/">Science</a>, <a href="/heart-twin/#tools">research tools</a>.</p>
 </section>
 
 <!-- ============ TEAM ============ -->
-<section class="band band-mist" id="team" aria-labelledby="h-team">
+<section class="band band-plain" id="team" aria-labelledby="h-team">
   <div class="wrap">
     <header class="sec-head sec-head-row" data-r>
       <div>
@@ -198,5 +157,5 @@ import BeatBuild from '../components/BeatBuild.astro';
   </div>
 </section>
 
-<WorkBand />
+<WorkBand tone="night" />
 </Base>

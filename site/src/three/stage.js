@@ -8,16 +8,15 @@ import { VIEWS, FAMILY, FRAME_ONE, FRAME_FAMILY, sizeLines } from './shots.js';
    A picture and the model are never seen together: the one on the stage fades to nothing, then the other fades in. */
 
 const TAU = Math.PI * 2;
-/* one row per scene on the page, in the page's order (src/pages/index.astro): whole device, two signals, it opens,
-   its own ECG, on a chest, four proposals. gl: 0 leaves the scene's still picture on the stage.
-   The camera goes once round the device over the six scenes.
+/* one row per scene on the page, in the page's order (src/pages/index.astro): whole device, two signals, it opens
+   (six sensors and the two wings, one scene), on a chest, a reading. gl: 0 leaves the scene's still picture on the stage.
+   The model is seen in one scene: it opens on the way in, and closes and turns to its wing on the way out.
    enter: where the camera comes from on the way into a scene, when that is not the scene before. It is used only
    after a scene with gl: 0, so the change of place happens while the canvas is not seen. */
 const SCENES = [
   { ...VIEWS.hero, explode: 0, family: 0, gl: 0, lines: 0 },
   { ...VIEWS.hero, az: VIEWS.hero.az + 1.1, dist: VIEWS.hero.dist * 1.25, explode: 0, family: 0, gl: 0, lines: 0 },
   { ...VIEWS.open, explode: 1, family: 0, gl: 1, lines: 0 },
-  { ...VIEWS.wing, az: VIEWS.wing.az + TAU, explode: 0, family: 0, gl: 1, lines: 0 },
   { ...VIEWS.wing, az: VIEWS.wing.az + TAU + 0.25, dist: VIEWS.wing.dist * 1.5, explode: 0, family: 0, gl: 0, lines: 0 },
   { ...VIEWS.wing, az: VIEWS.wing.az + TAU + 0.5, dist: VIEWS.wing.dist * 1.5, explode: 0, family: 0, gl: 0, lines: 0 },
 ];
