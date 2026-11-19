@@ -187,3 +187,19 @@ failures; the opening picture sampled on every frame for 3.5 s on three loads, n
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261119T102322Z /var/www/mdmcg/current
+
+## 2026-11-19 16:46 UTC
+
+Release `20261119T164431Z` is live (`/var/www/mdmcg/current`): fixes from the repeat readiness review. The 3D stage on Home is set up
+in short steps with its materials compiled in the background (the longest stop on a first desktop visit measured 599, 623
+and 607 ms on the live site over three fresh launches, against 2.3 to 4.0 s before; a scroll sent during loading moved the
+page within 66 ms). Team: the certification line says "at an earlier company". Science: beat figures say "with sensor noise
+only". Evidence: tolerance tiles labelled "Measured from the midline spot". Home: the Fit line names the zone from the middle
+of the chest. A reading: the ordinary-room sentence in times (about 25 seconds and about 5.7 minutes), an exception to the
+content check that the owner approved by name on 2026-11-19 (`ALLOWED` in `site/scripts/check-content.mjs`). Phone: the "why"
+heading lines up with the others. Content check passed as its own gate. Site pages only; lab, v1 and platform copied from the
+previous release (identical). 43 link destinations, 0 failures. Previous release kept: `20261119T160252Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261119T160252Z /var/www/mdmcg/current
