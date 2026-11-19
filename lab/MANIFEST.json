@@ -1,23 +1,23 @@
 {
-  "imported_utc": "2026-11-19T07:25:00.726Z",
-  "research_commit": "75d8f7a",
+  "imported_utc": "2026-11-19T10:23:15.575Z",
+  "research_commit": "b6aba25",
   "files": 125,
-  "bytes": 30456611,
+  "bytes": 30458879,
   "references_replaced": {
-    "total": 60,
+    "total": 63,
     "label": "internal study record",
     "by_rule": {
       "internal document": 34,
-      "script name": 3,
-      "drive path": 23
+      "script name": 4,
+      "drive path": 25
     }
   },
   "leak_check": "passed",
   "list": [
     {
-      "path": "assets/SensorArea-DOJh4zFp.js",
-      "bytes": 140730,
-      "sha256": "95b3391de7d4600804fd25deb372b98f6a0294cef7ebbc9066389cad41b27644",
+      "path": "assets/SensorArea-Bho7qOYU.js",
+      "bytes": 140885,
+      "sha256": "a77c0dcea4b70a43706eae53777a2a4301733a683761a6bc40b10a51072f7a2a",
       "references_replaced": 4
     },
     {
@@ -26,27 +26,27 @@
       "sha256": "ca6f1d77019829e5778742e1dbb9e60377a51a582c5f1df7671853348e8add27"
     },
     {
+      "path": "assets/index-CH3Zn9f5.js",
+      "bytes": 1343680,
+      "sha256": "f95b6c527d10adc8f5ac089e5ad7e7774da666946873a31163249fb7a32a8023",
+      "references_replaced": 1
+    },
+    {
       "path": "assets/index-ClGHkwXd.css",
       "bytes": 29853,
       "sha256": "b28c00f7b797baa569cb6625112771dca9fe74412aa8986b5a8e6e500bbd4023"
     },
     {
-      "path": "assets/index-D4Wyq_T6.js",
-      "bytes": 1343680,
-      "sha256": "9a31263af4afa90958f0458946b3db537e1b88430f50c87b70605237ff209d8f",
-      "references_replaced": 1
-    },
-    {
       "path": "data/design/anatomy.json",
-      "bytes": 142316,
-      "sha256": "96baa12177e2bbac24fd69efb8de0250fcdcee5c507f58cc02eb0dce4d2ed234",
-      "references_replaced": 1
+      "bytes": 142619,
+      "sha256": "550963d1096658f7a8fb0f5c5c010c1df6a26411d330d3111844af3ad8003d6e",
+      "references_replaced": 2
     },
     {
       "path": "data/design/design.json",
-      "bytes": 1270394,
-      "sha256": "2e3205130c96a4a32e10231693f5467f52856c76211f1cc0e27485a598da5ca7",
-      "references_replaced": 35
+      "bytes": 1272204,
+      "sha256": "e8122b04d3846bd6d14f24368cac166de4b7bb36db396b78daeda530d8cc1b4b",
+      "references_replaced": 37
     },
     {
       "path": "data/design/skin_deepest_heart.json",
@@ -301,7 +301,7 @@
     {
       "path": "index.html",
       "bytes": 777,
-      "sha256": "d1329246a7239bba961e39dafeedadd668a09809382621b4557cbfbbdf60d8cd"
+      "sha256": "72d38bf62d9bf25180664396ff2be208ab6c18c291fb4dc684a55b84dc9b63cd"
     },
     {
       "path": "sensor-images/body__deepest_heart.webp",
