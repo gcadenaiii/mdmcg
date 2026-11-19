@@ -70,7 +70,7 @@ import { LAB } from '../config';
         <h3>The main spike.</h3>
         <p>The tall, sharp part of each beat. In the virtual trial it clears after a handful of beats.</p>
         <div class="pair">
-          <div><b>5</b><span>beats, about, for a typical chest in the virtual trial</span></div>
+          <div><b>5</b><span>beats, about, for a typical chest in the virtual trial with sensor noise only</span></div>
         </div>
       </article>
       <article class="tile" data-r>
@@ -78,7 +78,7 @@ import { LAB } from '../config';
         <h3>Adds the recovery wave.</h3>
         <p>The slower, smaller wave that follows the spike. In the virtual trial it asks for more beats.</p>
         <div class="pair">
-          <div><b>30</b><span>beats, about, for a typical chest in the virtual trial</span></div>
+          <div><b>30</b><span>beats, about, for a typical chest in the virtual trial with sensor noise only</span></div>
         </div>
       </article>
     </div>
@@ -96,7 +96,7 @@ import { LAB } from '../config';
     <div class="split-media" data-r>
       <div class="panel">
         <p class="panel-k">Beats for the recovery wave, typical chest, by place worn</p>
-        <Bars class="bars-big" label="Beats needed by place worn: 28.3 at the breastbone, 99.5 at the left chest pocket, 106.9 under the left breast." rows={[{ label: 'Breastbone', value: 28.3 }, { label: 'Chest pocket', value: 99.5 }, { label: 'Under left breast', value: 106.9 }]} />
+        <Bars class="bars-big" label="Beats needed by place worn: 28.3 at the breastbone (the tested spot), 99.5 at the left chest pocket, 106.9 under the left breast." rows={[{ label: 'Breastbone, tested spot', value: 28.3 }, { label: 'Chest pocket', value: 99.5 }, { label: 'Under left breast', value: 106.9 }]} />
       </div>
     </div>
   </div>

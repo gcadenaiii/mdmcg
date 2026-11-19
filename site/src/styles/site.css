@@ -567,3 +567,16 @@ html.reveal .chests.drawn .chests-device { opacity: 1; }
   .calm { grid-template-columns: minmax(0, 1fr); gap: 36px; }
   .facts > div { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* ---------- final-review fixes, 2026-11-19 ---------- */
+/* the opening picture takes the stage without a fade (it was already painted) */
+.stage .fig.now, .stage .fig.now.on { transition: none !important; opacity: 1; visibility: visible; transform: none; }
+/* caption under the averaging figure, as under the heartbeat strip */
+.fig-media.fig-build { flex-direction: column; gap: 12px; }
+.fig-media.fig-build .fig-cap { align-self: flex-start; margin: 0 0 0 4%; font-size: var(--fs-small); color: var(--ink-3); }
+/* phone: in "why two signals" the hospital-study figure comes before the sentence that refers to it */
+@media (max-width: 900px) {
+  #why { display: flex; flex-direction: column; }
+  #why .scene-text { display: contents; }
+  #why .chip { order: 1; align-self: flex-start; } #why .h2 { order: 2; } #why .lead { order: 3; } #why .fig { order: 4; } #why .pull { order: 5; } #why .scene-text > p:last-child { order: 6; align-self: flex-start; }
+}

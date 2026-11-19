@@ -1,8 +1,8 @@
 {
-  "imported_utc": "2026-11-19T10:23:15.575Z",
-  "research_commit": "b6aba25",
+  "imported_utc": "2026-11-19T16:02:44.008Z",
+  "research_commit": "ce26fe5",
   "files": 125,
-  "bytes": 30458879,
+  "bytes": 30505322,
   "references_replaced": {
     "total": 63,
     "label": "internal study record",
@@ -15,9 +15,9 @@
   "leak_check": "passed",
   "list": [
     {
-      "path": "assets/SensorArea-Bho7qOYU.js",
-      "bytes": 140885,
-      "sha256": "a77c0dcea4b70a43706eae53777a2a4301733a683761a6bc40b10a51072f7a2a",
+      "path": "assets/SensorArea-CKX4NuIC.js",
+      "bytes": 142247,
+      "sha256": "3086227d40063b31116bff3a5bbc83d5082860096226c668fe18d961466b0ce7",
       "references_replaced": 4
     },
     {
@@ -26,9 +26,9 @@
       "sha256": "ca6f1d77019829e5778742e1dbb9e60377a51a582c5f1df7671853348e8add27"
     },
     {
-      "path": "assets/index-CH3Zn9f5.js",
+      "path": "assets/index-6MTVwIDa.js",
       "bytes": 1343680,
-      "sha256": "f95b6c527d10adc8f5ac089e5ad7e7774da666946873a31163249fb7a32a8023",
+      "sha256": "67188c1ced5f8627d682a55e44b69eadde8b74e9f91986edf7839c43193ca8fd",
       "references_replaced": 1
     },
     {
@@ -38,14 +38,14 @@
     },
     {
       "path": "data/design/anatomy.json",
-      "bytes": 142619,
-      "sha256": "550963d1096658f7a8fb0f5c5c010c1df6a26411d330d3111844af3ad8003d6e",
+      "bytes": 182458,
+      "sha256": "1d8a6781181ba1cb38ccb70e9493d6189d0dac33b1795d9569499cc2bcf650f9",
       "references_replaced": 2
     },
     {
       "path": "data/design/design.json",
-      "bytes": 1272204,
-      "sha256": "e8122b04d3846bd6d14f24368cac166de4b7bb36db396b78daeda530d8cc1b4b",
+      "bytes": 1277446,
+      "sha256": "c9af09844deb207d71ca84e192294c73ba45051fece7f4da5766e48fde520718",
       "references_replaced": 37
     },
     {
@@ -301,7 +301,7 @@
     {
       "path": "index.html",
       "bytes": 777,
-      "sha256": "72d38bf62d9bf25180664396ff2be208ab6c18c291fb4dc684a55b84dc9b63cd"
+      "sha256": "809d722428dee69340b6321da7c3af22ec50cebe23dfbb4e30da748578fc5eb9"
     },
     {
       "path": "sensor-images/body__deepest_heart.webp",

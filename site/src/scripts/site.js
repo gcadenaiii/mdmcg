@@ -93,6 +93,11 @@ const spines = Array.from(document.querySelectorAll('.spine')).map((spine) => {
     li.appendChild(a); dots.appendChild(li);
     return f;
   });
+  /* the opening picture is already on the screen before this script runs: keep it there. It takes the stage at once, with no
+     fade, and the scene dots start hidden (they belong to the later scenes). */
+  figs[0].classList.add('on', 'now');
+  stage.dataset.scene = '0';
+  requestAnimationFrame(() => requestAnimationFrame(() => figs[0].classList.remove('now')));
   stage.hidden = false;
   if (window.innerWidth <= 900) spine.insertBefore(stage, scenes[0]); // phone: the picture comes before the headline on the opening screen
   spine.classList.add('live');
