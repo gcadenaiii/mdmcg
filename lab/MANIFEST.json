@@ -1,8 +1,8 @@
 {
-  "imported_utc": "2026-11-19T06:42:25.477Z",
-  "research_commit": "8c3eec5",
+  "imported_utc": "2026-11-19T07:25:00.726Z",
+  "research_commit": "75d8f7a",
   "files": 125,
-  "bytes": 30456403,
+  "bytes": 30456611,
   "references_replaced": {
     "total": 60,
     "label": "internal study record",
@@ -165,8 +165,8 @@
     },
     {
       "path": "data/zenodo_heart_refit/electrodes.json",
-      "bytes": 30604,
-      "sha256": "27c66681192a53675a6bf275966f11b4468b8d9f379b64442ac04179055b1343",
+      "bytes": 30705,
+      "sha256": "ec73ea12b378d955a4987c8d806120c4a58c2a1b7c76302826ee544f442b0724",
       "references_replaced": 3
     },
     {
@@ -201,14 +201,14 @@
     },
     {
       "path": "data/zenodo_heart_refit/meta.json",
-      "bytes": 25667,
-      "sha256": "f0f12ae97e174078a3088ebd714b749b8c9029274198d48e20f309f4b92082de",
+      "bytes": 25735,
+      "sha256": "1b85c5938fe562c51a7add508bb918ff7edbc68d617223b48ba1bed535c1f5f0",
       "references_replaced": 8
     },
     {
       "path": "data/zenodo_heart_refit/noise.json",
-      "bytes": 41223,
-      "sha256": "dc361bac464fb9422c63071bfc0e31cd22d2383c59828ce6714641dce13e0798",
+      "bytes": 41235,
+      "sha256": "cb86f7e2ccecbe5e37992bcd8749a18d4fd0843cad9108a2744ad33493a4f19e",
       "references_replaced": 2
     },
     {
@@ -233,8 +233,8 @@
     },
     {
       "path": "data/zenodo_heart_refit/sensor.json",
-      "bytes": 89086,
-      "sha256": "19354f0b57af0e0dc693a7b7230d1a1e2e989a6948d1aa23dbba0cd5095c4bd1",
+      "bytes": 89095,
+      "sha256": "edc016e221202679751971e87d770a6b896e64358f5556533528cf93ca115b22",
       "references_replaced": 1
     },
     {
@@ -269,8 +269,8 @@
     },
     {
       "path": "data/zenodo_heart_refit/trust.json",
-      "bytes": 22385,
-      "sha256": "1b65326cd58c1b4df09f65860f3d35db421369e2a125539fd8a84e6b96d1e74e",
+      "bytes": 22403,
+      "sha256": "82c79920b11dbcef6ab4b5bbdccdb380a9ae5365d19080eec8c5c41e5fb749c9",
       "references_replaced": 4
     },
     {
