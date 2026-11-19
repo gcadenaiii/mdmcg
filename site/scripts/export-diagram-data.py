@@ -64,14 +64,20 @@ def chest():
         "body": {"key": body["key"], "id": body["id"], "label": who["label"], "chosen_as": who["rule"]},
         "window": body["window"],
         "landmark": {"left_mm": lm["left_mm"], "up_mm": lm["up_mm"], "name": pl["landmark"]["name"], "where": pl["landmark"]["where"]},
+        # 2026-11-19 (owner's decision): the site draws the device at the spot tested in the second run of the design study,
+        # 2 cm to the wearer's left of and 2 cm above the landmark, with that run's zone (centre from the midline to 3 cm left,
+        # 2 to 3 cm above). SIMULATED result; source: papers/paper3_design_study (second cohort, 84 chests; H2). The research
+        # app's own data (design.json) still holds the first run's rule, kept here as "first_run_rule".
         "rule": {
-            "above_cm": pl["above_cm"],
-            "left_cm": pl["left_cm"],
-            "within_cm": pl["within_cm"],
-            "text": pl["text"],
-            "tolerance_text": pl["tolerance_text"],
+            "above_cm": 2.0,
+            "left_cm": 2.0,
+            "within_cm": {"left": 1, "right": 2, "up": 1, "down": 0},
+            "text": "Centre the core 2 cm above the lower end of the breastbone and 2 cm toward the wearer's left.",
+            "tolerance_text": "The centre may sit from the midline to 3 cm to your left, and 2 to 3 cm above the lower end of the breastbone.",
+            "source": "design study, second run (84 scanned chests, simulated): position 2 cm left and 2 cm above; zone from the midline to 3 cm left, 2 to 3 cm above",
         },
-        "device_at": {"left_mm": at["left_mm"], "up_mm": at["up_mm"]},
+        "first_run_rule": {"above_cm": pl["above_cm"], "left_cm": pl["left_cm"], "within_cm": pl["within_cm"], "text": pl["text"]},
+        "device_at": {"left_mm": lm["left_mm"] + 20.0, "up_mm": lm["up_mm"] + 20.0},
         "device": {
             "option": version["option"],
             "name": version["name"],

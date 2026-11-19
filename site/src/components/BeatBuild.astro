@@ -1,9 +1,9 @@
 ---
-// "Sit still. Forty beats. One record." shown, not told: the ECG on top marks the beat; below it the magnetic line starts as one
-// noisy beat and clears as beats are lined up on the mark and averaged, while a counter climbs to 40.
+// "Sit still. Thirty beats. One record." shown, not told: the ECG on top marks the beat; below it the magnetic line starts as one
+// noisy beat and clears as beats are lined up on the mark and averaged, while a counter climbs to 30.
 // An illustration of averaging. The beat shapes are the research tool's computed traces (src/data/traces.json), each scaled to its
 // own peak. The noise is drawn (seeded, so every visit is the same) and falls as one over the square root of the count, as
-// averaging does; its size is chosen so the main spike stands clear at about 8 beats and the recovery wave at about 40, the
+// averaging does; its size is chosen so the main spike stands clear at about 5 beats and the recovery wave at about 30, the
 // two figures the site quotes for a typical chest in the virtual trial. Without script, or with reduced motion, the finished
 // record is shown.
 import data from '../data/traces.json';
@@ -13,13 +13,13 @@ const path = (arr: number[], base: number) => arr.map((v, i) => `${i ? 'L' : 'M'
 const peak = x(data.ecg.indexOf(Math.max(...data.ecg)), data.ecg.length);
 ---
 <svg class="trace build" viewBox={`0 0 ${W} 380`} role="img" data-mcg={JSON.stringify(data.mcg.map((v: number) => Math.round(v * 1000) / 1000))}
-  aria-label="One record being made. Above, the ECG marks each beat. Below, the magnetic signal: one beat is lost in noise; as beats are lined up on the ECG mark and averaged the main spike stands clear at about 8 beats and the slower recovery wave at about 40.">
+  aria-label="One record being made. Above, the ECG marks each beat. Below, the magnetic signal: one beat is lost in noise; as beats are lined up on the ECG mark and averaged the main spike stands clear at about 5 beats and the slower recovery wave at about 30.">
   <path class="t-base" d={`M${X0} ${ECG_Y} H${W}`} /><path class="t-base" d={`M${X0} ${MCG_Y} H${W}`} />
   <path class="t-mark" d={`M${peak.toFixed(1)} 14 V362`} />
   <path class="t-ecg" d={path(data.ecg, ECG_Y)} />
   <path class="t-mcg b-line" d={path(data.mcg, MCG_Y)} />
   <text class="t-key" x="0" y={ECG_Y - 22}>ECG</text><text x="0" y={ECG_Y + 6}>marks the beat</text>
-  <text class="t-key" x="0" y={MCG_Y - 22}>Magnetic</text><text class="b-count" x="0" y={MCG_Y + 6}>40 beats</text>
+  <text class="t-key" x="0" y={MCG_Y - 22}>Magnetic</text><text class="b-count" x="0" y={MCG_Y + 6}>30 beats</text>
   <text class="b-note" x={W} y="372" text-anchor="end">One record.</text>
 </svg>
 
@@ -32,15 +32,15 @@ const peak = x(data.ecg.indexOf(Math.max(...data.ecg)), data.ecg.length);
     const count = svg.querySelector<SVGTextElement>('.b-count');
     const note = svg.querySelector<SVGTextElement>('.b-note');
     if (!mcg.length || !line || !count || !note || reduce) return;
-    const W = 640, X0 = 170, amp = 84, MCG_Y = 300, N = 40, n = mcg.length;
+    const W = 640, X0 = 170, amp = 84, MCG_Y = 300, N = 30, n = mcg.length;
     let seed = 20261118;
     const rnd = () => { seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-    // forty noisy beats, and their running average
+    // thirty noisy beats, and their running average
     const sums = new Float64Array(n);
     const frames: string[] = [];
     for (let k = 1; k <= N; k++) {
       let s = 0;
-      for (let i = 0; i < n; i++) { s = s * 0.6 + (rnd() - 0.5) * 1.9; sums[i] += mcg[i] + s; }
+      for (let i = 0; i < n; i++) { s = s * 0.6 + (rnd() - 0.5) * 1.65; sums[i] += mcg[i] + s; }
       let d = '';
       for (let i = 0; i < n; i++) d += `${i ? 'L' : 'M'}${(X0 + (i / (n - 1)) * (W - X0)).toFixed(1)} ${(MCG_Y - (sums[i] / k) * amp).toFixed(1)}`;
       frames.push(d);
@@ -55,7 +55,7 @@ const peak = x(data.ecg.indexOf(Math.max(...data.ecg)), data.ecg.length);
       const step = () => {
         line!.setAttribute('d', frames[k]); count!.textContent = label(k + 1);
         k++;
-        if (k < N) timer = window.setTimeout(step, k < 9 ? 260 : 85);
+        if (k < N) timer = window.setTimeout(step, k < 6 ? 300 : 100);
         else timer = window.setTimeout(() => { line!.setAttribute('d', clean); svg.classList.add('done'); }, 500);
       };
       step();

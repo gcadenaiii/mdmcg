@@ -1,7 +1,7 @@
 ---
 // The front of one scanned chest, drawn from src/data/chest.json (see its `note` for the source of every number).
 // One set of data, four crops:
-//   landmark  the whole breastbone, the mark where the bone stops, and 3 cm up from it
+//   landmark  the whole breastbone, the mark where the bone stops, and the way from it to the device: up, then to the wearer's left
 //   zone      close on the lower breastbone: the core at the rule and the outline it may sit within
 //   body      the whole chest with the device on it
 //   anatomy   the whole chest, nothing on it
@@ -53,9 +53,9 @@ const tab = `M-5.3 ${-hl + 2} V${-(hl + 7)} A5.3 5.3 0 0 1 5.3 ${-(hl + 7)} V${-
 const tol = chest.rule.within_cm;
 const zone = { x0: at.x - tol.right * 10 - hw, x1: at.x + tol.left * 10 + hw, y0: at.y - tol.up * 10 - hl, y1: at.y + tol.down * 10 + hl };
 
-// the 3 cm: a dimension line beside the breastbone, on the wearer's right, from the landmark's level up to the core's centre
-const dimX = variant === 'landmark' ? lm.x - 26 : at.x - hw - 11;
-const upText = `${chest.rule.above_cm} cm`;
+// the way from the landmark to the core's centre: up along the midline, then toward the wearer's left
+const upText = `${chest.rule.above_cm} cm up`;
+const leftText = `${chest.rule.left_cm} cm left`;
 const showCore = variant === 'zone' || variant === 'body';
 const showMarks = variant !== 'anatomy';
 const showDim = variant === 'landmark' || variant === 'zone';
@@ -92,8 +92,8 @@ const pad = variant === 'body' || variant === 'anatomy' ? 30 : 14;
         )}
         {showDim && (
           <g class="dg-dim">
-            <path d={`M${lm.x - 11} ${lm.y} H${dimX - 4} M${(variant === 'landmark' ? at.x - 7 : at.x - hw - 2)} ${at.y} H${dimX - 4} M${dimX} ${lm.y} V${at.y}`} />
-            <path d={`M${dimX - 3.2} ${at.y + 6.5} L${dimX} ${at.y} L${dimX + 3.2} ${at.y + 6.5}`} />
+            <path d={`M${lm.x} ${lm.y - 9} V${at.y} H${at.x - 2}`} />
+            <path d={`M${at.x - 8.5} ${at.y - 3.2} L${at.x - 2} ${at.y} L${at.x - 8.5} ${at.y + 3.2}`} />
             {variant === 'landmark' && <path d={`M${at.x - 5} ${at.y} H${at.x + 5} M${at.x} ${at.y - 5} V${at.y + 5}`} class="dg-cross" />}
           </g>
         )}
@@ -106,7 +106,7 @@ const pad = variant === 'body' || variant === 'anatomy' ? 30 : 14;
       </svg>
       <text x={pad} y="14" dy="0.8em" class="dg-side">your right</text>
       <text x="100%" y="14" dx={-pad} dy="0.8em" text-anchor="end" class="dg-side">your left</text>
-      {showDim && <text x={px(dimX - 5)} y={py((lm.y + at.y) / 2)} dy="0.36em" text-anchor="end" class="dg-label dg-strong">{upText}</text>}
+      {showDim && <text x={px(lm.x - 6)} y={py(at.y)} dy="-0.15em" text-anchor="end" class="dg-label dg-strong">{upText}, {leftText}</text>}
       {variant === 'landmark' && <text x={px(lm.x)} y={py(lm.y + 9)} dy="1.25em" text-anchor="middle" class="dg-label">{chest.landmark.where}</text>}
       {variant === 'zone' && <text x={px(lm.x - 11)} y={py(lm.y)} dy="1.55em" text-anchor="end" class="dg-label">{chest.landmark.where}</text>}
     </svg>

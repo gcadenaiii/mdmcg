@@ -9,7 +9,7 @@ import WorkBand from '../components/WorkBand.astro';
 import LabLink from '../components/LabLink.astro';
 import { LAB } from '../config';
 ---
-<Base title="How a reading goes: sit still, forty beats" description="How a reading goes: take it from its case, place it on the breastbone, sit still, and let it average the beats.">
+<Base title="How a reading goes: sit still, thirty beats" description="How a reading goes: take it from its case, place it on the breastbone, sit still, and let it average the beats.">
 
 <section class="phero" aria-labelledby="h-page">
   <div class="wrap phero-in">
@@ -35,7 +35,7 @@ import { LAB } from '../config';
     </header>
     <ol class="flow">
       <li data-r><b></b><h3>Take it from its case</h3><p>It lives there, charged, between readings.</p></li>
-      <li data-r><b></b><h3>Place it on the breastbone</h3><p>Find where the bone stops. Centre it 3 cm above.</p></li>
+      <li data-r><b></b><h3>Place it on the breastbone</h3><p>Find where the bone stops. Centre it 2 cm above and 2 cm to your left.</p></li>
       <li data-r><b></b><h3>Start</h3><p>The wings pick up the ECG while the core listens for the field.</p></li>
       <li data-r><b></b><h3>Sit still</h3><p>It lines up each beat on the ECG mark and adds them.</p></li>
       <li data-r><b></b><h3>Read the record</h3><p>Two signals from the same heartbeats, on one clock.</p></li>
@@ -46,13 +46,13 @@ import { LAB } from '../config';
 <section class="band" aria-labelledby="h-place">
   <div class="wrap split split-wide-text">
     <div class="split-media frame frame-flush" data-r>
-      <ChestDiagram variant="landmark" alt="The breastbone and ribs of a chest outlined from a scan, seen from the front: a mark at the lower end of the breastbone, where the bone stops, and a line 3 cm up from it to the place the device is centred." />
+      <ChestDiagram variant="landmark" alt="The breastbone and ribs of a chest outlined from a scan, seen from the front: a mark at the lower end of the breastbone, where the bone stops, and a line from it, 2 cm up and then 2 cm toward the wearer's left, to the place the device is centred." />
     </div>
     <div class="split-text" data-r>
       <p class="chip">Placing it</p>
       <h2 id="h-place" class="h2">One landmark.<span class="teal">One finger.</span></h2>
-      <p class="lead">Slide a finger down the middle of your chest until the bone stops. Centre it 3 cm above that.</p>
-      <p>In the virtual trial the place is a zone, not a point. It is forgiving toward the wearer's left, and a little up or down. Not toward the right.</p>
+      <p class="lead">Slide a finger down the middle of your chest until the bone stops. Centre it 2 cm above that and 2 cm to your left.</p>
+      <p>In the virtual trial the place is a zone, not a point: from the middle of the chest to 3 cm toward your left, and 2 to 3 cm above where the bone stops.</p>
       <p><a class="textlink" href="/device/#wear">Where and how it is worn</a></p>
     </div>
   </div>
@@ -70,7 +70,7 @@ import { LAB } from '../config';
         <h3>The main spike.</h3>
         <p>The tall, sharp part of each beat. In the virtual trial it clears after a handful of beats.</p>
         <div class="pair">
-          <div><b>8</b><span>beats, about, for a typical chest in the virtual trial</span></div>
+          <div><b>5</b><span>beats, about, for a typical chest in the virtual trial</span></div>
         </div>
       </article>
       <article class="tile" data-r>
@@ -78,7 +78,7 @@ import { LAB } from '../config';
         <h3>Adds the recovery wave.</h3>
         <p>The slower, smaller wave that follows the spike. In the virtual trial it asks for more beats.</p>
         <div class="pair">
-          <div><b>40</b><span>beats, about, for a typical chest in the virtual trial</span></div>
+          <div><b>30</b><span>beats, about, for a typical chest in the virtual trial</span></div>
         </div>
       </article>
     </div>
@@ -96,7 +96,7 @@ import { LAB } from '../config';
     <div class="split-media" data-r>
       <div class="panel">
         <p class="panel-k">Beats for the recovery wave, typical chest, by place worn</p>
-        <Bars class="bars-big" label="Beats needed by place worn: 39.9 at the breastbone, 99.5 at the left chest pocket, 106.9 under the left breast." rows={[{ label: 'Breastbone', value: 39.9 }, { label: 'Chest pocket', value: 99.5 }, { label: 'Under left breast', value: 106.9 }]} />
+        <Bars class="bars-big" label="Beats needed by place worn: 28.3 at the breastbone, 99.5 at the left chest pocket, 106.9 under the left breast." rows={[{ label: 'Breastbone', value: 28.3 }, { label: 'Chest pocket', value: 99.5 }, { label: 'Under left breast', value: 106.9 }]} />
       </div>
     </div>
   </div>
