@@ -85,3 +85,18 @@ destinations, 0 failures. Previous release kept: `20261118T145656Z`.
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261118T145656Z /var/www/mdmcg/current
+
+## 2026-11-19 07:32 UTC
+
+Release `20261119T072512Z` is live (`/var/www/mdmcg/current`): Heart Twin page with the list of the six research tools under
+the opening and a diagram of how the parts relate; one term per thing on the site and in the tools (tools, electrodes, pass
+mark, tool names in place of page numbers); the tools' overall result as a count; a "Tool list" link back from every tool and
+the tool's name in the phone header; the note under "Forty beats" ends "with sensor noise only"; the second run reported as
+complete (84 older chests, 126 in the two runs). Uploaded as the site pages and lab; v1 and platform were copied on the
+server from the previous release (identical, checked locally). Every link followed on the live site with
+`site/scripts/check-links.mjs`: 44 destinations, 0 failures. robots.txt still closed. Previous release kept:
+`20261118T180414Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261118T180414Z /var/www/mdmcg/current
