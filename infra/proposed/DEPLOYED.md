@@ -147,3 +147,14 @@ kept: `20261119T084915Z`.
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261119T084915Z /var/www/mdmcg/current
+
+## 2026-11-19 09:50 UTC
+
+Release `20261119T094009Z` is live (`/var/www/mdmcg/current`): the size line on the first screen in the main font; the Heart Twin
+page no longer pins its picture on a phone (each picture scrolls with its step). Content check passed as its own gate.
+Uploaded as the site pages only; lab, v1 and platform copied from the previous release (identical). Every link followed on
+the live site: 0 failures. Previous release kept: `20261119T093547Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261119T093547Z /var/www/mdmcg/current
