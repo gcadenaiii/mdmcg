@@ -77,8 +77,8 @@ const spines = Array.from(document.querySelectorAll('.spine')).map((spine) => {
   const stage = spine.querySelector('.stage');
   const scenes = Array.from(spine.querySelectorAll('.scene'));
   if (!stage || !scenes.length || reduce) return null;
-  /* home page on a phone: no pinned picture. Each scene's picture stays with its own words and scrolls with them. */
-  if (spine.id === 'spine' && window.innerWidth <= 900) return null;
+  /* on a phone: no pinned picture, on any page. Each scene's picture stays with its own words and scrolls with them. */
+  if (window.innerWidth <= 900) return null;
   const layers = stage.querySelector('.stage-layers');
   const dots = stage.querySelector('.stage-dots');
   const figs = scenes.map((sc, i) => {

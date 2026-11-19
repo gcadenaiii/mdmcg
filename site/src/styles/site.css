@@ -488,7 +488,7 @@ html.reveal .chests.drawn .chests-device { opacity: 1; }
 .nav .nav-sub a { border-radius: 12px; padding: 10px 14px 8px; white-space: nowrap; }
 
 /* ---------- first screen: one object, one message ---------- */
-.scene-hero .hero-size { margin-top: 20px; font-family: var(--mono); font-size: 15px; letter-spacing: 0.01em; color: var(--ink-3); }
+.scene-hero .hero-size { margin-top: 20px; font-size: 16px; color: var(--ink-3); }
 .scene-hero .actions { gap: 16px 28px; }
 #spine .stage .dimbox { width: 118%; margin-left: -11%; }
 .stage-dots { transition: opacity 300ms var(--ease), visibility 0s; }
