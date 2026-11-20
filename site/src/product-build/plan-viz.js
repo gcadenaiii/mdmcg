@@ -23,7 +23,7 @@ export function strategyMap(x) {
   const ps = [{ id: 'battery', n: 1, name: 'Battery Product', role: 'Sell first: the near-term priority', href: '/plan/battery/' }, { id: 'ecg', n: 2, name: 'ECG/MCG', role: 'Longer-horizon medical technology', href: '/product-build/' }, { id: 'funding', n: 3, name: 'Funding and Partnerships', role: 'Capital for both', href: '/plan/funding/' }];
   const shared = ['Quality', 'Intellectual property', 'Finance', 'Security', 'Manufacturing partners', 'Management'];
   return `<div class="pl-map" role="group" aria-label="Company strategy map">
-    <div class="pl-map-top"><b>MDMCG</b><span>One company, three coordinated programs, one set of shared systems</span></div>
+    <div class="pl-map-top"><b>MDMCG</b><span>One company, three coordinated plans, one set of shared systems</span></div>
     <svg class="pl-map-wires" viewBox="0 0 900 44" preserveAspectRatio="none" aria-hidden="true"><path d="M450 0 V22 M150 22 H750 M150 22 V44 M450 22 V44 M750 22 V44"/></svg>
     <div class="pl-map-row">${ps.map(card).join('')}</div>
     <div class="pl-map-flow" aria-label="How the programs feed each other"><span><i>→</i> Revenue from Plan 1 funds Plan 2</span><span><i>→</i> Plan 3 brings capital to Plans 1 and 2</span><span><i>→</i> Plans 1 and 2 share the engineers, the magnetic sensing and the acquisition electronics</span></div>
@@ -62,7 +62,7 @@ export function roadmap(x) {
   const width = L + n * W + 230;
   return `<div class="pb-controls"><span>Zoom</span>${[[8, 'Year'], [16, 'Quarter'], [30, 'Month']].map(([w, n2]) => `<button type="button" class="pb-btn${W === w ? ' pl-on' : ''}" data-zoom="${w}" aria-pressed="${W === w}">${n2}</button>`).join('')}</div>
   <div class="pb-scroll pl-roadmap"><svg viewBox="0 0 ${width} ${y + 6}" width="${width}" height="${y + 6}" role="img" aria-label="Master roadmap of the three programs with milestones and overloaded weeks">${g}</svg></div>
-  ${legend([['pl-c-b', 'Battery product'], ['pl-c-e', 'ECG/MCG'], ['pl-c-f', 'Funding and partnerships'], ['pl-k-crit', 'thick outline: on the critical path'], ['pb-k-ms', 'stop/go milestone'], ['pl-k-link', 'dashed: one program waits on another'], ['pl-k-over', '! a person is planned over their hours']])}`;
+  ${legend([['pl-c-b', 'Battery product'], ['pl-c-e', 'ECG/MCG'], ['pl-c-f', 'Funding and partnerships'], ['pl-k-crit', 'thick outline: on the critical path'], ['pb-k-ms', 'gate'], ['pl-k-link', 'dashed: one program waits on another'], ['pl-k-over', '! a person is planned over their hours']])}`;
 }
 
 /* ---- I. shared capacity: stacked weekly hours by program for one person, with the capacity line */
@@ -120,8 +120,10 @@ export function phaseChart(s, today) {
     const a = work.map((r) => r.startDate).sort()[0], b = work.map((r) => r.finishDate).sort().pop(); const ms = ts.filter((r) => r.milestone).pop();
     return { name: ph.name, a, b, ms, crit: work.some((r) => r.critical), pctDone: Math.round(work.reduce((x, r) => x + r.percent, 0) / work.length) }; }).filter(Boolean);
   const now = today >= s.program.startDate && today <= s.sched.endDate ? `<i class="pl-ph-now" style="left:${pct(today)}%" title="today"></i>` : '';
-  return `<ol class="pl-ph" aria-label="Phases in order, one bar each">${rows.map((r) => `<li><div class="pl-ph-h"><b>${esc(r.name)}</b><span>${esc(r.a)} to ${esc(r.b)}${r.ms ? ` · gate ${esc(r.ms.finishDate)}` : ''}</span></div><div class="pl-ph-t"><i class="pl-ph-b${r.crit ? ' pl-ph-c' : ''}" style="left:${pct(r.a)}%;width:${Math.max(1.5, pct(r.b) - pct(r.a))}%"></i>${r.ms ? `<i class="pl-ph-m" style="left:${pct(r.ms.finishDate)}%" title="${esc(r.ms.title + ', ' + r.ms.finishDate)}"></i>` : ''}${now}</div></li>`).join('')}</ol>
-  <p class="pb-legend"><span><i class="pb-k pl-ph-kc"></i>dark bar: no slack, a week lost here moves the finish</span><span><i class="pb-k pl-ph-kn"></i>lighter bar: has slack</span><span><i class="pb-k pb-k-ms"></i>stop/go gate</span></p>`;
+  const months = []; { const d0 = new Date(t0); let m = Date.UTC(d0.getUTCFullYear(), d0.getUTCMonth() + 1, 1); while (m < t1) { months.push(C.fmtDate(m)); const dd = new Date(m); m = Date.UTC(dd.getUTCFullYear(), dd.getUTCMonth() + 1, 1); } }
+  const axis = `<div class="pl-ax" aria-hidden="true">${months.map((mo) => `<span style="left:${pct(mo)}%">${mo.slice(2, 7)}</span>`).join('')}${now ? `<em style="left:${pct(today)}%">today</em>` : ''}</div>`;
+  return `${axis}<ol class="pl-ph" aria-label="Phases in order, one bar each">${rows.map((r) => `<li><div class="pl-ph-h"><b>${esc(r.name)}</b><span>${esc(r.a)} to ${esc(r.b)}${r.ms ? ` · gate ${esc(r.ms.finishDate)}` : ''}</span></div><div class="pl-ph-t"><i class="pl-ph-b${r.crit ? ' pl-ph-c' : ''}" style="left:${pct(r.a)}%;width:${Math.max(1.5, pct(r.b) - pct(r.a))}%"></i>${r.ms ? `<i class="pl-ph-m" style="left:${pct(r.ms.finishDate)}%" title="${esc(r.ms.title + ', ' + r.ms.finishDate)}"></i>` : ''}${now}</div></li>`).join('')}</ol>
+  <p class="pb-legend"><span><i class="pb-k pl-ph-kc"></i>dark bar: no slack, a week lost here moves the finish</span><span><i class="pb-k pl-ph-kn"></i>lighter bar: has slack</span><span><i class="pb-k pb-k-ms"></i>gate</span></p>`;
 }
 
 /* ---- grouped bars: groups [{ label, values: [..] }], series [{ name, cls }] */
@@ -164,15 +166,28 @@ export function decisionLine(list, today) {
   return `<div class="pb-scroll pl-dline"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Decisions on their due dates">${g}</svg></div>${legend([['pl-k-open', 'open circle: awaiting decision'], ['pl-k-tri', 'triangle: late'], ['pl-k-made', 'filled circle: decided']])}`;
 }
 
-/* ---- the timing ambiguity from the audit, as an illustration (not prototype data) */
+/* ---- the timing ambiguity from the audit, as an illustration (not prototype data). Captions are HTML so they wrap. */
 export function timingFigure() {
-  const W = 620, H = 150; const pts = (shift, y0, amp) => Array.from({ length: 241 }, (_, i) => { const t = i / 240 * 6; return `${40 + i * 2.2},${y0 - amp * Math.sin(2 * Math.PI * (t - shift))}`; }).join(' ');
-  const step = (x0, y0) => `M40 ${y0} H${x0} V${y0 - 22} H${40 + 240 * 2.2}`;
-  return `<figure class="pl-fig"><div class="pb-scroll"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Two modules two milliseconds apart: a 1 kHz tone looks aligned, a shared step shows the offset">
-    <text x="40" y="14" class="pb-g-dt">1 kHz tone on both modules, module B late by 2 ms (two whole cycles): the traces coincide, phase reads 0 degrees</text>
-    <polyline points="${pts(0, 48, 18)}" class="pl-t-a"/><polyline points="${pts(2, 48, 18)}" class="pl-t-b"/>
-    <text x="40" y="92" class="pb-g-dt">A shared step on both modules: the same 2 ms shows as 125 samples at 62.5 kS/s</text>
-    <path d="${step(200, 136)}" class="pl-t-a"/><path d="${step(200 + 2 / 6 * 240 * 2.2, 132)}" class="pl-t-b"/>
-  </svg></div><figcaption>Illustration of the audit's point, with made-up signals. It is not prototype data and does not show a fault. ${''}</figcaption></figure>`;
+  const W = 620; const pts = (shift, y0, amp) => Array.from({ length: 241 }, (_, i) => { const t = i / 240 * 6; return `${20 + i * 2.4},${y0 - amp * Math.sin(2 * Math.PI * (t - shift))}`; }).join(' ');
+  const step = (x0, y0) => `M20 ${y0} H${x0} V${y0 - 24} H${20 + 240 * 2.4}`;
+  const svg = (inner, label) => `<div class="pb-scroll"><svg viewBox="0 0 ${W} 64" width="${W}" height="64" role="img" aria-label="${label}">${inner}</svg></div>`;
+  return `<div class="pl-fig"><p><b>A 1 kHz tone on both modules, with module B late by 2 ms.</b> Two milliseconds is two whole cycles, so the traces coincide and the phase reads 0 degrees.</p>${svg(`<polyline points="${pts(0, 32, 20)}" class="pl-t-a"/><polyline points="${pts(2, 32, 20)}" class="pl-t-b"/>`, 'Two identical tone traces lying on top of each other')}
+    <p><b>A shared step on both modules.</b> The same 2 ms now shows, as 125 samples at 62.5 kS/s.</p>${svg(`<path d="${step(190, 52)}" class="pl-t-a"/><path d="${step(190 + 2 / 6 * 240 * 2.4, 46)}" class="pl-t-b"/>`, 'Two step traces, the second one later than the first')}
+    <p class="pb-note">An illustration of the audit's point, drawn with made-up signals. It is not prototype data and does not show a fault.</p></div>`;
+}
+
+/* ---- the three plans on one month axis, one bar each, with the weeks that overload a person (Brief roadmap) */
+export function planBars(x) {
+  const { d, m } = x; const start = d.load.start; const end = d.scheds.map((s) => s.sched.endDate).sort().pop();
+  const t0 = C.parseDate(start), t1 = C.parseDate(end) + 7 * C.DAY; const pct = (dt) => Math.max(0, Math.min(100, (C.parseDate(dt) - t0) / (t1 - t0) * 100));
+  const months = []; { const d0 = new Date(t0); let mo = Date.UTC(d0.getUTCFullYear(), d0.getUTCMonth() + 1, 1); while (mo < t1) { months.push(C.fmtDate(mo)); const dd = new Date(mo); mo = Date.UTC(dd.getUTCFullYear(), dd.getUTCMonth() + 1, 1); } }
+  const now = d.today >= start && d.today <= end ? `<i class="pl-ph-now" style="left:${pct(d.today)}%" title="today"></i>` : '';
+  const waits = (id) => [...new Set((m.crossLinks || []).filter((k) => k.to.startsWith(id + ':')).map((k) => k.from.split(':')[0]))].map((from) => `<span class="pl-wait">waits for ${esc(PNAME[from])}</span>`).join(' ');
+  const rows = d.scheds.map((s) => { const ms = s.sched.rows.filter((r) => r.milestone); const nx = d.byProgram[s.id].next;
+    return `<li><div class="pl-ph-h"><b><a href="${s.href}">${s.n}. ${esc(s.name)}</a></b><span>${esc(s.program.startDate)} to ${esc(s.sched.endDate)}${nx ? ` · next gate: ${esc(nx.title)}, ${esc(nx.finishDate)}` : ''} ${waits(s.id)}</span></div><div class="pl-ph-t pl-ph-big"><i class="pl-ph-b ${PCOL[s.id]}" style="left:${pct(s.program.startDate)}%;width:${Math.max(1.5, pct(s.sched.endDate) - pct(s.program.startDate))}%"></i>${ms.map((r) => `<i class="pl-ph-m" style="left:${pct(r.finishDate)}%" title="${esc(r.title + ', ' + r.finishDate)}"></i>`).join('')}${now}</div></li>`; }).join('');
+  const ppl = d.load.people.filter((p) => p.weeklyHours != null);
+  const strip = ppl.map((p) => `<li><div class="pl-ph-h"><b>${esc(p.short)}</b><span>${d.load.totals[p.id].overWeeks} weeks over capacity</span></div><div class="pl-ph-t pl-over" role="img" aria-label="${esc(`${p.short}: ${d.load.totals[p.id].overWeeks} weeks over capacity`)}">${d.load.weeks.filter((w) => w.over[p.id]).map((w) => `<i style="left:${pct(w.date)}%;width:${Math.max(0.6, 7 * C.DAY / (t1 - t0) * 100)}%" title="${esc(`week of ${w.date}: over by ${w.over[p.id]} hours`)}"></i>`).join('')}${now}</div></li>`).join('');
+  return `<div class="pl-ax" aria-hidden="true">${months.map((mo) => `<span style="left:${pct(mo)}%">${mo.slice(2, 7)}</span>`).join('')}${now ? `<em style="left:${pct(d.today)}%">today</em>` : ''}</div><ol class="pl-ph">${rows}</ol><h4 class="pl-h4">Weeks that ask more of a person than they have</h4><ol class="pl-ph">${strip}</ol>
+  <p class="pb-legend"><span><i class="pb-k pb-k-ms"></i>gate</span><span><i class="pb-k pl-k-over"></i>week over capacity</span></p>`;
 }
 export { badge };

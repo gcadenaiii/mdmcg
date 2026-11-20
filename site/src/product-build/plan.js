@@ -86,9 +86,10 @@ function render(keep = true) {
   const i = DEF.tabs.findIndex((t) => t.k === ui.tab); const tab = DEF.tabs[i < 0 ? 0 : i];
   const subs = ui.working && tab.working && !DEF.library ? tab.working : null; const ws = subs ? Math.min(ui.wsub, subs.length - 1) : 0;
   const body = subs ? subs[ws][1](x) : tab.brief({ ...x, ui: { ...ui, working: DEF.library ? true : false } });
-  const pi = !DEF.library && !ui.working ? pathInfo(AREA, tab.k) : null;
+  const pi = DEF.library ? null : pathInfo(x, AREA, tab.k);
   const link = (q, cls, text) => `<a class="${cls}" href="${q.href}"${q.area === AREA ? ` data-tab="${q.k}"` : ''}>${text}</a>`;
-  const foot = pi ? `<nav class="pl-path" aria-label="Reading path">${pi.prev ? link(pi.prev, 'pl-prev', `← ${esc(pi.prev.label)}`) : '<span></span>'}<span>Step ${pi.step} of ${pi.of}</span>${pi.next ? link(pi.next, 'pl-next', `Next: ${esc(pi.next.label)} →`) : link({ href: '/plan/#today', area: 'hub', k: 'today' }, 'pl-next', 'Back to Today')}</nav>` : '';
+  const foot = DEF.library ? '' : pi ? `<nav class="pl-path" aria-label="Reading path">${pi.prev ? link(pi.prev, 'pl-prev', `← ${esc(pi.prev.label)}`) : '<span></span>'}<span>Step ${pi.step} of ${pi.of}${pi.also ? `<small>This screen also holds ${esc(pi.also)}</small>` : ''}</span>${pi.next ? link(pi.next, 'pl-next', `Next: ${esc(pi.next.label)} →`) : link({ href: '/plan/#today', area: 'hub', k: 'today' }, 'pl-next', 'Back to Today')}</nav>`
+    : `<nav class="pl-path" aria-label="Reading path"><a class="pl-prev" href="#now" data-tab="now">← Back to Now</a><span><small>This screen joins the reading path when it has something to show</small></span><span></span></nav>`;
   app.innerHTML = `<div class="wrap">${planNav(AREA)}
     <div class="pl-bar"><nav class="pb-tabs pl-tabs" aria-label="${esc(DEF.title)}"><ul>${DEF.tabs.filter((t) => !t.hidden || t === tab).map((t) => `<li><a href="#${t.k}"${t === tab ? ' aria-current="page"' : ''} data-tab="${t.k}">${esc(t.label)}</a></li>`).join('')}</ul></nav>
       <div class="pl-side">${!DEF.library && tab.working ? `<div class="pl-depth" role="group" aria-label="Depth"><button type="button" class="pb-btn${ui.working ? '' : ' pl-on'}" data-depth="brief" aria-pressed="${!ui.working}">Brief</button><button type="button" class="pb-btn${ui.working ? ' pl-on' : ''}" data-depth="working" aria-pressed="${ui.working}">Working</button></div>` : ''}<button type="button" class="pb-link pl-mine" data-open="changes||">Your changes${d.changes ? ` (${d.changes})` : ''}</button></div></div>
@@ -99,8 +100,17 @@ function render(keep = true) {
     <p class="pb-toast" id="pb-toast" role="status" aria-live="polite" hidden></p></div>${panel(x)}`;
   for (const [id, text] of Object.entries(ui.filter)) { const el = app.querySelector(`[data-filter="${id}"]`); if (el && text) { el.value = text; filterTable(id, text); } }
   for (const [id, s] of Object.entries(ui.sort)) sortTable(id, s.col, s.dir);
+  if (DEF.library) contents();
   if (keep) scrollTo(0, y);
   if (ui.panel) { const c = $('#pl-drawer .pb-btn'); if (c && !app.contains(document.activeElement)) c.focus(); }
+}
+/** the reference pages are long: list their sections beside them, and keep the list in view */
+function contents() {
+  const body = $('.pb-body', app); const heads = [...body.querySelectorAll(':scope > .pb-sec > h3, :scope > .pl-divide')]; if (heads.length < 3) return;
+  heads.forEach((h, i) => { h.id = h.id || `sec-${i + 1}`; });
+  const nav = document.createElement('nav'); nav.className = 'pl-toc'; nav.setAttribute('aria-label', 'On this page');
+  nav.innerHTML = `<b>On this page</b><ol>${heads.map((h) => `<li class="${h.classList.contains('pl-divide') ? 'pl-toc-d' : ''}"><a href="#${h.id}" data-jump="${h.id}">${esc(h.textContent)}</a></li>`).join('')}</ol>`;
+  const wrap = document.createElement('div'); wrap.className = 'pl-ref'; body.parentNode.insertBefore(wrap, body); wrap.append(nav, body);
 }
 function filterTable(id, text) { const t = $(`#t-${CSS.escape(id)}`); if (!t) return; const q = text.trim().toLowerCase(); for (const tr of t.tBodies[0].rows) tr.hidden = !!q && !tr.textContent.toLowerCase().includes(q); }
 function sortTable(id, col, dir) {
@@ -201,7 +211,10 @@ function go(k) { ui.tab = k; ui.task = null; ui.wsub = 0; ui.sub = ''; ui.panel 
 /* ------------------------------------------------------------------ events */
 
 app.addEventListener('click', (e) => {
-  const t = e.target.closest('[data-tab],[data-open],[data-task],[data-part],[data-sort],[data-csv],[data-act],[data-del],[data-zoom],[data-depth],[data-wsub],[data-seg],[data-chip],.pb-ed,a[href^="#"]'); if (!t) return;
+  const j = e.target.closest('[data-jump]'); if (j) { e.preventDefault(); const h = document.getElementById(j.dataset.jump); if (h) scrollTo(0, h.getBoundingClientRect().top + scrollY - 150); return; }
+  const t = e.target.closest('[data-go],[data-pick],[data-tab],[data-open],[data-task],[data-part],[data-sort],[data-csv],[data-act],[data-del],[data-zoom],[data-depth],[data-wsub],[data-seg],[data-chip],.pb-ed,a[href^="#"]'); if (!t) return;
+  if (t.dataset.go) { const [k, depth, ws] = t.dataset.go.split('|'); ui.tab = k; ui.working = depth === 'working'; ui.wsub = Number(ws || 0); ui.task = null; ui.panel = null; write(DEPTH, ui.working ? 'working' : 'brief', sessionStorage); history.replaceState(null, '', '#' + k); render(false); return scrollTo(0, Math.max(0, app.offsetTop - 80)); }
+  if (t.dataset.pick) { const [coll, id, text] = t.dataset.pick.split('|'); return setField(coll, id, 'decision', text); }
   if (t.dataset.tab) { e.preventDefault(); return go(t.dataset.tab); }
   if (t.matches('a[href^="#"]') && !t.dataset.tab) { const k = t.getAttribute('href').slice(1); if (DEF.tabs.some((q) => q.k === k)) { e.preventDefault(); return go(k); } return; }
   if (t.classList.contains('pb-ed')) return editCell(t);
@@ -246,6 +259,7 @@ app.addEventListener('change', (e) => {
 app.addEventListener('submit', (e) => {
   e.preventDefault(); const f = e.target; const data = Object.fromEntries(new FormData(f).entries());
   try {
+    if (f.dataset.cash !== undefined) { const v = Number(data.cash); if (!(v >= 0) || data.cash === '') throw new Error('An amount of zero or more is needed.'); ui.panel = null; return setField('capital', '_', 'cashOnHand', v); }
     if (f.dataset.add) return addRecord(f.dataset.add, data);
     if (f.dataset.approve) {
       const coll = f.dataset.coll || 'gates'; const g = C.gates({ tasks: coll === 'gates' ? m.tasks : m.bTasks, evidence: m.evidence, gates: m[coll] }).rows.find((q) => q.id === f.dataset.approve);
