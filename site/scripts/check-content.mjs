@@ -36,7 +36,7 @@ const RULES = [
 /* Sentences the owner approved by name. Each is taken out of the page before the rules are applied, so only this exact wording
    passes. 2026-11-19: the ordinary-room reading times on A reading (2026-11-20: the figure for the main spike follows the device, now option 2) (the 'reading time' rule stands for everything else). */
 const ALLOWED = [
-  'In an ordinary room, the virtual trial gives about 22 seconds for the main spike and about 5.7 minutes for the recovery wave on a typical chest.',
+  'In an ordinary room, on a typical chest, the virtual trial gives about 22 seconds for the main spike. The recovery wave shows in about 31 seconds, and the full ECG and MCG record takes about 5.7 minutes.',
 ];
 
 const files = [];
