@@ -1,310 +1,215 @@
-/* Company plan: what each section shows. Pictures first, short text second, tables on demand (inside "Details").
-   Public code: no figure is written here; every number comes from the plan's records through portfolio.js and calc.js. */
+/* Company plan: the Brief screens and how every screen is put together (reorganized 2026-11-20).
+
+   Three depths:
+     Brief    one screen, pictures first, a few words. Read-only. This file.
+     Working  the full sections with tables and edit fields (plan-sections.js and, for ECG/MCG, views.js). Shown only when
+              the reader switches to Working.
+     Library  reference material that is looked up, not read: parts, tools, standards, security, records.
+   One reading path: Today, Strategy, Roadmap, Money, Decisions. Every plan has the same four views: Now, Plan, Money, Proof.
+   Decisions and risks each live in one register for all plans. Detail opens in a side panel.
+   Public code: no figure is written here. */
 import * as C from './calc.js';
-import * as P from './portfolio.js';
-import { esc, badge, ed, tbl, tile, sec, ul, input, list, link, gantt, LABELS } from './views.js';
+import { esc, badge, ed, tbl, tile, sec, ul, input, gantt, LABELS } from './views.js';
+import * as L from './views.js';
+import * as S from './plan-sections.js';
 import * as V from './plan-viz.js';
 
 const $m = (v) => C.money(v == null ? v : Math.round(Number(v)));
-const details = (title, body, open = false) => `<details class="pl-details"${open ? ' open' : ''}><summary>${esc(title)}</summary>${body}</details>`;
-const cards = (items) => `<div class="pl-cards">${items.join('')}</div>`;
-const card = (title, body, cls = '') => `<article class="pl-box ${cls}"><h4>${title}</h4>${body}</article>`;
-const who = (x, id) => { const p = x.d.load.people.find((q) => q.id === id); return p ? p.short : id || ''; };
-const stated = (s) => `<span class="pb-b pb-b-${s === 'Shown' ? 'ok' : s === 'Stated' ? 'draft' : 'warn'}">${esc(s === 'Stated' ? 'Stated in a company document' : s === 'Shown' ? 'Shown, not verified' : 'Hypothesis')}</span>`;
-const floor = (b) => (b ? ' <span class="pb-b pb-b-warn">floor</span>' : '');
-const yn = (v) => (v == null ? '<span class="pb-none">not set</span>' : $m(v));
+const open = (kind, coll, id, label) => `<button type="button" class="pb-link pl-open" data-open="${kind}|${coll}|${esc(id)}">${esc(label ?? id)}</button>`;
+const more = (href, text) => `<a class="pl-more" href="${href}">${esc(text)} →</a>`;
+const empty = (b, p = '') => `<div class="pl-empty"><b>${esc(b)}</b>${p ? `<p>${p}</p>` : ''}</div>`;
+const xe = (x) => ({ ...x, d: x.d.ecg });                                   // the ECG/MCG sections read their own figures
+const KIT = {
+  battery: { name: 'Battery Product', n: 1, href: '/plan/battery/', program: 'bProgram', tasks: 'bTasks', gates: 'bGates', lines: 'bLines', risks: 'bRisks' },
+  ecg: { name: 'ECG/MCG', n: 2, href: '/product-build/', program: 'program', tasks: 'tasks', gates: 'gates', lines: 'lines', risks: 'risks' },
+  funding: { name: 'Funding and Partnerships', n: 3, href: '/plan/funding/', program: 'fProgram', tasks: 'fTasks', gates: null, lines: 'fLines', risks: null },
+};
+const readOf = (x, id) => (id === 'battery' ? x.d.readB : id === 'ecg' ? x.d.readE : null);
+const allDecisions = (x) => [...x.d.decisions.rows.map((r) => ({ ...r, coll: 'execDecisions' })), ...x.m.decisions.map((r) => ({ ...r, coll: 'decisions', program: 'ecg', due: null, days: null, owner: 'Director', made: !!(r.decision && r.decidedBy && r.decidedOn), evidence: (r.needs || []).join('; '), impactText: r.blocks }))];
+const allRisks = (x) => [...x.m.bRisks.map((r) => ({ ...r, coll: 'bRisks', program: 'battery' })), ...x.m.risks.map((r) => ({ ...r, coll: 'risks', program: 'ecg' }))].map((r) => ({ ...r, level: C.riskLevel(r.severity, r.probability), after: C.riskLevel(r.residualSeverity, r.residualProbability), score: r.severity * r.probability })).sort((a, b) => b.score - a.score);
 
-/* ================================================================ company strategy */
+/** how one plan stands, from its own records: a word, and the reason */
+export function standing(x, id) {
+  const s = x.d.byProgram[id]; const over = x.d.load.conflicts.filter((c) => c.programs.includes(id)).length;
+  if (s.sched.errors.length) return ['Blocked', 'the schedule has an error'];
+  if (s.sched.overdue.length) return ['At risk', `${s.sched.overdue.length} task${s.sched.overdue.length > 1 ? 's' : ''} overdue`];
+  if (over) return ['At risk', `${over} person-weeks over capacity`];
+  if (x.d.today < s.program.startDate) return ['Not started', `starts ${s.program.startDate}`];
+  return ['On plan', 'no task overdue, no week over capacity'];
+}
+const standBadge = (w) => `<span class="pb-b pb-b-${w === 'On plan' ? 'ok' : w === 'Not started' ? 'est' : w === 'At risk' ? 'warn' : 'bad'}">${esc(w)}</span>`;
+const chips = (key, cur) => `<div class="pl-chips" role="group" aria-label="Filter by plan">${[['', 'All'], ['battery', 'Battery'], ['ecg', 'ECG/MCG'], ['funding', 'Funding'], ['shared', 'Shared']].map(([v, n]) => `<button type="button" class="pb-btn${cur === v ? ' pl-on' : ''}" data-chip="${key}|${v}" aria-pressed="${cur === v}">${n}</button>`).join('')}</div>`;
+const segs = (key, cur, opts) => `<div class="pl-seg" role="group" aria-label="View">${opts.map(([v, n]) => `<button type="button" class="pb-btn${cur === v ? ' pl-on' : ''}" data-seg="${key}|${v}" aria-pressed="${cur === v}">${n}</button>`).join('')}</div>`;
 
-function sOverview(x) {
-  const { m, d } = x; const nextDl = d.dl.upcoming[0];
-  const gateOf = (o) => { if (!o.gate) return ''; const g = [...d.readB.gateRows, ...d.readE.gateRows].find((q) => q.id === o.gate); return g ? `${esc(g.id)} ${badge(g.status)}` : ''; };
+/* ================================================================ the reading path */
+
+function today(x) {
+  const { d } = x; const dec = allDecisions(x).filter((r) => !r.made && r.due).slice(0, 3); const mo = d.monthly;
+  const planCard = (id) => { const k = KIT[id]; const s = d.byProgram[id]; const [w, why] = standing(x, id); const rd = readOf(x, id); const g = rd && rd.currentGate;
+    return `<a class="pl-card ${V.PCOL[id]}" href="${k.href}"><span class="pl-card-n">Plan ${k.n}</span><b>${esc(k.name)}</b><p>${standBadge(w)} <small>${esc(why)}</small></p>
+      <dl><div><dt>Next</dt><dd>${s.next ? `${esc(s.next.title)}<br><b>${esc(s.next.finishDate)}</b>` : 'no milestone'}</dd></div>${g ? `<div><dt>Waiting on</dt><dd>${g.missing.length} thing${g.missing.length === 1 ? '' : 's'} before gate ${esc(g.id)}</dd></div>` : `<div><dt>Pipeline</dt><dd>${d.pipe.count} identified, ${$m(d.pipe.received)} received</dd></div>`}</dl></a>`; };
   return `
-  ${V.strategyMap(x)}
-  <div class="pb-tiles">
-    ${tile($m(d.budget.total) + floor(d.budget.isFloor), 'Three programs, planned cost', `${d.budget.notEstimated} cost lines have no figure yet`)}
-    ${tile(d.load.totals.A.overWeeks + ' weeks', 'Developer planned over capacity', `Director: ${d.load.totals.B.overWeeks} weeks`)}
-    ${tile(String(d.decisions.open), 'Decisions awaiting the owner', d.decisions.next ? `Next: ${esc(d.decisions.next.id)} by ${esc(d.decisions.next.due)}` : '')}
-    ${tile(d.monthly.cashOnHand == null ? 'not set' : $m(d.monthly.cashOnHand), 'Cash on hand', d.monthly.cashOnHand == null ? 'Runway cannot be worked out' : `Runway ${d.monthly.monthsOfRunway} months of the plan`)}
-    ${tile($m(d.pipe.received), 'Funding received', `${$m(d.pipe.committed)} committed · ${d.pipe.count} opportunities identified`)}
-    ${tile(nextDl ? esc(nextDl.deadline) : 'none dated', 'Next funding deadline', nextDl ? esc(nextDl.organisation + ': ' + nextDl.programme) : 'No verified date on record')}
-  </div>
-  ${sec('How the business is meant to work', V.chain(m.businessModel.map((b) => ({ title: b.step, text: b.text, tag: stated(b.status), attr: `title="${esc(b.basis)}"` })), { label: 'Business model from customer need to recurring revenue' })
-    + `<p class="pb-note">Three marks: shown in a demonstration but not verified, stated in a company document, or a hypothesis with no evidence yet. Hold the pointer on a step for its basis. ${esc(m.ambition)}</p>`)}
-  ${sec('Objectives and how each is measured', cards(m.objectives.map((o) => card(esc(o.title), `<p class="pl-kind">${esc(o.kind)} · ${esc(V.PNAME[o.program] || o.program)}</p><p><b>Measure.</b> ${esc(o.measure)}</p><p>${gateOf(o)}</p>`, V.PCOL[o.program]))))}`;
+  <div class="pl-map-row">${['battery', 'ecg', 'funding'].map(planCard).join('')}</div>
+  <div class="pl-today">
+    <section><h3>Needs you</h3>${dec.length ? `<ol class="pl-need">${dec.map((r) => `<li>${open('decision', r.coll, r.id, r.title)}<span>${esc(r.due)} · ${r.days < 0 ? `${-r.days} days late` : r.days === 0 ? 'today' : `in ${r.days} days`}</span></li>`).join('')}</ol>` : '<p>No decision is waiting.</p>'}${more('#decisions', `All ${allDecisions(x).filter((r) => !r.made).length} open decisions`)}</section>
+    <section><h3>Blocked or at risk</h3><ul class="pl-flags"><li><b>${d.load.totals.A.overWeeks}</b> weeks the developer is planned over capacity</li><li><b>${d.load.totals.B.overWeeks}</b> weeks the director is over capacity</li><li><b>${allRisks(x).filter((r) => r.level === 'High').length}</b> risks rated high</li></ul>${more('#roadmap', 'See the roadmap')}</section>
+    <section><h3>Money</h3><ul class="pl-flags"><li><b>${$m(d.budget.total)}</b> planned cost, three plans${d.budget.isFloor ? ' (a floor)' : ''}</li><li><b>${mo.cashOnHand == null ? 'not entered' : $m(mo.cashOnHand)}</b> cash on hand</li><li><b>${mo.runwayKnown ? (mo.runwayMonth || 'beyond the plan') : 'unknown'}</b> cash runs out</li></ul>${more('#money', 'See the money')}</section>
+  </div>`;
 }
 
-function sRoadmap(x) {
-  const { m, d } = x; const ppl = d.load.people;
-  return `
-  ${V.roadmap(x)}
-  <p class="pb-note">Each bar is a phase, placed by that program's own task dependencies. Select a program name, bar or milestone to open its plan. Dashed links show where one program waits on another.</p>
-  ${sec('Shared capacity: hours by week, person and program', ppl.map((p) => `<h4 class="pl-h4">${esc(p.name)}${p.rate != null ? ` · $${p.rate}/h` : ' · no rate on record'}${p.weeklyHours != null ? ` · ${p.weeklyHours} h a week` : ' · no weekly hours on record'}</h4>${V.capacity(x, p)}`).join('')
-    + V.legend([['pl-c-b', 'Battery product'], ['pl-c-e', 'ECG/MCG'], ['pl-c-f', 'Funding and partnerships'], ['pb-k-cap', 'hours available'], ['pl-k-over', '! over capacity']])
-    + `<div class="pb-tiles">${ppl.map((p) => { const t = d.load.totals[p.id]; return tile(`${Math.round(t.hours)} h`, p.short, `${t.unknownCapacity ? 'capacity not on record' : `${t.overWeeks} weeks over, by ${Math.round(t.over)} h in all`} · ${t.cost == null ? 'not costed' : $m(t.cost)}`); }).join('')}</div>`,
-    'A person has one weekly capacity for all programs together. An hour is planned once and costed once, at that person\'s single rate.')}
-  ${sec('What a change of plan would do', V.hbars(d.realloc.map((r) => ({ label: r.name, parts: [{ value: r.overHours.A, cls: 'pl-c-b', name: 'Developer hours over capacity' }, { value: r.overHours.B, cls: 'pl-c-e', name: 'Director hours over capacity' }], text: `${Math.round(r.overHours.A + r.overHours.B)} h over · ends ${r.lastEnd}${r.extraCost ? ' · adds ' + $m(r.extraCost) : ''}` })), { left: 330, label: 'Hours over capacity under each plan' })
-    + V.legend([['pl-c-b', 'Developer hours over capacity'], ['pl-c-e', 'Director hours over capacity']])
-    + details('Details: each plan', tbl('realloc', [{ h: 'Plan', v: (r) => esc(r.name) }, { h: 'Battery ends', v: (r) => esc(r.ends.battery) }, { h: 'ECG/MCG ends', v: (r) => esc(r.ends.ecg) }, { h: 'Funding work ends', v: (r) => esc(r.ends.funding) }, { h: 'Developer weeks over', n: 1, v: (r) => r.overWeeks.A }, { h: 'Director weeks over', n: 1, v: (r) => r.overWeeks.B }, { h: 'Added cost', n: 1, v: (r) => (r.extraCost == null ? 'not costed' : $m(r.extraCost)) }, { h: 'What it assumes', v: (r) => esc((m.reallocations.find((q) => q.id === r.id) || {}).note || '') }], d.realloc, { name: 'reallocation plans' })),
-    'Worked out from the same task and capacity records. Choosing between them is decision ED-02. To try another plan, change a program\'s start date in its own plan.')}
-  ${sec('Where one program waits on another', ul((m.crossLinks || []).map((k) => `<b>${esc(k.from.replace(':', ' '))}</b> → <b>${esc(k.to.replace(':', ' '))}</b>: ${esc(k.why)}`)))}
-  ${details(`Details: the ${d.load.conflicts.length} overloaded person-weeks`, tbl('conf', [{ h: 'Week of', v: (c) => esc(c.date) }, { h: 'Person', v: (c) => esc(who(x, c.person)) }, { h: 'Planned h', n: 1, v: (c) => c.hours }, { h: 'Available h', n: 1, v: (c) => c.capacity }, { h: 'Over by', n: 1, v: (c) => c.over }, { h: 'Programs', v: (c) => c.programs.map((p) => esc(V.PNAME[p])).join(', ') }, { h: 'Tasks', v: (c) => list(c.tasks) }], d.load.conflicts, { name: 'overloaded weeks' }))}`;
-}
-
-function sFinancials(x) {
-  const { m, d } = x; const mo = d.monthly; const b = d.budget;
-  const rev = x.ui.revenue ? d.econ.find((e) => e.units === Number(x.ui.volume || 25)) : null;
-  return `
-  <div class="pb-tiles">
-    ${tile($m(b.total) + floor(b.isFloor), 'Planned cost, three programs', `${b.notEstimated} lines not estimated · ${b.unpricedHours} h with no rate`)}
-    ${tile($m(mo.avgBurn), 'Average planned spend a month', `over ${mo.rows.length} months`)}
-    ${tile($m(mo.totalActual), 'Actual paid to date', `committed ${$m(mo.rows.reduce((s, r) => s + r.committedTotal, 0))}`)}
-    ${tile(ed(x, 'capital', '_', 'cashOnHand', m.capital.cashOnHand, { t: 'number', fmt: (v) => (v == null ? 'enter' : $m(v)) }), 'Cash on hand', esc(m.capital.cashOnHand == null ? m.capital.note : 'Entered by a person; this plan cannot verify it'))}
-    ${tile(mo.runwayKnown ? (mo.runwayMonth ? esc(mo.runwayMonth) : 'beyond the plan') : 'unknown', 'Cash runs out', mo.runwayKnown ? `${mo.monthsOfRunway} months of planned spending covered` : 'Needs cash on hand')}
-    ${tile(mo.fundingGap == null ? 'unknown' : $m(mo.fundingGap), 'Projected funding gap', 'Planned spending less cash on hand and cash received')}
-  </div>
-  ${sec('Budget by program', V.hbars(b.rows.map((r) => ({ label: r.name, parts: [{ value: r.labour, cls: V.PCOL[r.id], name: 'Labor' }, { value: r.other, cls: 'pl-c-oth', name: 'Other costs with a figure' }, { value: r.contingency, cls: 'pl-c-con', name: 'Contingency' }], text: $m(r.total) + (r.isFloor ? ` floor: ${r.notEstimated} lines not estimated` : '') })), { fmt: $m, label: 'Budget by program' })
-    + V.legend([['pl-c-b', 'Labor (program colour)'], ['pl-c-oth', 'Other costs with a figure'], ['pl-c-con', 'Contingency']])
-    + details('Details: how each figure is worked out', tbl('pbud', [{ h: 'Program', v: (r) => esc(r.name) }, { h: 'Labor', n: 1, v: (r) => $m(r.labour) }, { h: 'Other', n: 1, v: (r) => $m(r.other) }, { h: 'Contingency', n: 1, v: (r) => $m(r.contingency) }, { h: 'Total', n: 1, v: (r) => $m(r.total) }, { h: 'Lines not estimated', n: 1, v: (r) => r.notEstimated }, { h: 'Hours with no rate', n: 1, v: (r) => r.unpricedHours }, { h: 'Basis', v: (r) => esc(r.basis) }, { h: 'Status', v: () => badge('Planning Estimate') }], b.rows, { name: 'budget by program', foot: ['Total', '', '', '', $m(b.total), b.notEstimated, b.unpricedHours, '', ''] })),
-    'The ECG/MCG figure is that plan\'s own planning estimate; it is not an approved budget and nothing of it has been spent. The battery and funding figures are floors: they hold labor and leave out every cost that still needs a quotation.')}
-  ${sec('Planned, committed and actual spending by month', V.monthBars(mo.rows, { label: 'Planned spending by month and program, with committed and actual' })
-    + details('Details: by month', tbl('months', [{ h: 'Month', v: (r) => esc(r.month) }, { h: 'Battery', n: 1, v: (r) => $m(r.planned.battery || 0) }, { h: 'ECG/MCG', n: 1, v: (r) => $m(r.planned.ecg || 0) }, { h: 'Funding work', n: 1, v: (r) => $m(r.planned.funding || 0) }, { h: 'Planned', n: 1, v: (r) => $m(r.plannedTotal) }, { h: 'Committed', n: 1, v: (r) => $m(r.committedTotal) }, { h: 'Actual', n: 1, v: (r) => $m(r.actualTotal) }, { h: 'Cash in', n: 1, v: (r) => $m(r.cashIn) }, { h: 'Balance', n: 1, v: (r) => (r.balance == null ? 'unknown' : $m(r.balance)) }], mo.rows, { name: 'spending by month' })),
-    'Planned labor follows the hours placed in tasks. Committed is purchase orders, invoices and payments on record; actual is payments and logged hours. Both are zero: nothing has been bought.')}
-  ${sec('Cash balance and runway', mo.runwayKnown ? V.balanceLine(mo.rows) : `<div class="pl-empty"><b>No cash figure is on record.</b><p>Enter cash on hand in the tile above. The plan then draws the balance month by month, the month it runs out, and the funding gap.</p></div>`)}
-  ${sec('Funding: received, committed, prospective', V.hbars([{ label: 'Cash received', value: d.pipe.received, cls: 'pl-c-act' }, { label: 'Committed (award or signed)', value: d.pipe.committed, cls: 'pl-c-f' }, { label: 'Prospective, weighted', value: d.pipe.weighted, cls: 'pl-c-con', text: `${$m(d.pipe.weighted)} · ${d.pipe.noProbability} have no probability` }, { label: 'Prospective, unweighted', value: d.pipe.prospective, cls: 'pl-c-oth', text: `${$m(d.pipe.prospective)} · ${d.pipe.noAmount} have no amount` }], { fmt: $m, label: 'Funding by certainty' }),
-    'Only cash received is available. Weighted figures are estimates and exist only where a person has entered a probability with its reason. <a href="/plan/funding/#6">Open the pipeline</a>.')}
-  ${sec('Forecast revenue', `<div class="pb-controls"><label class="pb-ck"><input type="checkbox" data-uick="revenue"${x.ui.revenue ? ' checked' : ''}> Show the hypothetical revenue scenario</label><label>Systems a year <select data-ui="volume">${P.VOLUMES.map((v) => `<option${Number(x.ui.volume || 25) === v ? ' selected' : ''}>${v}</option>`).join('')}</select></label></div>`
-    + (rev && rev.ok ? `<div class="pb-tiles">${tile($m(rev.revenue), 'Revenue', 'hypothesis')}${tile($m(rev.grossProfit), 'Gross profit', `${rev.grossMarginPct}%`)}${tile($m(rev.operatingProfit), 'Operating profit', `${d.econUnset} cost inputs are still zero`)}${tile($m(rev.cashReceived), 'Cash received in the year', `payment after ${m.bEconomics.paymentDays} days`)}</div><p class="pb-alert">A hypothesis, not a forecast. No sale price, unit cost, order or customer is on record. It is not added to the cash balance above. <a href="/plan/battery/#6">Open the model</a>.</p>` : `<div class="pl-empty"><b>No revenue is forecast.</b><p>No order, price or customer is on record. Tick the box to see the hypothetical scenario from the battery plan's economics model.</p></div>`))}
-  ${sec('Purchases, quotations and invoices', `<form class="pb-form" data-add="expenses">${input('date', 'Date', { type: 'date', req: 1, val: d.today })}${input('program', 'Program', { opts: [['battery', 'Battery'], ['ecg', 'ECG/MCG'], ['funding', 'Funding'], ['shared', 'Shared']] })}${input('kind', 'Kind', { opts: P.EXPENSE_KINDS })}${input('vendor', 'Vendor', { req: 1 })}${input('what', 'What', { req: 1 })}${input('amount', 'Amount, $', { type: 'number', req: 1, step: '0.01', min: 0 })}${input('line', 'Cost line or task id')}${input('document', 'Where the document is kept', { req: 1 })}<button class="pb-btn" type="submit">Add</button></form>`
-    + tbl('exp', [{ h: 'Id', v: (e) => esc(e.id) }, { h: 'Date', v: (e) => esc(e.date) }, { h: 'Program', v: (e) => esc(V.PNAME[e.program] || e.program) }, { h: 'Kind', v: (e) => ed(x, 'expenses', e.id, 'kind', e.kind, { t: 'select', opts: P.EXPENSE_KINDS }) }, { h: 'Vendor', v: (e) => esc(e.vendor) }, { h: 'What', v: (e) => esc(e.what) }, { h: 'Amount', n: 1, v: (e) => $m(e.amount) }, { h: 'Line or task', v: (e) => esc(e.line || '') }, { h: 'Document', v: (e) => esc(e.document) }, { h: 'Entered by', v: (e) => esc(e.by) }, { h: '', v: (e) => `<button type="button" class="pb-link" data-del="expenses" data-id="${esc(e.id)}">remove</button>` }], m.expenses, { name: 'purchases and quotations', empty: 'Nothing has been quoted, ordered or paid.' }),
-    'Drill-down ends here: company total, program, task or cost line, then the quotation, order or invoice. Enter no supplier or customer record until decision ED-03 on a server-side store is made.')}`;
-}
-
-function sShared(x) {
-  const { m } = x; const a = m.securityAudit;
-  const cell = (t) => `<td>${esc(t)}</td>`;
-  return `
-  ${sec('One quality system, two product rule sets', `<div class="pb-scroll"><table class="pb-t pl-matrix"><thead><tr><th scope="col">Shared process</th><th scope="col">Common to both</th><th scope="col" class="pl-th-b">Battery product adds<br><small>industrial: ISO 9001 and instrument standards</small></th><th scope="col" class="pl-th-e">ECG/MCG adds<br><small>medical: ISO 13485 and FDA rules</small></th><th scope="col">Today</th></tr></thead><tbody>${m.sharedProcesses.map((p) => `<tr><th scope="row">${esc(p.process)}</th>${cell(p.shared)}${cell(p.battery)}${cell(p.ecg)}<td>${ed(x, 'sharedProcesses', p.id, 'state', p.state, { t: 'select', opts: ['In place', 'Partly', 'Missing'] })} ${badge(p.state)}</td></tr>`).join('')}</tbody></table></div>`
-    + `<p><b>Kept apart for each product.</b> ${list(m.productSpecific)}.</p>`,
-    `${m.sharedProcesses.filter((p) => p.state === 'Missing').length} of ${m.sharedProcesses.length} shared procedures are not written yet. No certificate is held and none is claimed: a list of document names is not compliance. A person with the right qualification approves each controlled release and each risk decision.`)}
-  ${sec('How the private area is protected today', `<p class="pb-alert">${esc(a.verdict)}</p>` + cards(a.today.map((t) => card(esc(t.item) + ' ' + badge(t.state), `<p>${esc(t.finding)}</p>`))))}
-  ${sec('Proposed: a server-side store with named accounts', V.chain(a.proposal.map((p) => ({ title: p.part, text: p.design })), { wrap: true, label: 'Proposed security architecture' }) + `<p class="pb-alert">${esc(a.needs)}</p>`)}
-  ${sec('One home for each kind of record', tbl('truth', [{ h: 'Record', v: (r) => esc(r.data) }, { h: 'Authoritative home', v: (r) => esc(r.home) }, { h: 'Rule', v: (r) => esc(r.rule) }], m.sourcesOfTruth, { name: 'sources of truth' }) + ul(m.syncRules.map(esc)), 'No paid project tool is added. Tasks, budgets and decisions are kept once.')}
-  ${sec('What AI tools draft and what people decide', cards([card('AI tools may draft', ul(m.aiUse.ai.map(esc))), card('Only a person decides', ul(m.aiUse.human.map(esc)))]) + `<p class="pb-note">${esc(m.aiUse.marks)}</p>`)}`;
-}
-
-function sDecisions(x) {
-  const { d } = x; const q = d.decisions;
-  return `
-  <div class="pb-tiles">${tile(String(q.open), 'Open')}${tile(String(q.overdue), 'Past their date')}${tile(String(q.rows.length - q.open), 'Decided')}${tile(q.next ? esc(q.next.due) : 'none', 'Next due', q.next ? esc(q.next.id + ' ' + q.next.title) : '')}</div>
-  ${V.decisionLine(q, d.today)}
-  <div class="pl-decisions">${q.rows.map((r) => `<article class="pl-box pl-dec ${V.PCOL[r.program] || ''}" id="dec-${esc(r.id)}"><header><h4>${esc(r.id)} ${esc(r.title)}</h4>${badge(r.made ? 'Approved' : r.days != null && r.days < 0 ? 'Blocked' : 'Review Required').replace('Approved', 'Decided').replace('Blocked', 'Overdue')}</header>
-    <dl class="pl-facts"><div><dt>Due</dt><dd>${ed(x, 'execDecisions', r.id, 'due', r.due, { t: 'date' })}${r.days != null && !r.made ? ` (${r.days < 0 ? Math.abs(r.days) + ' days ago' : 'in ' + r.days + ' days'})` : ''}</dd></div><div><dt>Owner</dt><dd>${esc(r.owner)}</dd></div><div><dt>Program</dt><dd>${esc(V.PNAME[r.program] || r.program)}</dd></div><div><dt>Financial impact</dt><dd>${r.impact != null ? $m(r.impact) : ''} ${esc(r.impactText || '')}</dd></div></dl>
-    <p>${esc(r.question)}</p>
-    <p><b>Alternatives.</b></p>${ul(r.options.map(esc))}
-    <p><b>Recommendation.</b> ${esc(r.recommendation)}</p><p><b>Evidence.</b> ${esc(r.evidence)}</p>
-    <p class="pl-decided"><b>Decision:</b> ${ed(x, 'execDecisions', r.id, 'decision', r.decision, { fmt: (v) => v || 'record the decision' })} · <b>by</b> ${ed(x, 'execDecisions', r.id, 'decidedBy', r.decidedBy, { fmt: (v) => v || 'name' })} · <b>on</b> ${ed(x, 'execDecisions', r.id, 'decidedOn', r.decidedOn, { t: 'date', fmt: (v) => v || 'date' })}</p></article>`).join('')}</div>
-  <p class="pb-note">A decision counts when it has its text, a person's name and a date. An AI tool cannot be named. Engineering decisions inside each program are in that program's own plan.</p>`;
-}
-
-/* ================================================================ battery */
-
-function taskPanel(x, coll, s) {
-  const id = x.ui.task; const t = x.m[coll].find((q) => q.id === id); const r = s.sched.byId.get(id); if (!t || !r) return '';
-  const row = (k, v) => `<div><dt>${esc(k)}</dt><dd>${v}</dd></div>`; const ppl = x.d.load.people;
-  return `<div class="pb-panel" id="pb-task"><div class="pb-panel-h"><h4>${esc(t.id)} ${esc(t.title)}</h4><button type="button" class="pb-btn" data-act="close-task">Close</button></div>${t.description ? `<p>${esc(t.description)}</p>` : ''}<dl class="pb-dl">
-    ${row('Planned start week', ed(x, coll, id, 'week', t.week, { t: 'number' }))}${t.milestone ? '' : row('Length, weeks', ed(x, coll, id, 'weeks', t.weeks, { t: 'number' }))}
-    ${row('Forecast', `${esc(r.startDate)} to ${esc(r.finishDate)}${r.slipWeeks ? ` (pushed ${r.slipWeeks} weeks by ${esc(r.drivenBy)})` : ''}`)}${row('Slack', r.critical ? 'none: on the critical path' : `${r.float} weeks`)}
-    ${row('Depends on', ed(x, coll, id, 'deps', C.fmtDeps(t.deps), { t: 'deps', fmt: (v) => v || 'nothing' }))}
-    ${t.milestone ? '' : ppl.map((p) => row(`Estimated hours, ${p.short}`, ed(x, coll, id, 'hours', t.hours[p.id] || 0, { t: 'number', k: p.id }))).join('')}
-    ${row('Percent complete', ed(x, coll, id, 'percent', t.percent, { t: 'number' }))}${row('Status', ed(x, coll, id, 'status', t.status, { t: 'select', opts: LABELS }))}
-    ${row('Deliverables', list(t.deliverables))}${t.risks.length ? row('Linked risks', list(t.risks)) : ''}${t.expense.length ? row('Cost lines', list(t.expense)) : ''}${t.external ? row('Outside review', esc(t.external)) : ''}${t.gate ? row('Gate', esc(t.gate)) : ''}</dl></div>`;
-}
-const progGantt = (x, s, coll) => gantt(x, { sched: s.sched, program: s.program, phases: s.phases, nowWeek: C.weekOf(s.program, x.d.today) }) + (x.ui.task && x.m[coll].some((t) => t.id === x.ui.task) ? taskPanel(x, coll, s) : '');
-const taskTable = (x, s, coll, name) => details('Details: every task', tbl(name, [{ h: 'Id', v: (r) => `<button type="button" class="pb-link" data-task="${esc(r.id)}">${esc(r.id)}</button>` }, { h: 'Task', v: (r) => esc(r.title) }, { h: 'Owner', v: (r) => esc(who(x, r.owner)) }, { h: 'Start', v: (r) => esc(r.startDate) }, { h: 'Finish', v: (r) => esc(r.finishDate) }, ...x.d.load.people.map((p) => ({ h: `h ${p.short}`, n: 1, v: (r) => C.taskHours(s.program, x.m[coll].find((t) => t.id === r.id), p.id) || '' })), { h: 'Depends on', v: (r) => esc(C.fmtDeps(r.deps)) }, { h: '%', n: 1, v: (r) => ed(x, coll, r.id, 'percent', r.percent, { t: 'number' }) }, { h: 'Slack', n: 1, v: (r) => r.float }, { h: 'Critical', v: (r) => (r.critical ? 'yes' : '') }], s.sched.rows, { name }));
-const gateCards = (x, rows, coll, sched) => `<div class="pb-gate-cards">${rows.map((g) => `<article class="pb-gate-card"><header><h4>${esc(g.id)} ${esc(g.title)}</h4>${badge(g.status)}${g.critical ? ' <span class="pb-b pb-b-warn">critical gate</span>' : ''}<small>${esc(C.finishOf(sched, g.milestone) || '')}</small></header><p><b>Criteria</b></p>${ul(g.criteria.map(esc))}<p><b>An approval releases:</b> ${esc(g.authorises)}</p>${details(`Still needed before a go: ${g.missing.length}`, ul(g.missing.map((q) => esc(q.text))))}
-    ${g.approval ? `<p class="pb-approved">${badge(g.status)} ${esc(g.approval.decision)} by ${esc(g.approval.by)} on ${esc(g.approval.date)} <button type="button" class="pb-link" data-act="withdraw" data-coll="${coll}" data-id="${esc(g.id)}">withdraw</button></p>` : `<form class="pb-form" data-approve="${esc(g.id)}" data-coll="${coll}">${input('by', 'Decided by (a person\'s name)', { req: 1, val: x.store.who })}${input('date', 'Date', { type: 'date', req: 1, val: x.d.today })}${input('decision', 'Decision', { opts: ['Approved', 'Conditional', 'No-go'] })}${input('note', 'Note')}<button class="pb-btn" type="submit">Record decision</button></form>`}</article>`).join('')}</div>`;
-
-function bEngineering(x) {
-  const { m, d } = x; const onFile = m.bSources.filter((s) => s.state === 'On file').length; const r = d.readB; const ag = m.bAgreement;
-  const col = (level, title, note) => `<section class="pl-col pl-col-${level.replace(/\s/g, '').toLowerCase()}"><h4>${esc(title)} <span>${m.bFindings.filter((f) => f.level === level).length}</span></h4><p class="pb-note">${esc(note)}</p>${m.bFindings.filter((f) => f.level === level).map((f) => `<div class="pl-find"><p>${esc(f.text)}</p><small>${esc(f.id)} · ${esc(f.source)}</small></div>`).join('')}</section>`;
-  return `
-  <p class="pb-alert">Preliminary. This page restates the audit of November 17, 2026 and the engineering agreement. Nothing here is a test of ours. An observation in a video is not a passed test.</p>
-  <div class="pl-board">${col('Shown', 'Shown in the videos', 'Seen on screen. Not measured by us.')}${col('Credible', 'Sound in principle', 'A reasonable choice. Not a result.')}${col('Not verified', 'Not verified', 'Claimed or implied; no independent record.')}${col('Open', 'Open', 'No evidence on file at all.')}</div>
-  ${sec('Why a zero phase reading is not enough', V.timingFigure(), 'The audit asks for a shared transient and a known-delay test beside the DFT test. The DFT test stays valid for what it measures.')}
-  ${sec('Engineering readiness', V.meters([{ label: 'Requirements with a planned test', done: r.withTest, of: r.requirements, note: 'Coverage of the plan, not of results' }, { label: 'Tests passed', done: r.passed, of: r.tests, note: `${r.failed} failed · ${r.notRun} not run` }, { label: 'Requirements with evidence', done: r.withEvidence, of: r.requirements, note: 'Evidence is added by people' }, { label: 'Risk controls verified', done: r.controlsVerified, of: r.controls, note: `${r.highRisks} risks rated high` }, { label: 'Release gates approved', done: r.gatesApproved, of: r.gates, note: r.currentGate ? `Current: ${r.currentGate.id} ${r.currentGate.title}` : '' }, { label: 'Source files on file', done: onFile, of: m.bSources.length, note: 'See the intake checklist' }])
-    + `<div class="pb-tiles">${tile(String(r.openDefects), 'Open defects', 'None on record: no test has been run')}${tile(String(r.gaps), 'Open traceability links')}</div>`)}
-  ${sec('Source intake checklist', V.hbars([{ label: 'On file', value: onFile, cls: 'pl-c-act' }, { label: 'Not received from the contractor', value: m.bSources.filter((s) => s.state === 'Not received').length, cls: 'pl-c-warn' }, { label: 'Not found in company records', value: m.bSources.filter((s) => s.state === 'Not found').length, cls: 'pl-c-bad' }], { fmt: (v) => v + ' items', label: 'Source files by state' })
-    + details('Details: every file and record', tbl('bsrc', [{ h: 'Id', v: (s) => esc(s.id) }, { h: 'File or record', v: (s) => esc(s.name) }, { h: 'State', v: (s) => ed(x, 'bSources', s.id, 'state', s.state, { t: 'select', opts: ['On file', 'Not received', 'Not found'] }) + ' ' + badge(s.state === 'On file' ? 'verified' : 'Review Required').replace('verified', 'on file') }, { h: 'Where', v: (s) => ed(x, 'bSources', s.id, 'where', s.where) }, { h: 'Expected from', v: (s) => esc(s.owner) }, { h: 'Note', v: (s) => esc(s.note) }], m.bSources, { name: 'source intake checklist' })),
-    'Asking for the missing files is the plan\'s first task (BT-001) and decision ED-06.')}
-  ${sec('The unresolved engineering matters', V.chain(m.bRequirements.slice(0, 14).map((q) => ({ title: q.id, text: q.text.length > 90 ? q.text.slice(0, 89) + '…' : q.text, tag: badge('Not run') })), { wrap: true, label: 'Unresolved engineering matters' }) + details('Details: each requirement, its test and its source', tbl('breq', [{ h: 'Id', v: (q) => esc(q.id) }, { h: 'What must be true', v: (q) => ed(x, 'bRequirements', q.id, 'text', q.text) }, { h: 'How it is checked', v: (q) => esc(q.method) }, { h: 'Test', v: (q) => list(m.bTests.filter((t) => t.requirements.includes(q.id)).map((t) => t.id)) }, { h: 'Evidence', v: (q) => list(m.evidence.filter((e) => m.bTests.some((t) => t.id === e.test && t.requirements.includes(q.id))).map((e) => e.id)) }, { h: 'From', v: (q) => esc(q.src) }, { h: 'Status', v: (q) => badge(q.status) }], m.bRequirements, { name: 'battery requirements' })), 'Each is a requirement to confirm against the controlling agreement. None has evidence.')}
-  ${sec('The engineering agreement, as written', V.hbars(ag.milestones.map((ms) => ({ label: `Milestone ${ms.n}`, value: ms.pct, cls: ms.n === 7 ? 'pl-c-warn' : 'pl-c-oth', text: `${ms.pct}% · ${ms.text.length > 70 ? ms.text.slice(0, 69) + '…' : ms.text}` })), { left: 110, label: 'Share of the fee by milestone' })
-    + `<dl class="pl-facts"><div><dt>Effective</dt><dd>${esc(ag.effective)}</dd></div><div><dt>Milestones due</dt><dd>${esc(ag.deadline)}</dd></div><div><dt>Fee</dt><dd>up to ${$m(ag.fee)}. ${esc(ag.feeNote)}</dd></div><div><dt>Acceptance test</dt><dd>${esc(ag.acceptance)}</dd></div><div><dt>Repair term</dt><dd>${esc(ag.warranty)}</dd></div><div><dt>Rights</dt><dd>${esc(ag.ip)}</dd></div></dl>`
-    + details('Details: specifications and points the agreement leaves unclear', `<p><b>Software to be delivered.</b> ${list(ag.software)}.</p><p><b>Requirements page.</b></p>${ul(ag.specs.map(esc))}<p><b>Unclear.</b></p>${ul(ag.unclear.map(esc))}`))}`;
-}
-
-function bDevelopment(x) {
-  const { m, d } = x; const s = d.byProgram.battery; const res = (t) => { const e = m.evidence.filter((q) => q.test === t.id && q.result !== 'Not a test'); return !e.length ? 'Not run' : e.some((q) => q.result === 'Fail') ? 'Fail' : 'Pass'; };
-  return `
-  <div class="pb-controls"><span>Start ${ed(x, 'bProgram', '_', 'startDate', m.bProgram.startDate, { t: 'date' })}</span><span>Length ${ed(x, 'bProgram', '_', 'durationWeeks', m.bProgram.durationWeeks, { t: 'number' })} weeks</span><span>Forecast finish <b>${esc(s.sched.endDate)}</b></span></div>
-  <p class="pb-note">${esc(m.bProgram.scheduleNote)} ${esc(m.bProgram.startNote)}</p>
-  ${V.chain(m.bPhases.filter((p) => p.id !== 'BC').map((p) => { const g = d.readB.gateRows.find((q) => q.id === 'BG-' + p.id.slice(1)); const rows = s.sched.rows.filter((r) => r.phase === p.id); return { title: p.name, text: rows.length ? `${rows.map((r) => r.startDate).sort()[0]} to ${rows.map((r) => r.finishDate).sort().pop()}` : '', tag: g ? badge(g.status) : '' }; }), { label: 'Battery development phases from handover to release' })}
-  ${progGantt(x, s, 'bTasks')}
-  ${sec('Critical path', `<p>${s.sched.rows.filter((r) => r.critical).map((r) => `<button type="button" class="pb-link" data-task="${esc(r.id)}">${esc(r.id)}</button>`).join(' → ')}</p>`)}
-  ${taskTable(x, s, 'bTasks', 'btasks')}
-  ${sec('Verification tests', tbl('btests', [{ h: 'Id', v: (t) => esc(t.id) }, { h: 'Test', v: (t) => esc(t.title) }, { h: 'Method', v: (t) => esc(t.method) }, { h: 'Requirements', v: (t) => list(t.requirements) }, { h: 'Risk controls', v: (t) => list(t.riskControls) }, { h: 'Result', v: (t) => badge(res(t)) }, { h: 'Evidence', v: (t) => list(m.evidence.filter((e) => e.test === t.id).map((e) => e.id)) }], m.bTests, { name: 'battery tests' }), 'No test has been run by us. A result appears only when a person adds an evidence record with a result.')}
-  ${sec('Add an evidence record', `<form class="pb-form" data-add="evidence">${input('id', 'Record id', { req: 1 })}${input('test', 'Test', { opts: [['', 'not a test record'], ...m.bTests.map((q) => [q.id, q.id + ' ' + q.title])] })}${input('task', 'Task', { opts: [['', 'none'], ...m.bTasks.map((q) => [q.id, q.id])] })}${input('title', 'What it is', { req: 1 })}${input('location', 'Where it is kept', { req: 1 })}${input('result', 'Result', { opts: ['Not a test', 'Pass', 'Fail'] })}${input('date', 'Date', { type: 'date', req: 1, val: d.today })}<button class="pb-btn" type="submit">Add</button></form>`
-    + tbl('bevid', [{ h: 'Id', v: (r) => esc(r.id) }, { h: 'Test', v: (r) => esc(r.test || '') }, { h: 'What', v: (r) => esc(r.title) }, { h: 'Where', v: (r) => esc(r.location) }, { h: 'Result', v: (r) => badge(r.result === 'Not a test' ? null : r.result) }, { h: 'Date', v: (r) => esc(r.date) }, { h: 'By', v: (r) => esc(r.by) }], m.evidence.filter((e) => /^E-BG|^B/.test(e.id) || m.bTests.some((t) => t.id === e.test) || m.bTasks.some((t) => t.id === e.task)), { name: 'battery evidence', empty: 'No evidence on record.' }))}`;
-}
-
-function bCommercial(x) {
-  const { m, d } = x; const f = d.funnel;
-  const comp = m.equipment;
-  return `
-  ${sec('Commercialization funnel', V.funnelViz(f) + `<p class="pb-note">Filled bar: customer records that have reached the stage. Outline: the target. Targets are aims, not customers: no customer is on record.</p>`
-    + details('Details: how each stage is measured', tbl('fmeas', [{ h: 'Stage', v: (r) => esc(r.stage) }, { h: 'Counts when', v: (r) => esc(r.measure) }, { h: 'Target', v: (r) => esc(r.target) }], m.funnelMeasures, { name: 'funnel measures' })))}
-  ${sec('Customers and opportunities', `<form class="pb-form" data-add="customers">${input('name', 'Organisation', { req: 1 })}${input('segment', 'Segment', { opts: m.segments.map((s) => [s.id, s.name]) })}${input('stage', 'Stage', { opts: P.FUNNEL_STAGES })}${input('contact', 'Contact\'s role', { req: 1 })}${input('value', 'Value if won, $', { type: 'number', min: 0 })}${input('criteria', 'Their acceptance criteria')}${input('record', 'Where the interview or agreement record is kept', { req: 1 })}<button class="pb-btn" type="submit">Add</button></form>`
-    + tbl('cust', [{ h: 'Id', v: (c) => esc(c.id) }, { h: 'Organisation', v: (c) => esc(c.name) }, { h: 'Segment', v: (c) => esc((m.segments.find((s) => s.id === c.segment) || {}).name || '') }, { h: 'Stage', v: (c) => ed(x, 'customers', c.id, 'stage', c.stage, { t: 'select', opts: P.FUNNEL_STAGES }) }, { h: 'Contact', v: (c) => esc(c.contact) }, { h: 'Value', n: 1, v: (c) => yn(c.value) }, { h: 'Acceptance criteria', v: (c) => esc(c.criteria || '') }, { h: 'Record', v: (c) => esc(c.record) }, { h: 'Lost', v: (c) => ed(x, 'customers', c.id, 'lost', c.lost, { t: 'check', label: 'lost' }) }], m.customers, { name: 'customers', empty: 'No customer on record. The targets: 10 to 15 interviews, two or more design partners.' }),
-    'One record per organisation. Hold these entries until decision ED-03: customer names should sit in a server-side store.')}
-  ${sec('Who buys, in order', cards(m.segments.map((s) => card(`${s.priority}. ${esc(s.name)}`, `<p>${esc(s.why)}</p><p><b>Evidence.</b> ${esc(s.evidence)}</p><p><b>Risk.</b> ${esc(s.risk)}</p>`))) + details('Details: buyer personas', tbl('pers', [{ h: 'Role', v: (p) => esc(p.role) }, { h: 'Wants', v: (p) => esc(p.wants) }, { h: 'Will ask', v: (p) => esc(p.asks) }, { h: 'Buys through', v: (p) => esc(p.buys) }], m.personas, { name: 'buyer personas' })), 'Personas are hypotheses until interviews confirm them.')}
-  ${sec('Competing and reference equipment', comp.length ? tbl('equip', [{ h: 'Maker', v: (e) => esc(e.maker) }, { h: 'Model', v: (e) => esc(e.model) }, { h: 'Class', v: (e) => esc(e.class) }, { h: 'Channels', v: (e) => esc(e.channels || '') }, { h: 'At once or switched', v: (e) => esc(e.simultaneous || '') }, { h: 'Frequency', v: (e) => esc(e.frequency || '') }, { h: 'Accuracy', v: (e) => esc(e.accuracy || '') }, { h: 'Throughput', v: (e) => esc(e.throughput || '') }, { h: 'Automation and data', v: (e) => esc(e.automation || '') }, { h: 'Calibration', v: (e) => esc(e.calibration || '') }, { h: 'Price', n: 1, v: (e) => (e.price_usd != null ? $m(e.price_usd) : esc(e.price_kind || 'not found')) }, { h: 'Source', v: (e) => link(e.source_url) }, { h: 'Read', v: (e) => badge(e.verified ? 'verified' : 'not verified') }], comp, { name: 'competing equipment' }) : '<div class="pl-empty"><b>The comparison is not on record yet.</b><p>Task BC-01 produces it.</p></div>',
-    `Web research read on ${esc(m.meta.researchReadOn.market || 'no date')}. Sixty-four channels alone is not assumed to be an advantage: the comparison is on simultaneous measurement, accuracy, throughput, data integration, calibration, service and total cost.`)}
-  ${sec('Pricing hypotheses', tbl('price', [{ h: 'Model', v: (p) => esc(p.model) }, { h: 'Figure', v: (p) => esc(p.figure) }, { h: 'Standing', v: (p) => stated(p.status) }, { h: 'Basis', v: (p) => esc(p.basis) }], m.pricingHypotheses, { name: 'pricing hypotheses' }), 'Every price is hypothetical until a customer or a supplier record supports it.')}
-  ${details('Details: interview questions, pilot agreement checklist, launch readiness', cards([card('Interview questions', ul(m.interviewPlan.map(esc))), card('Pilot agreement checklist', ul(m.pilotChecklist.map(esc))), card('Commercial launch readiness', ul(m.launchReadiness.map(esc)))]))}
-  ${details(`Details: what the company's own documents state (${m.internalFacts.filter((q) => ['segment', 'customer', 'partner', 'competitor', 'market', 'price', 'projection'].includes(q.topic)).length} statements)`, tbl('facts', [{ h: 'Id', v: (q) => esc(q.id) }, { h: 'Topic', v: (q) => esc(q.topic) }, { h: 'Statement', v: (q) => esc(q.statement) }, { h: 'Quote', v: (q) => `<q>${esc(q.quote)}</q>` }, { h: 'Document', v: (q) => esc(q.source_file.replace('.txt', '')) + ' ' + esc(q.source_page) }], m.internalFacts.filter((q) => ['segment', 'customer', 'partner', 'competitor', 'market', 'price', 'projection'].includes(q.topic)), { name: 'company document statements' }) + `<p class="pb-note">Stated in company documents; not independently verified. Projections are claims. The documents disagree with each other in ${m.internalContradictions.length} places.</p>`)}`;
-}
-
-function bManufacturing(x) {
-  const { m } = x; const cls = { MDMCG: 'pl-own', Outsourced: 'pl-out', Both: 'pl-both' };
-  return `
-  ${V.chain(m.mfgFlow.map((s) => ({ title: s.step, tag: `<span class="pb-b pb-b-${s.who === 'MDMCG' ? 'ok' : s.who === 'Both' ? 'draft' : 'est'}">${esc(s.who === 'Both' ? 'Shared' : s.who)}</span>`, foot: `We keep: ${esc(s.keeps)}`, cls: cls[s.who] })), { wrap: true, label: 'Outsourced manufacturing from engineering release to repair' })}
-  <p class="pb-note">MDMCG keeps the requirements, approved designs, acceptance criteria, firmware, calibration algorithms, customer records and release authority at every step. No manufacturer is chosen and none has quoted.</p>
-  ${sec('Make or buy, function by function', tbl('mb', [{ h: 'Id', v: (r) => esc(r.id) }, { h: 'Function', v: (r) => esc(r.fn) }, { h: 'Choice', v: (r) => esc(r.choice) }, { h: 'Why', v: (r) => esc(r.why) }, { h: 'Request-for-quotation package', v: (r) => esc(r.rfq) }, { h: 'Selection and acceptance criteria', v: (r) => esc(r.criteria) }, { h: 'Supplier', v: (r) => ed(x, 'makeBuy', r.id, 'supplier', r.supplier, { fmt: (v) => v || 'none chosen' }) }, { h: 'Backup', v: (r) => ed(x, 'makeBuy', r.id, 'backup', r.backup, { fmt: (v) => v || 'none' }) }, { h: 'Quotation', v: (r) => ed(x, 'makeBuy', r.id, 'quote', r.quote, { fmt: (v) => v || 'none on record' }) }, { h: 'Status', v: (r) => ed(x, 'makeBuy', r.id, 'status', r.status, { t: 'select', opts: LABELS }) }], m.makeBuy, { name: 'make or buy' }),
-    'For each bought function the plan asks for: a qualification, a technical and quality agreement, a lead-time and cost analysis, a first-article or pilot-lot verification, production acceptance criteria and a backup supplier.')}
-  ${sec('Candidate manufacturers and services', m.manufacturers.length ? tbl('cm', [{ h: 'Name', v: (c) => esc(c.name) }, { h: 'Kind', v: (c) => esc(c.kind) }, { h: 'Services', v: (c) => esc(c.services || '') }, { h: 'Minimums', v: (c) => esc(c.minimums || '') }, { h: 'Lead time', v: (c) => esc(c.lead_time || '') }, { h: 'Certifications', v: (c) => esc(c.certifications || '') }, { h: 'Pricing', v: (c) => esc(c.pricing || '') }, { h: 'Source', v: (c) => link(c.source_url) }, { h: 'Read', v: (c) => badge(c.verified ? 'verified' : 'not verified') }], m.manufacturers, { name: 'candidate manufacturers' }) : '<div class="pl-empty"><b>No candidate list on record yet.</b></div>', 'From each company\'s own pages. Facts only; no ranking and no recommendation. None has been contacted.')}
-  ${sec('Supplier scorecard', V.chain(m.supplierScorecard.map((s) => ({ title: s })), { wrap: true, label: 'Supplier scorecard measures' }), 'Scored for each supplier after each lot. Empty until there is a supplier.')}`;
-}
-
-function bSupport(x) {
+function strategy(x) {
   const { m } = x;
-  return `
-  ${V.chain(['Shipment', 'Installation and training', 'Acceptance at the customer', 'Support', 'Calibration', 'Return and repair', 'Firmware update', 'End of life'].map((t) => ({ title: t })), { wrap: true, label: 'Product lifecycle after shipment' })}
-  ${sec('One record for each unit', V.chain(m.serialRecord.map((s) => ({ title: s })), { wrap: true, label: 'Serialized product record' }), 'Every unit carries its history from build to disposal. Nothing is recorded yet: no unit has been built for a customer.')}
-  ${sec('Warranty, support and lifecycle policy', tbl('sup', [{ h: 'Topic', v: (r) => esc(r.topic) }, { h: 'Policy', v: (r) => esc(r.text) }], m.supportPolicy, { name: 'support policy' }), 'A draft for the director. Terms are set before the first pilot.')}`;
+  return `${V.strategyMap(x)}
+  ${sec('How the business is meant to work', V.chain(m.businessModel.map((b) => ({ title: b.step, text: b.text, tag: S.stated(b.status), attr: `title="${esc(b.basis)}"` })), { label: 'Business model from customer need to recurring revenue' }))}`;
 }
 
-function bBudget(x) {
-  const { m, d } = x; const b = d.bBudget; const s = d.byProgram.battery; const e = m.bEconomics;
-  const groups = Object.entries(b.groups);
-  const okEcon = d.econ[0].ok;
-  return `
-  <div class="pb-tiles">${tile($m(b.total) + floor(b.isFloor), 'Battery plan, planned cost', `${b.notEstimated} of ${b.lines} cost lines have no figure`)}${tile($m(b.labour), 'Labor from task hours', `${b.hours.A} h developer · ${b.hours.B} h director`)}${tile(b.unpricedHours + ' h', 'Business-lead hours with no rate', 'Decision ED-05')}${tile(esc(s.sched.endDate), 'Limited release, as planned', `${s.sched.endWeek} weeks from ${esc(m.bProgram.startDate)}`)}</div>
-  <p class="pb-alert">This is not a complete battery budget. Labor is worked out from the tasks. Ten costs need a quotation or the handover before any figure is honest, so they are left empty and the total is a floor.</p>
-  ${sec('Costs by kind', V.hbars([{ label: 'Labor: engineering', value: b.labour, cls: 'pl-c-b', text: $m(b.labour) }, ...groups.map(([g, v]) => ({ label: g, value: v.amount, cls: 'pl-c-oth', text: v.notEstimated ? `${$m(v.amount)} · ${v.notEstimated} not estimated` : $m(v.amount) })), { label: `Contingency ${b.contingencyPct}%`, value: b.contingency, cls: 'pl-c-con', text: $m(b.contingency) }], { fmt: $m, left: 230, label: 'Battery costs by kind' })
-    + tbl('blines', [{ h: 'Id', v: (l) => esc(l.id) }, { h: 'Kind', v: (l) => esc(l.group) }, { h: 'Cost', v: (l) => esc(l.title) }, { h: 'Amount', n: 1, v: (l) => ed(x, 'bLines', l.id, 'amount', l.amount, { t: 'number', fmt: (v) => (v == null ? 'not estimated' : $m(v)) }) }, { h: 'Basis', v: (l) => ed(x, 'bLines', l.id, 'kind', l.kind, { t: 'select', opts: ['Not estimated', ...C.PRICE_KINDS] }) }, { h: 'Week', n: 1, v: (l) => ed(x, 'bLines', l.id, 'week', l.week, { t: 'number', fmt: (v) => v || 'spread' }) }, { h: 'What it needs', v: (l) => esc(l.source) }], m.bLines, { name: 'battery cost lines' }))}
-  ${sec('Three schedules', V.hbars(d.bScen.map((sc) => ({ label: sc.name, value: sc.weeks, cls: sc.id === 'baseline' ? 'pl-c-b' : 'pl-c-oth', text: `${sc.weeks} weeks · ends ${sc.endDate} · labor ${$m(sc.labour)}` })), { left: 110, label: 'Schedule length by scenario' })
-    + cards(d.bScen.map((sc) => card(esc(sc.name), `<p>${esc(sc.summary)}</p>${ul(sc.risks.map(esc))}`))), 'Lean and Extended stretch the baseline tasks; their hours stretch with them. All three are estimates until the handover shows what exists.')}
-  ${sec('Unit economics: a model with hypothetical inputs', `<div class="pl-inputs">${Object.keys(m.economicsLabels).map((k) => `<label><span>${esc(m.economicsLabels[k])}</span>${ed(x, 'bEconomics', '_', k, e[k], { t: 'number' })}${e.basis && e.basis[k] ? `<small>${esc(e.basis[k])}</small>` : (e.unset || []).includes(k) && !x.mine('bEconomics', '_', k) ? '<small class="pl-unset">not set: zero until entered</small>' : ''}</label>`).join('')}</div>`
-    + (okEcon ? V.groupBars(d.econ.map((r) => ({ label: `${r.units} systems`, values: [r.revenue, r.grossProfit, r.operatingProfit, r.cashReceived] })), [{ name: 'Revenue', cls: 'pl-c-b' }, { name: 'Gross profit', cls: 'pl-c-e' }, { name: 'Operating profit', cls: 'pl-c-f' }, { name: 'Cash received in the year', cls: 'pl-c-act' }], { label: 'Revenue, gross profit, operating profit and cash by annual volume' })
-      + `<p class="pb-alert">${d.econUnset} cost inputs are still zero, so profit here is an upper bound, not an expectation. The price and unit cost are hypotheses taken from company documents; no bill of materials, quotation, royalty figure or order exists.</p>`
-      + tbl('econ', [{ h: 'Systems a year', n: 1, v: (r) => r.units }, { h: 'Revenue', n: 1, v: (r) => $m(r.revenue) }, { h: 'Cost of goods', n: 1, v: (r) => $m(r.cogs) }, { h: 'Gross profit', n: 1, v: (r) => $m(r.grossProfit) }, { h: 'Gross margin', n: 1, v: (r) => r.grossMarginPct + '%' }, { h: 'Operating profit', n: 1, v: (r) => $m(r.operatingProfit) }, { h: 'Cash received', n: 1, v: (r) => $m(r.cashReceived) }, { h: 'Owed at year end', n: 1, v: (r) => $m(r.receivablesAtYearEnd) }, { h: 'Working capital', n: 1, v: (r) => $m(r.workingCapital) }, { h: 'Break-even units', n: 1, v: (r) => (r.breakEvenUnits == null ? 'none: no margin' : r.breakEvenUnits) }, { h: 'Break-even revenue', n: 1, v: (r) => (r.breakEvenRevenue == null ? '' : $m(r.breakEvenRevenue)) }], d.econ, { name: 'unit economics by volume' })
-      + (d.sens.length ? `<h4 class="pl-h4">Sensitivity at 25 systems: operating profit when one input moves 20%</h4>` + V.hbars(d.sens.map((sv) => ({ label: m.economicsLabels[sv.key], value: sv.swing, cls: 'pl-c-oth', text: `${$m(Math.min(sv.low, sv.high))} to ${$m(Math.max(sv.low, sv.high))}` })), { fmt: $m, left: 290, label: 'Sensitivity of operating profit' }) : '')
-      : `<div class="pl-empty"><b>The model needs a price and a unit cost.</b><p>Missing: ${list(d.econ[0].missing)}.</p></div>`),
-    'Revenue, gross profit, operating profit and cash received are four different things and are shown apart. Change any input and every figure follows.')}
-  ${sec('Risks', tbl('brisk', [{ h: 'Id', v: (r) => esc(r.id) }, { h: 'Kind', v: (r) => esc(r.kind) }, { h: 'Risk', v: (r) => esc(r.hazard) }, { h: 'Effect', v: (r) => esc(r.harm) }, { h: 'Severity', n: 1, v: (r) => ed(x, 'bRisks', r.id, 'severity', r.severity, { t: 'number' }) }, { h: 'Probability', n: 1, v: (r) => ed(x, 'bRisks', r.id, 'probability', r.probability, { t: 'number' }) }, { h: 'Level', v: (r) => badge(C.riskLevel(r.severity, r.probability)) }, { h: 'Control', v: (r) => r.controls.map((c) => `<b>${esc(c.id)}</b> ${esc(c.text)}`).join('<br>') }, { h: 'With control', v: (r) => badge(C.riskLevel(r.residualSeverity, r.residualProbability)) }], [...m.bRisks].sort((p, q) => q.severity * q.probability - p.severity * p.probability), { name: 'battery risks' }), 'First estimates on a 1 to 5 scale; not reviewed.')}`;
+function roadmap(x) {
+  const { d } = x; const ppl = d.load.people.filter((p) => p.weeklyHours != null);
+  return `${V.roadmap(x)}
+  ${sec('Are the people overbooked?', V.hbars(ppl.map((p) => { const t = d.load.totals[p.id]; return { label: p.short, parts: [{ value: Math.max(0, t.hours - t.over), cls: 'pl-c-b', name: 'Hours within capacity' }, { value: t.over, cls: 'pl-c-bad', name: 'Hours over capacity' }], text: `${t.overWeeks} weeks over, by ${Math.round(t.over)} hours` }; }), { left: 110, label: 'Planned hours within and over capacity, by person' }) + V.legend([['pl-c-b', 'Planned hours within capacity'], ['pl-c-bad', 'Hours over capacity']]))}`;
 }
 
-function bQuality(x) {
-  const { m, d } = x; const r = d.readB; const s = d.byProgram.battery;
+function money(x) {
+  const { d } = x; const b = d.budget; const mo = d.monthly;
   return `
-  ${V.meters([{ label: 'Release gates approved', done: r.gatesApproved, of: r.gates, note: r.currentGate ? `Current: ${r.currentGate.id} ${r.currentGate.title}` : 'All decided' }, { label: 'Tests passed', done: r.passed, of: r.tests, note: `${r.notRun} not run` }, { label: 'Requirements approved', done: r.approved, of: r.requirements, note: 'Evidence reviewed and approved by a person' }, { label: 'Risk controls verified', done: r.controlsVerified, of: r.controls, note: '' }])}
-  ${sec('Stage gates', gateCards(x, r.gateRows, 'bGates', s.sched), 'A go needs the earlier gates, the gate\'s tasks and its evidence. A no-go can be recorded at any time. Nothing is approved.')}
-  ${sec('Standards and rules: what applies, and when', m.bStandards.length ? tbl('bstd', [{ h: 'Id', v: (q) => esc(q.id) }, { h: 'Standard or rule', v: (q) => esc(q.name) }, { h: 'Edition', v: (q) => esc(q.edition || '') }, { h: 'Topic', v: (q) => esc(q.topic) }, { h: 'Applies', v: (q) => `<span class="pb-b pb-b-est">${esc(q.applies_when || '')}</span>` }, { h: 'What it asks for', v: (q) => esc(q.what_it_requires || '') }, { h: 'Why', v: (q) => esc(q.why || '') }, { h: 'Source', v: (q) => link(q.source_url) + (q.quote ? `<br><q>${esc(q.quote)}</q>` : '') }, { h: 'Read', v: (q) => badge(q.verified ? 'verified' : 'not verified') }], m.bStandards, { name: 'battery standards' }) : '<div class="pl-empty"><b>The applicability analysis is not on record yet.</b><p>Task BT-103 produces it.</p></div>',
-    `Web research read on ${esc(m.meta.researchReadOn.market || 'no date')}. Applicability depends on the instrument's voltage, how it connects to cells, its user, its environment, its claims and where it is sold. A product-safety engineer must read this before it is relied on. No certification is held or claimed.`)}
-  ${sec('Quality system elements for the instrument', V.chain(m.qmsElements.map((q) => ({ title: q })), { wrap: true, label: 'Quality system elements' }), 'Built on the shared procedures under Company Strategy. Traceability runs: customer need, requirement, design output, risk control, test, evidence, approval.')}
-  ${details(`Details: traceability, ${d.bTrace.gaps.length} open links`, tbl('btrace', [{ h: 'Requirement', v: (q) => esc(q.id) }, { h: 'Needs', v: (q) => list(q.needs) }, { h: 'Outputs', v: (q) => list(q.outputs) }, { h: 'Controls', v: (q) => list(q.controls) }, { h: 'Tests', v: (q) => list(q.tests) }, { h: 'Evidence', v: (q) => list(q.evidence) }, { h: 'Approved', v: (q) => list(q.approved) }, { h: 'Status', v: (q) => badge(q.status) }], d.bTrace.rows, { name: 'battery traceability' }) + tbl('bgaps', [{ h: 'Kind', v: (g) => esc(g.kind.replace(/-/g, ' ')) }, { h: 'Record', v: (g) => esc(g.id) }, { h: 'Missing', v: (g) => esc(g.text) }], d.bTrace.gaps, { name: 'battery open links' }))}`;
+  <div class="pb-tiles pl-3">${tile($m(b.total) + S.floor(b.isFloor), 'Planned cost, three plans', `${b.notEstimated} costs still need a quotation`)}${tile(mo.cashOnHand == null ? 'not entered' : $m(mo.cashOnHand), 'Cash on hand', mo.cashOnHand == null ? 'Switch to Working to enter it' : '')}${tile($m(d.pipe.received), 'Funding received', `${$m(d.pipe.committed)} committed`)}</div>
+  ${sec('What each plan costs', V.hbars(b.rows.map((r) => ({ label: r.name, parts: [{ value: r.labour, cls: V.PCOL[r.id], name: 'Labor' }, { value: r.other, cls: 'pl-c-oth', name: 'Other costs' }, { value: r.contingency, cls: 'pl-c-con', name: 'Contingency' }], text: $m(r.total) + (r.isFloor ? ' floor' : '') })), { fmt: $m, label: 'Budget by plan' }) + V.legend([['pl-c-b', 'Labor (plan colour)'], ['pl-c-oth', 'Other costs'], ['pl-c-con', 'Contingency']]))}
+  ${sec('Spending by month', V.monthBars(mo.rows, { label: 'Planned spending by month and plan' }))}
+  ${sec('Cash', mo.runwayKnown ? V.balanceLine(mo.rows) : empty('No cash figure is on record.', 'Enter cash on hand to see the balance, the month it runs out and the funding gap.'))}`;
 }
 
-/* ================================================================ funding */
+function decisions(x) {
+  const { d } = x; const f = x.ui.decPlan || ''; const rows = allDecisions(x).filter((r) => !f || r.program === f);
+  const row = (r) => `<li class="${r.made ? 'done' : r.days != null && r.days < 0 ? 'late' : ''}"><span class="pl-reg-id">${esc(r.id)}</span>${open('decision', r.coll, r.id, r.title)}<span class="pl-reg-m">${esc(V.PNAME[r.program] || 'Shared')}</span><span class="pl-reg-m">${r.made ? 'Decided' : r.due ? `${esc(r.due)}${r.days < 0 ? ', late' : ''}` : 'no date'}</span></li>`;
+  return `${V.decisionLine(d.decisions, d.today)}
+  ${chips('decPlan', f)}
+  <ul class="pl-reg">${rows.filter((r) => !r.made).map(row).join('')}${rows.filter((r) => r.made).map(row).join('')}</ul>
+  <p class="pb-note">${rows.filter((r) => !r.made).length} open. Select a decision to read its alternatives, recommendation and evidence, and to record it.</p>`;
+}
 
-const oppCols = (x) => [{ h: 'Id', v: (o) => esc(o.id) }, { h: 'Organisation and program', v: (o) => `<b>${esc(o.organisation)}</b><br>${esc(o.programme)}${o.number ? ` (${esc(o.number)})` : ''}` }, { h: 'For', v: (o) => esc(o.target === 'both' ? 'Both' : V.PNAME[o.target] || o.target) }, { h: 'Stage', v: (o) => ed(x, 'opportunities', o.id, 'stage', o.stage, { t: 'select', opts: P.FUNDING_STAGES }) }, { h: 'Open?', v: (o) => esc(o.openStatus || '') }, { h: 'Deadline', v: (o) => ed(x, 'opportunities', o.id, 'deadline', o.deadline, { t: 'date', fmt: (v) => v || 'none verified' }) }, { h: 'Program range', v: (o) => esc(o.amountText || '') }, { h: 'Requested', n: 1, v: (o) => ed(x, 'opportunities', o.id, 'amountRequested', o.amountRequested, { t: 'number', fmt: (v) => (v == null ? 'set' : $m(v)) }) }, { h: 'Attainable', n: 1, v: (o) => ed(x, 'opportunities', o.id, 'amountAttainable', o.amountAttainable, { t: 'number', fmt: (v) => (v == null ? 'set' : $m(v)) }) }, { h: 'Probability, %', n: 1, v: (o) => ed(x, 'opportunities', o.id, 'probability', o.probability, { t: 'number', fmt: (v) => (v == null ? 'none' : v) }) }, { h: 'Basis of the probability', v: (o) => ed(x, 'opportunities', o.id, 'probabilityBasis', o.probabilityBasis, { fmt: (v) => v || 'none' }) }, { h: 'Eligibility', v: (o) => esc(o.eligibility || '') + ((o.eligibilityQuestions || []).length ? ul(o.eligibilityQuestions.map(esc)) : '') }, { h: 'Matching', v: (o) => esc(o.matching || '') }, { h: 'Restrictions', v: (o) => esc(o.restrictions || '') }, { h: 'Decision expected', v: (o) => esc(o.expectedDecision || '') }, { h: 'Reporting', v: (o) => esc(o.reporting || '') }, { h: 'Owner', v: (o) => esc(who(x, o.owner)) }, { h: 'Received', n: 1, v: (o) => ed(x, 'opportunities', o.id, 'amountReceived', o.amountReceived, { t: 'number', fmt: (v) => (v == null ? '' : $m(v)) || 'none' }) }, { h: 'Received on', v: (o) => ed(x, 'opportunities', o.id, 'receivedDate', o.receivedDate, { t: 'date', fmt: (v) => v || 'date' }) }, { h: 'Source', v: (o) => link(o.sourceUrl) }, { h: 'Read', v: (o) => (o.sourceUrl ? badge(o.verified ? 'verified' : 'not verified') + ' ' + esc((o.readAt || '').slice(0, 10)) : '') }, { h: 'Note', v: (o) => esc(o.note || '') }];
-const FINE = ['Eligibility', 'Matching', 'Restrictions', 'Decision expected', 'Reporting', 'Note', 'Basis of the probability', 'Received', 'Received on', 'Owner', 'Requested'];
-const oppTable = (x, id, rows, empty) => tbl(id, oppCols(x).filter((c) => !FINE.includes(c.h)), rows, { name: id, empty }) + (rows.length ? details('Details: eligibility, matching, restrictions, reporting, amounts received', tbl(id + '-fine', oppCols(x).filter((c) => ['Id', 'Organisation and program', ...FINE].includes(c.h)), rows, { name: id + ' fine print' })) : '');
+function risks(x) {
+  const f = x.ui.riskPlan || ''; const all = allRisks(x); const rows = all.filter((r) => !f || r.program === f);
+  const count = (p, lvl) => all.filter((r) => r.program === p && r.level === lvl).length;
+  return `${V.hbars(['battery', 'ecg'].map((p) => ({ label: V.PNAME[p], parts: [{ value: count(p, 'High'), cls: 'pl-c-bad', name: 'High' }, { value: count(p, 'Medium'), cls: 'pl-c-warn', name: 'Medium' }, { value: count(p, 'Low'), cls: 'pl-c-con', name: 'Low' }], text: `${count(p, 'High')} high · ${count(p, 'Medium')} medium · ${count(p, 'Low')} low` })), { left: 150, label: 'Risks by plan and level' })}
+  ${V.legend([['pl-c-bad', 'High'], ['pl-c-warn', 'Medium'], ['pl-c-con', 'Low']])}
+  ${chips('riskPlan', f)}
+  <ul class="pl-reg">${rows.slice(0, 8).map((r) => `<li><span class="pl-reg-id">${esc(r.id)}</span>${open('risk', r.coll, r.id, r.hazard)}<span class="pl-reg-m">${esc(V.PNAME[r.program])}</span><span class="pl-reg-m">${esc(r.level)} now, ${esc(r.after)} with its control</span></li>`).join('')}</ul>
+  <p class="pb-note">The top ${Math.min(8, rows.length)} of ${rows.length}, highest first. First estimates; not reviewed. Switch to Working for the full register.</p>`;
+}
 
-function fStrategy(x) {
-  const { m, d } = x; const s = d.byProgram.funding;
+/* ================================================================ the same four views for every plan */
+
+function pNow(x, id) {
+  const { m, d } = x; const k = KIT[id]; const s = d.byProgram[id]; const [w, why] = standing(x, id); const rd = readOf(x, id); const g = rd && rd.currentGate; const b = d.budget.rows.find((r) => r.id === id);
+  const steps = s.sched.rows.filter((r) => !r.milestone && !r.loe && r.percent < 100).slice(0, 3);
+  const dec = allDecisions(x).filter((r) => !r.made && r.program === id).slice(0, 2);
+  const picture = id === 'battery' ? sec('What the evidence supports today', V.hbars([['Shown', 'Shown in the videos', 'pl-c-b'], ['Credible', 'Sound in principle', 'pl-c-oth'], ['Not verified', 'Not verified', 'pl-c-warn'], ['Open', 'No evidence at all', 'pl-c-bad']].map(([lv, name, cls]) => ({ label: name, value: m.bFindings.filter((f) => f.level === lv).length, cls, text: m.bFindings.filter((f) => f.level === lv).length + ' findings' })), { left: 170, label: 'Audit findings by standing' }) + '<p class="pb-note">From the audit of November 17, 2026. Nothing has been tested by us.</p>')
+    : id === 'ecg' ? sec('The gate that matters', `<p class="pl-lead">${esc(m.program.criticalGate)}</p>`)
+    : sec('Pipeline', V.chain(d.pipe.stages.map((st) => ({ title: st.name, big: st.count })), { label: 'Funding pipeline by stage' }) + '<p class="pb-note">Only cash received is available.</p>');
   return `
-  <div class="pl-channels">${m.channels.map((c, i) => card(`${'ABCD'[i]}. ${esc(c.name)}`, `<dl class="pl-facts"><div><dt>Dilution</dt><dd>${esc(c.dilution)}</dd></div><div><dt>Time to money</dt><dd>${esc(c.speed)}</dd></div><div><dt>In the pipeline</dt><dd>${m.opportunities.filter((o) => ({ 'CH-A': ['customer-funded'], 'CH-B': ['non-dilutive grant', 'contract', 'state grant'], 'CH-C': ['partnership'], 'CH-D': ['equity'] }[c.id] || []).includes(o.type)).length}</dd></div></dl>${ul(c.items.map(esc))}<p><b>Today.</b> ${esc(c.state)}</p>`, 'pl-c-fbox')).join('')}</div>
-  <p class="pb-note">${esc(m.fProgram.objective)}</p>
-  ${sec('Funding work, on its own timeline', `<div class="pb-controls"><span>Start ${ed(x, 'fProgram', '_', 'startDate', m.fProgram.startDate, { t: 'date' })}</span><span>Length ${ed(x, 'fProgram', '_', 'durationWeeks', m.fProgram.durationWeeks, { t: 'number' })} weeks</span><span>Forecast finish <b>${esc(s.sched.endDate)}</b></span></div>` + progGantt(x, s, 'fTasks') + taskTable(x, s, 'fTasks', 'ftasks'), 'The same director and business lead as the product plans; their hours appear in the shared capacity chart.')}
-  ${sec('What counts as traction', V.chain(m.tractionRules.map((t) => ({ title: t })), { wrap: true, label: 'Rules for counting traction' }))}
-  ${sec('Deliverables', tbl('fdel', [{ h: 'Id', v: (r) => esc(r.id) }, { h: 'Deliverable', v: (r) => esc(r.title) }, { h: 'From task', v: (r) => esc(r.task) }, { h: 'State', v: (r) => esc(r.state) }, { h: 'Where it is kept', v: (r) => ed(x, 'fDeliverables', r.id, 'location', r.location, { fmt: (v) => v || 'does not exist yet' }) }, { h: 'Status', v: (r) => ed(x, 'fDeliverables', r.id, 'status', r.status, { t: 'select', opts: LABELS }) }], m.fDeliverables, { name: 'funding deliverables' }))}`;
+  <div class="pb-tiles pl-4">${tile(standBadge(w), 'Standing', esc(why))}${tile(s.next ? esc(s.next.finishDate) : 'none', 'Next milestone', s.next ? esc(s.next.title) : '')}${g ? tile(esc(g.id), 'Current gate', `${esc(g.title)} · needs ${g.missing.length}`) : tile(String(d.pipe.count), 'Opportunities', `${d.dl.upcoming.length} with a date ahead`)}${tile($m(b.total) + S.floor(b.isFloor), 'Planned cost', b.isFloor ? `${b.notEstimated} costs need a quotation` : 'planning estimate')}</div>
+  ${sec('Next three steps', steps.length ? V.chain(steps.map((r) => ({ title: r.title, text: `${r.startDate} to ${r.finishDate}`, foot: open('task', k.tasks, r.id, 'Open ' + r.id) })), { label: 'Next three steps' }) : '<p>Every task is complete.</p>')}
+  ${picture}
+  ${dec.length ? sec('Decisions this plan is waiting for', `<ul class="pl-reg">${dec.map((r) => `<li><span class="pl-reg-id">${esc(r.id)}</span>${open('decision', r.coll, r.id, r.title)}<span class="pl-reg-m">${esc(r.due || 'no date')}</span></li>`).join('')}</ul>`) : ''}`;
 }
-const byType = (m, types) => m.opportunities.filter((o) => types.includes(o.type));
-function fGrants(x) {
-  const { m, d } = x; const rows = byType(m, ['non-dilutive grant', 'contract', 'state grant']);
-  const up = d.dl.upcoming.filter((o) => rows.some((r) => r.id === o.id));
-  return `
-  <div class="pb-tiles">${tile(String(rows.length), 'Programs identified')}${tile(String(rows.filter((o) => /open now/.test(o.openStatus || '')).length), 'Read as open now')}${tile(String(up.length), 'With a verified date ahead')}${tile(String(rows.filter((o) => !o.verified).length), 'Not verified on a primary page')}</div>
-  ${up.length ? sec('Deadlines ahead', V.hbars(up.map((o) => ({ label: o.organisation.length > 26 ? o.organisation.slice(0, 25) + '…' : o.organisation, value: Math.max(1, o.days), cls: o.days <= 30 ? 'pl-c-warn' : 'pl-c-f', text: `${o.deadline} · in ${o.days} days · ${o.programme.length > 44 ? o.programme.slice(0, 43) + '…' : o.programme}` })), { left: 220, label: 'Days to each deadline' }), 'Dates as read on each program\'s own page. Check the page again before relying on a date.') : sec('Deadlines ahead', '<div class="pl-empty"><b>No verified deadline is on record.</b></div>')}
-  ${sec('Is each program running?', m.fundingStatus.length ? V.hbars(['open', 'closed', 'paused', 'unclear'].map((st) => ({ label: st, value: m.fundingStatus.filter((r) => r.status === st).length, cls: st === 'open' ? 'pl-c-f' : 'pl-c-oth' })).filter((r) => r.value), { fmt: (v) => v + ' programs', left: 110, label: 'Programs by status' }) + details('Details: each program, as read', tbl('fstat', [{ h: 'Program', v: (r) => esc(r.programme) }, { h: 'Status', v: (r) => `<span class="pb-b pb-b-${r.status === 'open' ? 'ok' : r.status === 'unclear' ? 'warn' : 'est'}">${esc(r.status)}</span>` }, { h: 'Detail', v: (r) => esc(r.detail) }, { h: 'As read', v: (r) => `<q>${esc(r.quote || '')}</q>` }, { h: 'Source', v: (r) => link(r.source_url) }, { h: 'Read', v: (r) => badge(r.verified ? 'verified' : 'not verified') + ' ' + esc((r.read_at || '').slice(0, 10)) }], m.fundingStatus, { name: 'program status' })) : '<div class="pl-empty"><b>No program status on record yet.</b><p>Task FT-301 screens the programs.</p></div>')}
-  ${sec('Grant and state programs', oppTable(x, 'grants', rows, 'No program on record yet.'), `Web research read on ${esc(m.meta.researchReadOn.funding || 'no date')}. A program listed here is identified, nothing more. The company is not assumed to be eligible: ownership, size and who the lead investigator works for are checked against each program's rules, and decision ED-01 decides which company applies.`)}
-  ${m.fundingRules.length ? details(`Details: ${m.fundingRules.length} rules on duplicate funding, effort, subcontracting, cost share and securities`, tbl('frules', [{ h: 'Topic', v: (r) => esc(r.topic) }, { h: 'Rule', v: (r) => esc(r.rule) }, { h: 'Citation', v: (r) => esc(r.citation || '') }, { h: 'As read', v: (r) => `<q>${esc(r.quote || '')}</q>` }, { h: 'Source', v: (r) => link(r.source_url) }, { h: 'Read', v: (r) => badge(r.verified ? 'verified' : 'not verified') }], m.fundingRules, { name: 'funding rules' })) : ''}
-  ${m.fundingNotFound.length ? details('Details: could not be found or verified', ul(m.fundingNotFound.map(esc))) : ''}`;
+
+function pPlan(x, id) {
+  const { m, d } = x; const s = d.byProgram[id]; const sub = x.ui.sub || '';
+  const timeline = () => `<p class="pl-lead">${esc(s.program.startDate)} to <b>${esc(s.sched.endDate)}</b> · ${s.sched.endWeek} weeks · ${s.sched.rows.filter((r) => r.critical).length} items on the critical path</p>
+    ${gantt(x, { sched: s.sched, program: s.program, phases: s.phases, nowWeek: C.weekOf(s.program, d.today) })}<p class="pb-note">Select a bar or a diamond to open the task.</p>`;
+  if (id === 'battery') {
+    const cur = sub || 'build'; const seg = segs('sub', cur, [['build', 'Build'], ['sell', 'Sell'], ['make', 'Make']]);
+    if (cur === 'sell') return seg + V.funnelViz(d.funnel) + '<p class="pb-note">Filled: customer records that reached the stage. Outline: the target. No customer is on record. Switch to Working to add one.</p>' + S.cards(m.segments.map((sg) => S.card(`${sg.priority}. ${esc(sg.name)}`, `<p>${esc(sg.why)}</p>`)));
+    if (cur === 'make') { const cls = { MDMCG: 'pl-own', Outsourced: 'pl-out', Both: 'pl-both' }; return seg + V.chain(m.mfgFlow.map((f) => ({ title: f.step, tag: `<span class="pb-b pb-b-${f.who === 'MDMCG' ? 'ok' : f.who === 'Both' ? 'draft' : 'est'}">${esc(f.who === 'Both' ? 'Shared' : f.who)}</span>`, cls: cls[f.who] })), { wrap: true, label: 'Outsourced manufacturing from release to repair' }) + '<p class="pb-note">MDMCG keeps the requirements, designs, acceptance criteria, firmware, calibration methods, customer records and release authority at every step. No manufacturer is chosen.</p>'; }
+    return seg + timeline();
+  }
+  if (id === 'funding') {
+    const cur = sub || 'pipeline'; const seg = segs('sub', cur, [['pipeline', 'Pipeline'], ['dates', 'Dates'], ['timeline', 'Timeline']]);
+    if (cur === 'timeline') return seg + timeline();
+    if (cur === 'dates') { const up = d.dl.upcoming; return seg + (up.length ? V.hbars(up.map((o) => ({ label: o.organisation.length > 30 ? o.organisation.slice(0, 29) + '…' : o.organisation, value: Math.max(1, o.days), cls: o.days <= 30 ? 'pl-c-warn' : 'pl-c-f', text: `${o.deadline} · in ${o.days} days` })), { left: 250, label: 'Days to each deadline' }) + '<p class="pb-note">Dates as read on each program\'s own page on 2026-11-19. Eligibility is not checked for any of them.</p>' : empty('No verified deadline is on record.')); }
+    const TYPES = { 'CH-A': ['customer-funded'], 'CH-B': ['non-dilutive grant', 'contract', 'state grant'], 'CH-C': ['partnership'], 'CH-D': ['equity'] };
+    return seg + V.chain(d.pipe.stages.map((st) => ({ title: st.name, big: st.count, text: st.name === 'Cash received' ? $m(d.pipe.received) : st.attainable ? `${$m(st.attainable)} attainable` : '' })), { label: 'Funding pipeline by stage' }) + V.hbars(m.channels.map((c) => ({ label: c.name, value: m.opportunities.filter((o) => TYPES[c.id].includes(o.type)).length, cls: 'pl-c-f' })), { fmt: (v) => v + ' identified', left: 250, label: 'Opportunities by channel' }) + '<p class="pb-note">Identified means found, nothing more. Only cash received counts as available.</p>';
+  }
+  return timeline();
 }
-function fCustomer(x) {
-  const { m, d } = x;
-  return `
-  ${V.chain([{ title: 'Interview', big: d.funnel.rows[0].reached }, { title: 'Technical evaluation', big: d.funnel.rows[2].reached }, { title: 'Paid pilot signed', big: d.funnel.rows[3].reached }, { title: 'Money received', big: $m(m.opportunities.filter((o) => o.type === 'customer-funded').reduce((s, o) => s + (Number(o.amountReceived) || 0), 0)) }], { label: 'Customer-funded development from interview to money' })}
-  <p class="pb-note">Counts come from the customer records in the <a href="/plan/battery/#3">battery plan's commercial section</a>. Nothing is counted until a record exists.</p>
-  ${sec('Customer-funded opportunities', oppTable(x, 'custf', byType(m, ['customer-funded']), 'None.'))}
-  ${sec('Before a paid pilot is signed', ul(m.pilotChecklist.map(esc)))}`;
+
+function pMoney(x, id) {
+  const { d } = x; const b = d.budget.rows.find((r) => r.id === id);
+  if (id === 'battery') { const bb = d.bBudget; const ok = d.econ[0].ok;
+    return `<div class="pb-tiles pl-3">${tile($m(bb.total) + S.floor(bb.isFloor), 'Planned cost', `labor only; ${bb.notEstimated} costs need a quotation`)}${tile($m(bb.labour), 'Labor', `${bb.hours.A} h developer · ${bb.hours.B} h director`)}${tile(String(bb.notEstimated), 'Costs with no figure yet', 'left empty, not guessed')}</div>
+    ${sec('Three schedules', V.hbars(d.bScen.map((sc) => ({ label: sc.name, value: sc.weeks, cls: sc.id === 'baseline' ? 'pl-c-b' : 'pl-c-oth', text: `${sc.weeks} weeks · ends ${sc.endDate} · labor ${$m(sc.labour)}` })), { left: 110, label: 'Schedule length by scenario' }))}
+    ${sec('If it sells: a model, not a forecast', ok ? V.groupBars(d.econ.map((r) => ({ label: `${r.units} a year`, values: [r.revenue, r.grossProfit, r.operatingProfit] })), [{ name: 'Revenue', cls: 'pl-c-b' }, { name: 'Gross profit', cls: 'pl-c-e' }, { name: 'Operating profit', cls: 'pl-c-f' }], { label: 'Revenue, gross profit and operating profit by annual volume' }) + `<p class="pb-alert">An upper bound. The price and unit cost are hypotheses from company documents and ${d.econUnset} cost inputs are still zero. No price, quotation or order exists.</p>` : empty('The model needs a price and a unit cost.'))}`; }
+  if (id === 'ecg') { const e = d.ecg; const bud = e.bud;
+    return `<div class="pb-tiles pl-3">${tile($m(bud.total), 'Planning total', `${$m(bud.direct)} direct + ${bud.contingencyPct}% contingency`)}${tile($m(e.spendActual), 'Spent to date', `planned to date ${$m(e.spendPlanned)}`)}${tile(`${bud.unverifiedLines} of ${bud.items.length}`, 'Cost lines still estimates', 'none quoted')}</div>
+    ${sec('Where the money goes', V.hbars([['Labor', bud.labour.cost, 'pl-c-e'], ['Hardware', bud.hardware, 'pl-c-oth'], ['Software and cloud', bud.software, 'pl-c-oth'], ['External review', bud.external, 'pl-c-oth'], ['Contingency', bud.contingency, 'pl-c-con']].map(([label, value, cls]) => ({ label, value, cls })), { fmt: $m, left: 170, label: 'ECG/MCG budget by category' }))}
+    ${sec('Three scenarios', V.hbars(e.scenarios.map((sc) => ({ label: sc.name, value: sc.b.total, cls: sc.id === 'baseline' ? 'pl-c-e' : 'pl-c-oth', text: `${$m(sc.b.total)} · ${sc.b.durationWeeks} weeks · ends ${sc.endDate}` })), { fmt: $m, left: 170, label: 'Scenario totals' }))}`; }
+  const mo = d.monthly; const p = d.pipe;
+  return `<div class="pb-tiles pl-3">${tile($m(p.received), 'Cash received', 'the only money that is available')}${tile($m(p.committed), 'Committed', 'awarded or signed, not yet cash')}${tile(mo.fundingGap == null ? 'unknown' : $m(mo.fundingGap), 'Funding gap', mo.fundingGap == null ? 'needs cash on hand' : 'planned spending less cash')}</div>
+  ${sec('Funding by certainty', V.hbars([{ label: 'Cash received', value: p.received, cls: 'pl-c-act' }, { label: 'Committed', value: p.committed, cls: 'pl-c-f' }, { label: 'Prospective, weighted', value: p.weighted, cls: 'pl-c-con', text: `${$m(p.weighted)} · ${p.noProbability} have no probability` }, { label: 'Prospective, unweighted', value: p.prospective, cls: 'pl-c-oth', text: `${$m(p.prospective)} · ${p.noAmount} have no amount` }], { fmt: $m, label: 'Funding by certainty' }))}
+  ${sec('Twelve months of cash', mo.runwayKnown ? V.balanceLine(mo.rows.slice(0, 12)) : empty('No cash figure is on record.', 'Enter cash on hand under Money on the company page.'))}
+  <p class="pb-note">The funding work itself is planned at ${$m(b.total)}, a floor: ${b.notEstimated} costs need a quotation.</p>`;
 }
-function fPartners(x) {
-  const { m, d } = x;
-  return `
-  ${sec('Partner outreach', `<form class="pb-form" data-add="partners">${input('name', 'Organisation', { req: 1 })}${input('kind', 'Kind', { opts: m.channels.find((c) => c.id === 'CH-C').items })}${input('target', 'For', { opts: [['battery', 'Battery'], ['ecg', 'ECG/MCG'], ['both', 'Both']] })}${input('state', 'State', { opts: ['Identified', 'Contacted', 'In discussion', 'Agreement in negotiation', 'Signed', 'Closed'] })}${input('offer', 'What each side would bring', { req: 1 })}${input('record', 'Where the record is kept', { req: 1 })}<button class="pb-btn" type="submit">Add</button></form>`
-    + tbl('partners', [{ h: 'Id', v: (p) => esc(p.id) }, { h: 'Organisation', v: (p) => esc(p.name) }, { h: 'Kind', v: (p) => esc(p.kind) }, { h: 'For', v: (p) => esc(V.PNAME[p.target] || 'Both') }, { h: 'State', v: (p) => ed(x, 'partners', p.id, 'state', p.state, { t: 'select', opts: ['Identified', 'Contacted', 'In discussion', 'Agreement in negotiation', 'Signed', 'Closed'] }) }, { h: 'What each side brings', v: (p) => esc(p.offer) }, { h: 'Record', v: (p) => esc(p.record) }, { h: 'By', v: (p) => esc(p.by) }], m.partners, { name: 'partners', empty: 'No partner on record.' }), 'One record per organisation.')}
-  ${sec('Partnership opportunities', oppTable(x, 'partf', byType(m, ['partnership']), 'None.'))}
-  ${details(`Details: partners named in the company's own documents`, tbl('pfacts', [{ h: 'Id', v: (q) => esc(q.id) }, { h: 'Statement', v: (q) => esc(q.statement) }, { h: 'Quote', v: (q) => `<q>${esc(q.quote)}</q>` }, { h: 'Document', v: (q) => esc(q.source_file.replace('.txt', '')) + ' ' + esc(q.source_page) }], m.internalFacts.filter((q) => q.topic === 'partner' || q.topic === 'customer'), { name: 'partners in company documents' }) + '<p class="pb-note">Stated in documents of 2024 and 2025 that belong to a different company. Not verified, and no agreement is on file.</p>')}
-  <p class="pb-note">Overloaded weeks for the business lead and director are on the <a href="/plan/#2">Strategic Roadmap</a>: ${d.load.totals.B.overWeeks} director weeks are over capacity.</p>`;
+
+function pProof(x, id) {
+  const { m, d } = x; const k = KIT[id]; const s = d.byProgram[id];
+  if (id === 'funding') { const done = m.investorChecklist.filter((c) => c.state === 'Done').length;
+    return `${V.meters([{ label: 'Customer interviews on record', done: d.funnel.rows[0].reached, of: m.funnelTargets['Customer discovery'], note: 'against the target' }, { label: 'Paid pilots signed', done: d.funnel.rows[3].reached, of: m.funnelTargets['Paid pilot'], note: 'against the target' }, { label: 'Investor preparation', done, of: m.investorChecklist.length, note: '' }, { label: 'Funding documents written', done: m.fDeliverables.filter((q) => q.location).length, of: m.fDeliverables.length, note: '' }])}
+    ${sec('What counts', V.chain(m.tractionRules.map((t) => ({ title: t })), { wrap: true, label: 'Rules for counting traction' }))}`; }
+  const r = readOf(x, id);
+  return `${V.meters([{ label: 'Gates approved', done: r.gatesApproved, of: r.gates, note: r.currentGate ? `Current: ${r.currentGate.id}` : 'all decided' }, { label: 'Tests passed', done: r.passed, of: r.tests, note: `${r.notRun} not run` }, { label: 'Requirements with evidence', done: r.withEvidence, of: r.requirements, note: '' }, { label: 'Risk controls verified', done: r.controlsVerified, of: r.controls, note: '' }])}
+  ${sec('Stop/go gates', `<ol class="pl-gates">${r.gateRows.map((g) => `<li class="${r.currentGate && g.id === r.currentGate.id ? 'cur' : ''}"><b>${esc(g.id)}</b>${open('gate', k.gates, g.id, g.title)}${badge(g.status)}<small>${esc(C.finishOf(s.sched, g.milestone) || '')}</small></li>`).join('')}</ol><p class="pb-note">Select a gate for its criteria, what it still needs, and to record a decision. Nothing is approved.</p>`)}
+  ${id === 'battery' ? sec('Why a zero phase reading is not enough', V.timingFigure()) : ''}`;
 }
-function fInvestment(x) {
-  const { m } = x;
-  return `
-  ${V.meters([{ label: 'Investor preparation', done: m.investorChecklist.filter((c) => c.state === 'Done').length, of: m.investorChecklist.length, note: 'A raise is decided at milestone FM-5' }])}
-  ${sec('Investor preparation checklist', tbl('inv', [{ h: 'Item', v: (c) => esc(c.item) }, { h: 'State', v: (c) => ed(x, 'investorChecklist', c.id, 'state', c.state, { t: 'select', opts: ['Open', 'In progress', 'Done'] }) }], m.investorChecklist, { name: 'investor checklist' }))}
-  ${sec('Equity opportunities', oppTable(x, 'eqf', byType(m, ['equity']), 'None.'))}
-  ${m.fundingBenchmarks.length ? sec('Published benchmarks', tbl('bench', [{ h: 'Measure', v: (b) => esc(b.metric) }, { h: 'Value', v: (b) => esc(b.value) }, { h: 'Publisher', v: (b) => esc(b.publisher || '') }, { h: 'Period', v: (b) => esc(b.period || '') }, { h: 'Source', v: (b) => link(b.source_url) }, { h: 'Read', v: (b) => badge(b.verified ? 'verified' : 'not verified') }], m.fundingBenchmarks, { name: 'funding benchmarks' }), 'For orientation only. They say nothing about what this company could raise.') : ''}
-  <p class="pb-alert">An offering of securities is regulated. Counsel reviews any raise before anyone is approached. Aspirations are kept apart from verified traction and from money received in every document.</p>`;
+
+/* ================================================================ the side panel */
+
+export function panel(x0) {
+  const p = x0.ui.panel; if (!p) return '';
+  const x = { ...x0, ui: { ...x0.ui, working: true } };             // a record opened in the panel can always be edited
+  const { d } = x; const row = (kk, v) => `<div><dt>${esc(kk)}</dt><dd>${v}</dd></div>`; let title = '', body = '';
+  if (p.kind === 'task') { const id = Object.keys(KIT).find((q) => KIT[q].tasks === p.coll); const s = d.byProgram[id]; const t = x.m[p.coll].find((q) => q.id === p.id); if (t) { title = `${t.id} ${t.title}`; body = S.taskPanel({ ...x, ui: { ...x.ui, task: p.id } }, p.coll, s).replace(/<div class="pb-panel-h">[\s\S]*?<\/div>/, '').replace('class="pb-panel" id="pb-task"', 'class="pl-in"'); } }
+  if (p.kind === 'gate') { const id = Object.keys(KIT).find((q) => KIT[q].gates === p.coll); const g = readOf(x, id).gateRows.find((q) => q.id === p.id); if (g) { title = `${g.id} ${g.title}`;
+    body = `<p>${badge(g.status)} ${esc(C.finishOf(d.byProgram[id].sched, g.milestone) || '')}</p><p><b>Criteria</b></p>${ul(g.criteria.map(esc))}<p><b>An approval releases:</b> ${esc(g.authorises)}</p><p><b>Still needed before a go: ${g.missing.length}</b></p>${ul(g.missing.map((q) => esc(q.text)))}
+      ${g.approval ? `<p class="pb-approved">${esc(g.approval.decision)} by ${esc(g.approval.by)} on ${esc(g.approval.date)} <button type="button" class="pb-link" data-act="withdraw" data-coll="${p.coll}" data-id="${esc(g.id)}">withdraw</button></p>` : `<form class="pb-form" data-approve="${esc(g.id)}" data-coll="${p.coll}">${input('by', 'Decided by (a person\'s name)', { req: 1, val: x.store.who })}${input('date', 'Date', { type: 'date', req: 1, val: d.today })}${input('decision', 'Decision', { opts: ['Approved', 'Conditional', 'No-go'] })}${input('note', 'Note')}<button class="pb-btn" type="submit">Record decision</button></form>`}`; } }
+  if (p.kind === 'decision') { const r = allDecisions(x).find((q) => q.id === p.id && q.coll === p.coll); if (r) { title = `${r.id} ${r.title}`;
+    body = `<dl class="pb-dl">${row('Plan', esc(V.PNAME[r.program] || 'Shared'))}${p.coll === 'execDecisions' ? row('Due', ed(x, p.coll, r.id, 'due', r.due, { t: 'date' })) : ''}${row('Owner', esc(r.owner))}${r.impactText ? row(p.coll === 'execDecisions' ? 'Financial impact' : 'Held until decided', esc(r.impactText)) : ''}</dl>
+      <p>${esc(r.question)}</p><p><b>Alternatives</b></p>${ul(r.options.map(esc))}<p><b>Recommendation.</b> ${esc(r.recommendation)}</p>${r.evidence ? `<p><b>Evidence.</b> ${esc(r.evidence)}</p>` : ''}
+      <dl class="pb-dl pl-record">${row('Decision', ed(x, p.coll, r.id, 'decision', r.decision, { fmt: (v) => v || 'record the decision' }))}${row('By', ed(x, p.coll, r.id, 'decidedBy', r.decidedBy, { fmt: (v) => v || 'name' }))}${row('On', ed(x, p.coll, r.id, 'decidedOn', r.decidedOn, { t: 'date', fmt: (v) => v || 'date' }))}</dl><p class="pb-note">A decision counts with its text, a person's name and a date.</p>`; } }
+  if (p.kind === 'risk') { const r = allRisks(x).find((q) => q.id === p.id && q.coll === p.coll); if (r) { title = `${r.id} ${r.hazard}`;
+    body = `<dl class="pb-dl">${row('Plan', esc(V.PNAME[r.program]))}${row('Kind', esc(r.kind))}${row('Effect', esc(r.harm))}${row('Severity, 1 to 5', ed(x, p.coll, r.id, 'severity', r.severity, { t: 'number' }))}${row('Probability, 1 to 5', ed(x, p.coll, r.id, 'probability', r.probability, { t: 'number' }))}${row('Level', esc(r.level))}${row('Controls', r.controls.map((c) => `<b>${esc(c.id)}</b> ${esc(c.text)}`).join('<br>'))}${row('Severity with control', ed(x, p.coll, r.id, 'residualSeverity', r.residualSeverity, { t: 'number' }))}${row('Probability with control', ed(x, p.coll, r.id, 'residualProbability', r.residualProbability, { t: 'number' }))}${row('Level with control', esc(r.after))}${row('Status', ed(x, p.coll, r.id, 'status', r.status, { t: 'select', opts: LABELS }))}</dl>`; } }
+  if (!body) return '';
+  return `<div class="pl-scrim" data-act="close-panel"></div><aside class="pl-drawer" id="pl-drawer" role="dialog" aria-modal="true" aria-label="${esc(title)}"><header><h3>${esc(title)}</h3><button type="button" class="pb-btn" data-act="close-panel">Close</button></header><div class="pl-drawer-b">${body}</div></aside>`;
 }
-function fPipeline(x) {
-  const { m, d } = x; const p = d.pipe;
-  return `
-  ${V.chain(p.stages.map((s) => ({ title: s.name, big: s.count, text: s.name === 'Cash received' ? $m(p.received) : s.attainable ? `${$m(s.attainable)} attainable` : s.requested ? `${$m(s.requested)} requested` : 'no amount set', cls: s.name === 'Cash received' ? 'pl-own' : s.name === 'Award or commitment' ? 'pl-both' : '' })), { label: 'Funding pipeline by stage' })}
-  <div class="pb-tiles">${tile($m(p.received), 'Cash received', 'The only money that is available')}${tile($m(p.committed), 'Committed', 'Awarded or signed; not cash until received')}${tile($m(p.prospective), 'Prospective, unweighted', `${p.noAmount} have no attainable amount`)}${tile($m(p.weighted), 'Prospective, weighted', `an estimate · covers ${p.weightedCovers}; ${p.noProbability} have no probability`)}</div>
-  ${sec('By product', V.hbars(p.byTarget.map((t) => ({ label: t.target === 'both' ? 'Both' : V.PNAME[t.target], value: t.count, cls: V.PCOL[t.target] || 'pl-c-s', text: `${t.count} opportunities · ${$m(t.attainable)} attainable` })), { left: 170, label: 'Opportunities by product' }))}
-  ${sec('Every opportunity', `<form class="pb-form" data-add="opportunities">${input('organisation', 'Organisation', { req: 1 })}${input('programme', 'Program or deal', { req: 1 })}${input('type', 'Type', { opts: ['customer-funded', 'non-dilutive grant', 'state grant', 'contract', 'partnership', 'equity'] })}${input('target', 'For', { opts: [['battery', 'Battery'], ['ecg', 'ECG/MCG'], ['both', 'Both']] })}${input('deadline', 'Deadline', { type: 'date' })}${input('sourceUrl', 'Source page')}<button class="pb-btn" type="submit">Add</button></form>` + oppTable(x, 'opps', m.opportunities, 'None.'),
-    'Stage, amounts, probability and dates are yours to set. A probability needs its reason beside it. An opportunity is never counted as cash before a received amount and date are entered.')}`;
-}
-function fCash(x) {
-  const { m, d } = x; const mo = d.monthly; const next12 = mo.rows.slice(0, 12); const chk = d.alloc;
-  const phaseCost = d.scheds.flatMap((s) => s.phases.map((ph) => { const ts = s.tasks.filter((t) => t.phase === ph.id); const cost = d.load.people.filter((p) => p.rate != null).reduce((a, p) => a + ts.reduce((b, t) => b + C.taskHours(s.program, t, p.id), 0) * p.rate, 0); const rows = s.sched.rows.filter((r) => r.phase === ph.id); return { program: s.name, pid: s.id, phase: ph.name, cost: C.round2(cost), from: rows.map((r) => r.startDate).sort()[0] || '', to: rows.map((r) => r.finishDate).sort().pop() || '' }; })).filter((r) => r.cost > 0);
-  return `
-  <div class="pb-tiles">${tile(ed(x, 'capital', '_', 'cashOnHand', m.capital.cashOnHand, { t: 'number', fmt: (v) => (v == null ? 'enter' : $m(v)) }), 'Cash on hand', m.capital.cashOnHand == null ? 'Not on record' : 'Entered by a person')}${tile($m(next12.reduce((s, r) => s + r.plannedTotal, 0)), 'Planned spending, next 12 months', 'labor and the costs that have a figure')}${tile(mo.runwayKnown ? (mo.runwayMonth ? esc(mo.runwayMonth) : 'beyond the plan') : 'unknown', 'Cash runs out')}${tile(mo.fundingGap == null ? 'unknown' : $m(mo.fundingGap), 'Funding gap')}</div>
-  ${sec('Twelve months of cash', mo.runwayKnown ? V.balanceLine(next12) : '<div class="pl-empty"><b>The balance cannot be drawn.</b><p>Enter cash on hand above.</p></div>')}
-  ${V.monthBars(next12, { label: 'Planned spending for the next twelve months' })}
-  ${sec('Capital needed by program and phase', V.hbars(phaseCost.map((r) => ({ label: r.phase.length > 40 ? r.phase.slice(0, 39) + '…' : r.phase, value: r.cost, cls: V.PCOL[r.pid], text: `${$m(r.cost)} · ${r.from} to ${r.to}` })), { fmt: $m, left: 300, label: 'Labor cost by phase' }) + V.legend([['pl-c-b', 'Battery product'], ['pl-c-e', 'ECG/MCG'], ['pl-c-f', 'Funding and partnerships']]), 'Labor from task hours at each person\'s rate. Costs that still need a quotation are not in these bars.')}
-  ${sec('Charging costs to awards', `<form class="pb-form" data-add="allocations">${input('award', 'Award', { opts: m.opportunities.map((o) => [o.id, o.id + ' ' + o.organisation]) })}${input('kind', 'Kind', { opts: [['expense', 'An expense'], ['hours', 'Hours of a person']] })}${input('ref', 'Expense id, or person (A, B, C)', { req: 1 })}${input('week', 'Week (for hours)', { type: 'number', min: 1 })}${input('amount', 'Dollars, or hours', { type: 'number', req: 1, step: '0.01', min: 0 })}<button class="pb-btn" type="submit">Add</button></form>`
-    + (chk.ok ? `<p>${badge('verified').replace('verified', 'no double allocation')} ${m.allocations.length} allocations on record.</p>` : `<p class="pb-alert">${chk.problems.map((p) => esc(p.text)).join('<br>')}</p>`)
-    + tbl('alloc', [{ h: 'Id', v: (a) => esc(a.id) }, { h: 'Award', v: (a) => esc(a.award) }, { h: 'Kind', v: (a) => esc(a.kind) }, { h: 'Expense or person', v: (a) => esc(a.ref) }, { h: 'Week', n: 1, v: (a) => a.week || '' }, { h: 'Amount', n: 1, v: (a) => a.amount }, { h: '', v: (a) => `<button type="button" class="pb-link" data-del="allocations" data-id="${esc(a.id)}">remove</button>` }], m.allocations, { name: 'allocations', empty: 'No award exists, so nothing is allocated.' }),
-    'Each award keeps its own budget. The check refuses the same expense charged beyond its amount, and more hours of a person charged in a week than were logged.')}`;
-}
+
+/* ================================================================ how the screens are put together */
+
+const view = (k, label, brief, working, path = false) => ({ k, label, brief, working, path });
+const plan = (id, w) => [view('now', 'Now', (x) => pNow(x, id), w.now), view('plan', 'Plan', (x) => pPlan(x, id), w.plan), view('money', 'Money', (x) => pMoney(x, id), w.money), view('proof', 'Proof', (x) => pProof(x, id), w.proof)];
+const ecgLines = (x) => tbl('elines', [{ h: 'Id', v: (r) => esc(r.id) }, { h: 'Cost', v: (r) => esc(r.title) }, { h: 'Amount', n: 1, v: (r) => ed(x, 'lines', r.id, 'amount', r.amount, { t: 'number', fmt: C.money }) }, { h: 'Basis', v: (r) => ed(x, 'lines', r.id, 'kind', r.kind, { t: 'select', opts: C.PRICE_KINDS }) }, { h: 'Planned week', n: 1, v: (r) => ed(x, 'lines', r.id, 'week', r.week, { t: 'number', fmt: (v) => v || 'spread' }) }, { h: 'Actual paid', n: 1, v: (r) => ed(x, 'lines', r.id, 'actual', r.actual, { t: 'number', fmt: C.money }) }, { h: 'Paid in week', n: 1, v: (r) => ed(x, 'lines', r.id, 'actualWeek', r.actualWeek, { t: 'number', fmt: (v) => v || 'set' }) }, { h: 'Note', v: (r) => esc(r.note || '') }], x.m.lines, { name: 'ecg cost lines' });
+const ecgGates = (x) => S.gateCards(x, x.d.readE.gateRows, 'gates', x.d.byProgram.ecg.sched);
+const allRiskTable = (x) => tbl('riskreg', [{ h: 'Id', v: (r) => esc(r.id) }, { h: 'Plan', v: (r) => esc(V.PNAME[r.program]) }, { h: 'Kind', v: (r) => esc(r.kind) }, { h: 'Risk', v: (r) => esc(r.hazard) }, { h: 'Effect', v: (r) => esc(r.harm) }, { h: 'Severity', n: 1, v: (r) => ed(x, r.coll, r.id, 'severity', r.severity, { t: 'number' }) }, { h: 'Probability', n: 1, v: (r) => ed(x, r.coll, r.id, 'probability', r.probability, { t: 'number' }) }, { h: 'Level', v: (r) => esc(r.level) }, { h: 'Controls', v: (r) => r.controls.map((c) => `<b>${esc(c.id)}</b> ${esc(c.text)}`).join('<br>') }, { h: 'With control', v: (r) => esc(r.after) }], allRisks(x), { name: 'risk register' });
+const objectives = (x) => S.cards(x.m.objectives.map((o) => S.card(esc(o.title), `<p class="pl-kind">${esc(o.kind)} · ${esc(V.PNAME[o.program] || o.program)}</p><p><b>Measure.</b> ${esc(o.measure)}</p>`, V.PCOL[o.program]))) + `<p class="pb-note">${esc(x.m.ambition)}</p>`;
 
 export const AREAS = {
-  strategy: { title: 'MDMCG Company Strategy', tabs: [['1', 'Executive Overview', sOverview], ['2', 'Strategic Roadmap', sRoadmap], ['3', 'Portfolio Financials', sFinancials], ['4', 'Shared Operations and Quality', sShared], ['5', 'Executive Decisions', sDecisions]] },
-  battery: { title: 'Execution Plan 1: Battery Product', tabs: [['1', 'Engineering Completion', bEngineering], ['2', 'Product Development and Verification', bDevelopment], ['3', 'Commercial Development', bCommercial], ['4', 'Manufacturing and Supply Chain', bManufacturing], ['5', 'Customer Support and Product Lifecycle', bSupport], ['6', 'Budget, Timeline, and Risk', bBudget], ['7', 'Quality and Release Readiness', bQuality]] },
-  funding: { title: 'Execution Plan 3: Funding and Partnerships', tabs: [['1', 'Funding Strategy', fStrategy], ['2', 'Grants and Non-Dilutive Funding', fGrants], ['3', 'Customer-Funded Development', fCustomer], ['4', 'Strategic Partnerships', fPartners], ['5', 'Investment and Capital Raising', fInvestment], ['6', 'Funding Pipeline', fPipeline], ['7', 'Cash Flow and Capital Allocation', fCash]] },
+  hub: { title: 'Company Plan', tabs: [
+    view('today', 'Today', today, null, true),
+    view('strategy', 'Strategy', strategy, [['Objectives', objectives], ['Shared operations', S.sShared]], true),
+    view('roadmap', 'Roadmap', roadmap, [['Capacity and what-ifs', S.sRoadmap]], true),
+    view('money', 'Money', money, [['All figures', S.sFinancials]], true),
+    view('decisions', 'Decisions', decisions, null, true),
+    view('risks', 'Risks', risks, [['Full register', allRiskTable]]),
+  ] },
+  battery: { title: 'Plan 1: Battery Product', tabs: plan('battery', { now: [['Engineering state', S.bEngineering]], plan: [['Build', S.bDevelopment], ['Sell', S.bCommercial], ['Make', S.bManufacturing], ['Support', S.bSupport]], money: [['Budget and economics', S.bBudget]], proof: [['Gates, standards, traceability', S.bQuality]] }) },
+  ecg: { title: 'Plan 2: ECG/MCG', tabs: plan('ecg', { now: [['Overview', (x) => L.overview(xe(x))]], plan: [['Timeline and tasks', (x) => L.timeline(xe(x))], ['People and hours', (x) => L.resources(xe(x))]], money: [['Scenarios', (x) => L.scenariosView(xe(x))], ['Cost lines', ecgLines]], proof: [['Gates', ecgGates], ['Requirements and traceability', (x) => L.requirementsView(xe(x))], ['Tests', (x) => L.testing(xe(x))]] }) },
+  funding: { title: 'Plan 3: Funding and Partnerships', tabs: plan('funding', { now: [['Strategy and deliverables', S.fStrategy]], plan: [['Pipeline', S.fPipeline], ['Grants', S.fGrants], ['Customers', S.fCustomer], ['Partners', S.fPartners]], money: [['Cash and awards', S.fCash]], proof: [['Investor preparation', S.fInvestment]] }) },
+  library: { title: 'Library', library: true, tabs: [
+    view('records', 'Your changes and history', (x) => L.records(xe(x)), null),
+    view('parts', 'Parts and sourcing', (x) => L.hardware(xe(x)), null),
+    view('tools', 'Tools and software', (x) => L.software(xe(x)), null),
+    view('standards', 'Standards and quality', (x) => L.quality(xe(x)), null),
+    view('security', 'Security and data', (x) => L.security(xe(x)), null),
+  ] },
 };
-export const PLAN_NAV = [['strategy', '/plan/', 'Company Strategy'], ['battery', '/plan/battery/', '1 Battery Product'], ['ecg', '/product-build/', '2 ECG/MCG'], ['funding', '/plan/funding/', '3 Funding and Partnerships']];
+export const PLAN_NAV = [['hub', '/plan/', 'Company'], ['battery', '/plan/battery/', '1 Battery'], ['ecg', '/product-build/', '2 ECG/MCG'], ['funding', '/plan/funding/', '3 Funding'], ['library', '/plan/library/', 'Library']];
 export const planNav = (cur) => `<nav class="pl-nav" aria-label="Company plan"><ul>${PLAN_NAV.map(([id, href, name]) => `<li><a href="${href}" class="${V.PCOL[id] || ''}"${id === cur ? ' aria-current="page"' : ''}>${esc(name)}</a></li>`).join('')}</ul></nav>`;
+export { allDecisions, allRisks, KIT };

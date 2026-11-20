@@ -339,8 +339,8 @@ test('access: a short code is refused at build, and each build uses a fresh salt
 });
 test('access: a release with no code holds nothing to open', async () => { await assert.rejects(unlock({ locked: true }, 'anything at all')); });
 test('access: the page code that the public can read never imports the data', () => {
-  for (const f of ['app.js', 'views.js', 'calc.js', 'crypto.js']) { const t = readFileSync(new URL('../src/product-build/' + f, import.meta.url), 'utf8'); assert.ok(!/seed\/|data\/product-build/.test(t.replace(/\/\*[\s\S]*?\*\//g, '')), f + ' must not import the seed'); }
-  const page = readFileSync(new URL('../src/pages/product-build/index.astro', import.meta.url), 'utf8');
+  for (const f of ['plan.js', 'plan-views.js', 'plan-sections.js', 'plan-viz.js', 'portfolio.js', 'views.js', 'calc.js', 'crypto.js']) { const t = readFileSync(new URL('../src/product-build/' + f, import.meta.url), 'utf8'); assert.ok(!/seed\/|data\/product-build/.test(t.replace(/\/\*[\s\S]*?\*\//g, '')), f + ' must not import the seed'); }
+  const page = readFileSync(new URL('../src/pages/product-build/index.astro', import.meta.url), 'utf8') + readFileSync(new URL('../src/components/PlanShell.astro', import.meta.url), 'utf8');
   assert.ok(!/seed\//.test(page));
 });
 const dist = new URL('../dist/', import.meta.url);

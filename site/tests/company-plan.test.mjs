@@ -213,6 +213,6 @@ test('claims: the new records hold no customer, order, award, approval or certif
   assert.match(seed.securityAudit.verdict, /does not meet/);
 });
 test('access: the plan pages\' public code never imports the internal data and holds no dollar figure', () => {
-  for (const f of ['plan.js', 'plan-views.js', 'plan-viz.js', 'portfolio.js']) { const t = readFileSync(new URL('../src/product-build/' + f, import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, ''); assert.ok(!/seed\/|data\/product-build/.test(t), f); assert.ok(!/\$\s?\d{2},?\d{3}/.test(t), f + ' holds no dollar figure'); }
+  for (const f of ['plan.js', 'plan-views.js', 'plan-sections.js', 'plan-viz.js', 'portfolio.js']) { const t = readFileSync(new URL('../src/product-build/' + f, import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, ''); assert.ok(!/seed\/|data\/product-build/.test(t), f); assert.ok(!/\$\s?\d{2},?\d{3}/.test(t), f + ' holds no dollar figure'); }
   const shell = readFileSync(new URL('../src/components/PlanShell.astro', import.meta.url), 'utf8'); assert.ok(!/seed\//.test(shell));
 });

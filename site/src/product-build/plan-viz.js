@@ -28,7 +28,7 @@ export function strategyMap(x) {
     <div class="pl-map-row">${ps.map(card).join('')}</div>
     <div class="pl-map-flow" aria-label="How the programs feed each other"><span><i>→</i> Revenue from Plan 1 funds Plan 2</span><span><i>→</i> Plan 3 brings capital to Plans 1 and 2</span><span><i>→</i> Plans 1 and 2 share the engineers, the magnetic sensing and the acquisition electronics</span></div>
     <svg class="pl-map-wires" viewBox="0 0 900 30" preserveAspectRatio="none" aria-hidden="true"><path d="M150 0 V15 M450 0 V15 M750 0 V15 M150 15 H750 M450 15 V30"/></svg>
-    <div class="pl-map-shared"><b>Shared operations</b><ul>${shared.map((s) => `<li>${esc(s)}</li>`).join('')}</ul><a href="/plan/#4">One set of procedures, people and records for all three</a></div>
+    <div class="pl-map-shared"><b>Shared operations</b><ul>${shared.map((s) => `<li>${esc(s)}</li>`).join('')}</ul><a href="/plan/#strategy">One set of procedures, people and records for all three</a></div>
   </div>`;
 }
 
@@ -149,12 +149,13 @@ export function decisionLine(q, today) {
   const t0 = Math.min(C.parseDate(today), ...rows.map((r) => C.parseDate(r.due))) - 7 * C.DAY, t1 = Math.max(...rows.map((r) => C.parseDate(r.due))) + 14 * C.DAY;
   const W = 900, H = 150, sx = (date) => 30 + (C.parseDate(date) - t0) / (t1 - t0) * (W - 60);
   let g = `<line x1="30" x2="${W - 30}" y1="90" y2="90" class="pl-d-axis"/>`;
-  const tx = sx(today); g += `<line x1="${tx}" x2="${tx}" y1="20" y2="104" class="pb-g-now"/><text x="${tx + 4}" y="28" class="pb-g-dt">today ${esc(today)}</text>`;
+  const tx = sx(today); g += `<line x1="${tx}" x2="${tx}" y1="8" y2="104" class="pb-g-now"/><text x="${tx - 4}" y="14" text-anchor="end" class="pb-g-dt">today</text>`;
   const seen = {};
   rows.forEach((r) => { const cx = sx(r.due); const lvl = seen[r.due] = (seen[r.due] || 0) + 1; const cy = 90 - (lvl - 1) * 24; const overdue = !r.made && r.days < 0;
     const mark = r.made ? `<circle cx="${cx}" cy="${cy}" r="8" class="pl-d-made"/>` : overdue ? `<path d="M${cx} ${cy - 10} L${cx + 9} ${cy + 7} L${cx - 9} ${cy + 7} Z" class="pl-d-over"/>` : `<circle cx="${cx}" cy="${cy}" r="8" class="pl-d-open"/>`;
     g += `<a href="#dec-${esc(r.id)}">${mark}<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="pl-d-id">${esc(r.id.replace('ED-', ''))}</text><title>${esc(`${r.id} ${r.title}: due ${r.due}, ${r.made ? 'decided' : overdue ? 'overdue' : 'open'}`)}</title></a>`; });
-  [...new Set(rows.map((r) => r.due))].forEach((dt) => { g += `<text x="${sx(dt)}" y="122" text-anchor="middle" class="pb-g-dt">${esc(dt.slice(5))}</text><text x="${sx(dt)}" y="136" text-anchor="middle" class="pb-g-dt">${esc(dt.slice(0, 4))}</text>`; });
+  let lastX = -999, low = false;
+  [...new Set(rows.map((r) => r.due))].sort().forEach((dt) => { const cx = sx(dt); low = cx - lastX < 64 ? !low : false; lastX = cx; g += `<text x="${cx}" y="${low ? 136 : 122}" text-anchor="middle" class="pb-g-dt">${esc(dt.slice(2))}</text>`; });
   return `<div class="pb-scroll"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Decisions on their due dates">${g}</svg></div>${legend([['pl-k-open', 'open circle: awaiting decision'], ['pl-k-tri', 'triangle: overdue'], ['pl-k-made', 'filled circle: decided']])}`;
 }
 
