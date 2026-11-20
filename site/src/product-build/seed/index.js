@@ -46,7 +46,7 @@ export { SENTINEL };
    same collections as before. The new collections carry their own names (b... battery, f... funding). */
 import { bProgram, bSources, bFindings, bAgreement, bNeeds, bRequirements, bOutputs, bTests, bRisks, bPhases, bTasks, bGates, bLines, bScenarios } from './battery.js';
 import * as company from './company.js';
-import { fProgram, fPhases, fTasks, fLines, channels, seedOpportunities, fDeliverables, investorChecklist, tractionRules } from './funding.js';
+import { fProgram, fPhases, fTasks, fLines, fRisks, channels, seedOpportunities, fDeliverables, investorChecklist, tractionRules } from './funding.js';
 import internalFile from '../../data/product-build/internal.json' with { type: 'json' };
 import fundingFile from '../../data/product-build/funding.json' with { type: 'json' };
 import marketFile from '../../data/product-build/market.json' with { type: 'json' };
@@ -64,7 +64,7 @@ const researched = (fundingFile.opportunities || []).map((o) => ({
 Object.assign(seed, {
   bProgram, bSources, bFindings, bAgreement, bNeeds, bRequirements, bOutputs, bTests, bRisks, bPhases, bTasks, bGates, bLines, bScenarios,
   ...company,
-  fProgram, fPhases, fTasks, fLines, channels, fDeliverables, investorChecklist, tractionRules,
+  fProgram, fPhases, fTasks, fLines, fRisks, channels, fDeliverables, investorChecklist, tractionRules,
   opportunities: [...seedOpportunities, ...researched],
   fundingStatus: fundingFile.programme_status || [], fundingRules: fundingFile.rules || [], fundingBenchmarks: fundingFile.benchmarks || [], fundingNotFound: fundingFile.not_found || [],
   equipment: marketFile.equipment || [], marketFacts: marketFile.market || [], bStandards: marketFile.standards || [], manufacturers: marketFile.manufacturers || [], marketBenchmarks: marketFile.benchmarks || [], marketNotFound: marketFile.not_found || [],

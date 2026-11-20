@@ -104,3 +104,13 @@ export const investorChecklist = [
   { id: 'IC-9', item: 'Data room with every claim tied to a record', state: 'Open' },
 ];
 export const tractionRules = ['An interview counts when a written record exists.', 'A pilot counts when an agreement is signed.', 'Revenue counts when money is received.', 'A grant counts as available when cash is received, and only for the costs the award allows.', 'A figure from a plan or a slide is an ambition, and is shown as one.'];
+
+/* Risks of the funding plan. First estimates on the same 1 to 5 scale as the other plans; not reviewed. */
+const FR = (id, kind, hazard, harm, sev, prob, control, sev2, prob2) => ({ id, kind, area: kind, hazard, harm, severity: sev, probability: prob, controls: [{ id: id.replace('FK', 'FRC'), text: control, requirements: [] }], residualSeverity: sev2, residualProbability: prob2, status: 'Engineering Draft', owner: 'B' });
+export const fRisks = [
+  FR('FK-01', 'Cost', 'Cash runs out before any funding is received', 'Work stops on both products', 5, 3, 'Enter cash on hand; a twelve-month cash model; spending approved one gate at a time', 5, 2),
+  FR('FK-02', 'Regulatory', 'The company that applies is not the company that is eligible', 'An application is rejected, or an award cannot be accepted', 4, 3, 'Eligibility checked against each program\'s own rules after decision ED-01', 4, 1),
+  FR('FK-03', 'Schedule', 'Applications take the director and business lead away from the products', 'Product milestones slip', 3, 4, 'Application hours shown in the shared capacity chart before a decision to apply', 3, 2),
+  FR('FK-04', 'Regulatory', 'The same cost or the same hours are charged to two awards', 'Repayment, and loss of future eligibility', 4, 2, 'One budget per award and the allocation check on this plan', 4, 1),
+  FR('FK-05', 'Commercial', 'An opportunity is counted as money before it is received', 'Spending against funds that do not arrive', 4, 3, 'Identified, committed and received kept apart; only received counts as available', 4, 1),
+];

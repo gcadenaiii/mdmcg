@@ -17,9 +17,9 @@ export function chain(steps, o = {}) {
 /* ---- A. company strategy map */
 export function strategyMap(x) {
   const { m, d } = x;
-  const card = (p) => { const s = d.byProgram[p.id]; const b = d.budget.rows.find((r) => r.id === p.id); const nx = s.next;
-    return `<a class="pl-card ${PCOL[p.id]}" href="${p.href}"><span class="pl-card-n">Execution Plan ${p.n}</span><b>${esc(p.name)}</b><em>${esc(p.role)}</em>
-      <dl><div><dt>Next milestone</dt><dd>${nx ? `${esc(nx.title)}<br>${esc(nx.finishDate)}` : 'none'}</dd></div><div><dt>Finish, as planned</dt><dd>${esc(s.sched.endDate)}</dd></div><div><dt>Budget</dt><dd>${$m(b.total)}${b.isFloor ? ' <span class="pb-b pb-b-warn">floor</span>' : ''}</dd></div></dl></a>`; };
+  const card = (p) => { const s = d.byProgram[p.id]; const nx = s.next;
+    return `<a class="pl-card ${PCOL[p.id]}" href="${p.href}"><span class="pl-card-n">Plan ${p.n}</span><b>${esc(p.name)}</b><em>${esc(p.role)}</em>
+      <dl><div><dt>Next milestone</dt><dd>${nx ? `${esc(nx.title)}<br>${esc(nx.finishDate)}` : 'none'}</dd></div><div><dt>Finish, as planned</dt><dd>${esc(s.sched.endDate)}</dd></div></dl></a>`; };
   const ps = [{ id: 'battery', n: 1, name: 'Battery Product', role: 'Sell first: the near-term priority', href: '/plan/battery/' }, { id: 'ecg', n: 2, name: 'ECG/MCG', role: 'Longer-horizon medical technology', href: '/product-build/' }, { id: 'funding', n: 3, name: 'Funding and Partnerships', role: 'Capital for both', href: '/plan/funding/' }];
   const shared = ['Quality', 'Intellectual property', 'Finance', 'Security', 'Manufacturing partners', 'Management'];
   return `<div class="pl-map" role="group" aria-label="Company strategy map">
@@ -105,19 +105,23 @@ export function balanceLine(rows) {
   return `<div class="pb-scroll"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Cash balance by month">${g}</svg></div>`;
 }
 
-/* ---- horizontal bars: [{ label, value, cls, note, parts: [{ value, cls, name }] }] */
+/* ---- horizontal bars, as HTML so the labels keep their size on any screen: [{ label, value, cls, text, parts: [{ value, cls, name }] }] */
 export function hbars(rows, o = {}) {
-  const max = Math.max(1, ...rows.map((r) => (r.parts ? r.parts.reduce((s, p) => s + p.value, 0) : r.value)), ...(o.ref ? [o.ref] : []));
-  const W = 980, L = o.left || 190, bh = 26, gap = 12, R = 400;
-  let g = '';
-  rows.forEach((r, i) => { const yy = 6 + i * (bh + gap); let x0 = L; const parts = r.parts || [{ value: r.value, cls: r.cls, name: r.label }];
-    g += `<text x="0" y="${yy + 17}" class="pb-c-lab">${esc(r.label)}</text>`;
-    for (const p of parts) { const w = (W - L - R) * p.value / max; g += `<rect x="${x0}" y="${yy}" width="${Math.max(0, w)}" height="${bh}" class="${p.cls || 'pl-c-b'}"><title>${esc(`${r.label}: ${p.name} ${o.fmt ? o.fmt(p.value) : p.value}`)}</title></rect>`; x0 += w; }
-    if (r.outline != null) g += `<rect x="${L}" y="${yy - 2}" width="${(W - L - R) * r.outline / max}" height="${bh + 4}" class="pl-c-out"><title>${esc(`${r.label}: target ${r.outline}`)}</title></rect>`;
-    g += `<text x="${Math.max(x0, r.outline != null ? L + (W - L - R) * r.outline / max : 0) + 8}" y="${yy + 17}" class="pb-c-lab">${esc(r.text != null ? r.text : (o.fmt ? o.fmt(r.value != null ? r.value : parts.reduce((s, p) => s + p.value, 0)) : ''))}</text>`; });
-  if (o.ref) { const rx = L + (W - L - R) * o.ref / max; g += `<line x1="${rx}" x2="${rx}" y1="0" y2="${rows.length * (bh + gap)}" class="pb-c-cap"/><text x="${rx + 4}" y="10" class="pb-c-ax">${esc(o.refName)}</text>`; }
-  const H = rows.length * (bh + gap) + 4;
-  return `<div class="pb-scroll"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(o.label || 'Bar chart')}">${g}</svg></div>`;
+  const tot = (r) => (r.parts ? r.parts.reduce((s, p) => s + p.value, 0) : r.value);
+  const max = Math.max(1, ...rows.map(tot), o.ref || 0);
+  return `<div class="pl-hb" role="group" aria-label="${esc(o.label || 'Bar chart')}">${rows.map((r) => { const parts = r.parts || [{ value: r.value, cls: r.cls, name: r.label }]; const text = r.text != null ? r.text : (o.fmt ? o.fmt(tot(r)) : '');
+    return `<div class="pl-hb-row"><span class="pl-hb-l">${esc(r.label)}</span><span class="pl-hb-t">${parts.map((p) => `<i class="${p.cls || 'pl-c-b'}" style="width:${Math.max(0, p.value) / max * 100}%" title="${esc(`${p.name}: ${o.fmt ? o.fmt(p.value) : p.value}`)}"></i>`).join('')}</span><span class="pl-hb-v">${esc(text)}</span></div>`; }).join('')}</div>`;
+}
+
+/* ---- one bar per phase, with its dates and the gate that closes it. Brief depth; the task chart is in Working. */
+export function phaseChart(s, today) {
+  const t0 = C.parseDate(s.program.startDate), t1 = C.parseDate(s.sched.endDate) + C.DAY; const pct = (dt) => Math.max(0, Math.min(100, (C.parseDate(dt) - t0) / (t1 - t0) * 100));
+  const rows = s.phases.map((ph) => { const ts = s.sched.rows.filter((r) => r.phase === ph.id && !r.loe); const work = ts.filter((r) => !r.milestone); if (!work.length) return null;
+    const a = work.map((r) => r.startDate).sort()[0], b = work.map((r) => r.finishDate).sort().pop(); const ms = ts.filter((r) => r.milestone).pop();
+    return { name: ph.name, a, b, ms, crit: work.some((r) => r.critical), pctDone: Math.round(work.reduce((x, r) => x + r.percent, 0) / work.length) }; }).filter(Boolean);
+  const now = today >= s.program.startDate && today <= s.sched.endDate ? `<i class="pl-ph-now" style="left:${pct(today)}%" title="today"></i>` : '';
+  return `<ol class="pl-ph" aria-label="Phases in order, one bar each">${rows.map((r) => `<li><div class="pl-ph-h"><b>${esc(r.name)}</b><span>${esc(r.a)} to ${esc(r.b)}${r.ms ? ` · gate ${esc(r.ms.finishDate)}` : ''}</span></div><div class="pl-ph-t"><i class="pl-ph-b${r.crit ? ' pl-ph-c' : ''}" style="left:${pct(r.a)}%;width:${Math.max(1.5, pct(r.b) - pct(r.a))}%"></i>${r.ms ? `<i class="pl-ph-m" style="left:${pct(r.ms.finishDate)}%" title="${esc(r.ms.title + ', ' + r.ms.finishDate)}"></i>` : ''}${now}</div></li>`).join('')}</ol>
+  <p class="pb-legend"><span><i class="pb-k pl-ph-kc"></i>dark bar: no slack, a week lost here moves the finish</span><span><i class="pb-k pl-ph-kn"></i>lighter bar: has slack</span><span><i class="pb-k pb-k-ms"></i>stop/go gate</span></p>`;
 }
 
 /* ---- grouped bars: groups [{ label, values: [..] }], series [{ name, cls }] */
@@ -143,20 +147,21 @@ export function funnelViz(f) {
   return `<ol class="pl-funnel" aria-label="Commercialization funnel">${f.rows.map((r, i) => `<li><span class="pl-funnel-n">${i + 1}</span><div class="pl-funnel-b"><b>${esc(r.name)}</b><div class="pl-funnel-t"><i class="pl-funnel-tg" style="width:${(r.target || 0) / max * 100}%"></i><i class="pl-funnel-r" style="width:${r.reached / max * 100}%"></i></div></div><div class="pl-funnel-v"><strong>${r.reached}</strong><span>${r.target != null ? `target ${r.target}` : 'no target set'}</span>${r.conversion != null ? `<small>${Math.round(r.conversion * 100)}% of the step before</small>` : ''}</div></li>`).join('')}</ol>`;
 }
 
-/* ---- J. decision timeline: one mark per decision on its due date */
-export function decisionLine(q, today) {
-  const rows = q.rows.filter((r) => r.due); if (!rows.length) return '';
-  const t0 = Math.min(C.parseDate(today), ...rows.map((r) => C.parseDate(r.due))) - 7 * C.DAY, t1 = Math.max(...rows.map((r) => C.parseDate(r.due))) + 14 * C.DAY;
-  const W = 900, H = 150, sx = (date) => 30 + (C.parseDate(date) - t0) / (t1 - t0) * (W - 60);
-  let g = `<line x1="30" x2="${W - 30}" y1="90" y2="90" class="pl-d-axis"/>`;
-  const tx = sx(today); g += `<line x1="${tx}" x2="${tx}" y1="8" y2="104" class="pb-g-now"/><text x="${tx - 4}" y="14" text-anchor="end" class="pb-g-dt">today</text>`;
-  const seen = {};
-  rows.forEach((r) => { const cx = sx(r.due); const lvl = seen[r.due] = (seen[r.due] || 0) + 1; const cy = 90 - (lvl - 1) * 24; const overdue = !r.made && r.days < 0;
-    const mark = r.made ? `<circle cx="${cx}" cy="${cy}" r="8" class="pl-d-made"/>` : overdue ? `<path d="M${cx} ${cy - 10} L${cx + 9} ${cy + 7} L${cx - 9} ${cy + 7} Z" class="pl-d-over"/>` : `<circle cx="${cx}" cy="${cy}" r="8" class="pl-d-open"/>`;
-    g += `<a href="#dec-${esc(r.id)}">${mark}<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="pl-d-id">${esc(r.id.replace('ED-', ''))}</text><title>${esc(`${r.id} ${r.title}: due ${r.due}, ${r.made ? 'decided' : overdue ? 'overdue' : 'open'}`)}</title></a>`; });
+/* ---- J. decision timeline: one numbered mark per decision on its due date (the same numbers as the list beneath) */
+export function decisionLine(list, today) {
+  const rows = list.filter((r) => r.due); if (!rows.length) return '';
+  const t0 = Math.min(C.parseDate(today), ...rows.map((r) => C.parseDate(r.due))) - 7 * C.DAY, t1 = Math.max(...rows.map((r) => C.parseDate(r.due))) + 10 * C.DAY;
+  const W = 1000, sx = (date) => 30 + (C.parseDate(date) - t0) / (t1 - t0) * (W - 60);
+  const stack = {}; let top = 1; for (const r of rows) { stack[r.due] = (stack[r.due] || 0) + 1; top = Math.max(top, stack[r.due]); }
+  const base = 28 + top * 24, H = base + 50; const seen = {};
+  let g = `<line x1="30" x2="${W - 30}" y1="${base}" y2="${base}" class="pl-d-axis"/>`;
+  const tx = sx(today); g += `<line x1="${tx}" x2="${tx}" y1="6" y2="${base + 12}" class="pb-g-now"/><text x="${tx - 4}" y="14" text-anchor="end" class="pb-g-dt">today</text>`;
+  for (const r of rows) { const cx = sx(r.due); const lvl = seen[r.due] = (seen[r.due] || 0) + 1; const cy = base - (lvl - 1) * 24; const late = !r.made && r.days < 0;
+    const mark = r.made ? `<circle cx="${cx}" cy="${cy}" r="9" class="pl-d-made"/>` : late ? `<path d="M${cx} ${cy - 11} L${cx + 10} ${cy + 8} L${cx - 10} ${cy + 8} Z" class="pl-d-over"/>` : `<circle cx="${cx}" cy="${cy}" r="9" class="pl-d-open"/>`;
+    g += `<g data-open="${r.kind || 'decision'}|${r.coll}|${esc(r.id)}" class="pl-d-g" tabindex="0" role="button" aria-label="${esc(`${r.n}. ${r.title}, due ${r.due}, ${r.made ? 'decided' : late ? 'late' : 'open'}`)}">${mark}<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="pl-d-id">${r.n}</text><title>${esc(`${r.n}. ${r.title}: ${r.due}`)}</title></g>`; }
   let lastX = -999, low = false;
-  [...new Set(rows.map((r) => r.due))].sort().forEach((dt) => { const cx = sx(dt); low = cx - lastX < 64 ? !low : false; lastX = cx; g += `<text x="${cx}" y="${low ? 136 : 122}" text-anchor="middle" class="pb-g-dt">${esc(dt.slice(2))}</text>`; });
-  return `<div class="pb-scroll"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Decisions on their due dates">${g}</svg></div>${legend([['pl-k-open', 'open circle: awaiting decision'], ['pl-k-tri', 'triangle: overdue'], ['pl-k-made', 'filled circle: decided']])}`;
+  [...new Set(rows.map((r) => r.due))].sort().forEach((dt) => { const cx = sx(dt); low = cx - lastX < 70 ? !low : false; lastX = cx; g += `<text x="${cx}" y="${base + (low ? 40 : 26)}" text-anchor="middle" class="pb-g-dt">${esc(dt.slice(2))}</text>`; });
+  return `<div class="pb-scroll pl-dline"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Decisions on their due dates">${g}</svg></div>${legend([['pl-k-open', 'open circle: awaiting decision'], ['pl-k-tri', 'triangle: late'], ['pl-k-made', 'filled circle: decided']])}`;
 }
 
 /* ---- the timing ambiguity from the audit, as an illustration (not prototype data) */

@@ -28,7 +28,9 @@ export const gaps = [
 ];
 
 /* Decisions the director must make. None has been made. `blocks` is what may not happen before the decision. */
-const D = (id, title, question, options, recommendation, blocks, needs = []) => ({ id, title, question, options, recommendation, blocks, needs, status: 'Review Required', decision: null });
+/* due: the date by which the plan needs the answer (a planning date, from the task it holds up). owner: who decides. */
+const DUE = { 'D-01': '2026-11-27', 'D-02': '2026-12-04', 'D-03': '2026-12-04', 'D-04': '2026-11-27', 'D-05': '2027-01-15', 'D-06': '2027-01-15', 'D-07': '2027-03-12', 'D-08': '2027-01-22', 'D-09': '2026-11-27', 'D-10': '2026-11-23' };
+const D = (id, title, question, options, recommendation, blocks, needs = []) => ({ id, title, question, options, recommendation, blocks, needs, due: DUE[id] || null, owner: 'Director', status: 'Review Required', decision: null, decidedBy: null, decidedOn: null });
 export const decisions = [
   D('D-01', 'Purchase of MCG sensor evaluation hardware', 'Which sensors are bought for the feasibility experiments, and at what cost?', ['The candidates the developer shortlists after quotations', 'A single lowest-cost candidate', 'Wait for a second quotation round'], 'Shortlist two sensor types if the quotations fit the allowance, so that one failure does not end the experiments.', 'Any sensor order (budget line H-01)', ['Quotations on record']),
   D('D-02', 'The feasibility criterion', 'What signal-to-noise ratio and repeatability must the heart signal reach for the gate to pass?', ['Derive from the virtual trial\'s figures for the chosen sensor', 'Take a published unshielded recording as the bar', 'Set a simpler bar on the coil signal only'], 'Derive it from the virtual trial and write it down before the first experiment. It must not be changed after results are seen.', 'The start of the feasibility experiments (T-203)'),

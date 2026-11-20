@@ -17,7 +17,6 @@ export const NAV: { label: string; href?: string; sub?: { href: string; label: s
     { href: '/science/', label: 'Science' },
     { href: '/heart-twin/#tools', label: 'Research tools' },
     { href: '/plan/', label: 'Company Plan' },
-    { href: '/product-build/', label: 'Product Build' },
   ] },
 ];
 

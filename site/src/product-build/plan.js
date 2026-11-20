@@ -6,7 +6,7 @@ import * as C from './calc.js';
 import * as P from './portfolio.js';
 import { unlock, WrongCode } from './crypto.js';
 import { esc, mode } from './views.js';
-import { AREAS, planNav, panel } from './plan-views.js';
+import { AREAS, planNav, panel, pathInfo } from './plan-views.js';
 
 const KEY = 'pb:v1', CODE = 'pb:code', DEPTH = 'pb:depth';
 const $ = (s, r = document) => r.querySelector(s);
@@ -84,14 +84,15 @@ function render(keep = true) {
   const y = scrollY; derive();
   const x = { m, d, ui, store, mine };
   const i = DEF.tabs.findIndex((t) => t.k === ui.tab); const tab = DEF.tabs[i < 0 ? 0 : i];
-  const subs = ui.working && tab.working ? tab.working : null; const ws = subs ? Math.min(ui.wsub, subs.length - 1) : 0;
+  const subs = ui.working && tab.working && !DEF.library ? tab.working : null; const ws = subs ? Math.min(ui.wsub, subs.length - 1) : 0;
   const body = subs ? subs[ws][1](x) : tab.brief({ ...x, ui: { ...ui, working: DEF.library ? true : false } });
-  const path = DEF.tabs.filter((t) => t.path); const pi = path.indexOf(tab);
-  const foot = pi >= 0 && !ui.working ? `<nav class="pl-path" aria-label="Reading path">${pi > 0 ? `<a href="#${path[pi - 1].k}" data-tab="${path[pi - 1].k}">← ${esc(path[pi - 1].label)}</a>` : '<span></span>'}<span>${pi + 1} of ${path.length}</span>${pi < path.length - 1 ? `<a class="pl-next" href="#${path[pi + 1].k}" data-tab="${path[pi + 1].k}">Next: ${esc(path[pi + 1].label)} →</a>` : '<a class="pl-next" href="/plan/battery/">Next: Plan 1, Battery →</a>'}</nav>` : '';
+  const pi = !DEF.library && !ui.working ? pathInfo(AREA, tab.k) : null;
+  const link = (q, cls, text) => `<a class="${cls}" href="${q.href}"${q.area === AREA ? ` data-tab="${q.k}"` : ''}>${text}</a>`;
+  const foot = pi ? `<nav class="pl-path" aria-label="Reading path">${pi.prev ? link(pi.prev, 'pl-prev', `← ${esc(pi.prev.label)}`) : '<span></span>'}<span>Step ${pi.step} of ${pi.of}</span>${pi.next ? link(pi.next, 'pl-next', `Next: ${esc(pi.next.label)} →`) : link({ href: '/plan/#today', area: 'hub', k: 'today' }, 'pl-next', 'Back to Today')}</nav>` : '';
   app.innerHTML = `<div class="wrap">${planNav(AREA)}
-    <div class="pl-bar"><nav class="pb-tabs pl-tabs" aria-label="${esc(DEF.title)}"><ul>${DEF.tabs.map((t) => `<li><a href="#${t.k}"${t === tab ? ' aria-current="page"' : ''} data-tab="${t.k}">${esc(t.label)}</a></li>`).join('')}</ul></nav>
-      ${DEF.library ? '' : `<div class="pl-depth" role="group" aria-label="Depth"><button type="button" class="pb-btn${ui.working ? '' : ' pl-on'}" data-depth="brief" aria-pressed="${!ui.working}">Brief</button><button type="button" class="pb-btn${ui.working ? ' pl-on' : ''}" data-depth="working" aria-pressed="${ui.working}"${tab.working ? '' : ' disabled title="This screen has no working detail"'}>Working</button></div>`}</div>
-    <div class="pb-head"><h2 class="pb-h2" tabindex="-1">${esc(tab.label)}</h2><p class="pb-meta">${esc(DEF.title)} · everything is an estimate or a draft unless it is marked otherwise${d.changes ? ` · ${d.changes} change${d.changes === 1 ? '' : 's'} of yours` : ''}</p></div>
+    <div class="pl-bar"><nav class="pb-tabs pl-tabs" aria-label="${esc(DEF.title)}"><ul>${DEF.tabs.filter((t) => !t.hidden || t === tab).map((t) => `<li><a href="#${t.k}"${t === tab ? ' aria-current="page"' : ''} data-tab="${t.k}">${esc(t.label)}</a></li>`).join('')}</ul></nav>
+      <div class="pl-side">${!DEF.library && tab.working ? `<div class="pl-depth" role="group" aria-label="Depth"><button type="button" class="pb-btn${ui.working ? '' : ' pl-on'}" data-depth="brief" aria-pressed="${!ui.working}">Brief</button><button type="button" class="pb-btn${ui.working ? ' pl-on' : ''}" data-depth="working" aria-pressed="${ui.working}">Working</button></div>` : ''}<button type="button" class="pb-link pl-mine" data-open="changes||">Your changes${d.changes ? ` (${d.changes})` : ''}</button></div></div>
+    <div class="pb-head"><h2 class="pb-h2" tabindex="-1">${esc(tab.label)}</h2><p class="pb-meta">${esc(DEF.title)} · everything is an estimate or a draft unless it is marked otherwise</p></div>
     ${subs && subs.length > 1 ? `<div class="pl-seg" role="group" aria-label="Working section">${subs.map((s, j) => `<button type="button" class="pb-btn${j === ws ? ' pl-on' : ''}" data-wsub="${j}" aria-pressed="${j === ws}">${esc(s[0])}</button>`).join('')}</div>` : ''}
     <div class="pb-body pl-body${subs || DEF.library ? ' pl-working' : ' pl-brief'}" data-view="${tab.k}">${body}</div>
     ${foot}
@@ -175,7 +176,7 @@ function editCell(b) {
 const PREFIX = { expenses: 'EX', customers: 'CU', partners: 'PA', allocations: 'AL', opportunities: 'FO-U', anomalies: 'AN' };
 function addRecord(c, data) {
   const now = new Date().toISOString();
-  if (!store.who.trim() && c !== 'hoursLog') throw new Error('Enter your name first: Library, "Your changes and history".');
+  if (!store.who.trim() && c !== 'hoursLog') throw new Error('Enter your name first: "Your changes" at the top right.');
   const all = [...(seed[c] || []), ...(store.added[c] || [])];
   const rec = { ...data, by: store.who || 'not stated', at: now };
   if (c === 'evidence' || c === 'reviews') { rec.id = String(rec.id || '').trim().toUpperCase(); if (!/^[A-Z0-9][A-Z0-9-]*$/.test(rec.id)) throw new Error('An id of letters, digits and dashes is needed.'); if (all.some((r) => r.id === rec.id && !(store.removed[c] || []).includes(r.id))) throw new Error(`${rec.id} is already on record.`); }
@@ -227,7 +228,7 @@ app.addEventListener('click', (e) => {
   if (act === 'lock') { write(CODE, null, sessionStorage); location.reload(); }
 });
 addEventListener('keydown', (e) => { if (e.key === 'Escape' && ui.panel && seed) { ui.panel = null; render(); } });
-app.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('svg [data-task]')) { e.preventDefault(); e.target.dispatchEvent(new MouseEvent('click', { bubbles: true })); } });
+app.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('svg [data-task], svg [data-open]')) { e.preventDefault(); e.target.dispatchEvent(new MouseEvent('click', { bubbles: true })); } });
 app.addEventListener('input', (e) => { const f = e.target.dataset.filter; if (f) { ui.filter[f] = e.target.value; filterTable(f, e.target.value); } });
 app.addEventListener('change', (e) => {
   const t = e.target;

@@ -146,8 +146,8 @@ export const bRisks = [
   R('BK-06', 'Regulatory', 'Safety and EMC requirements are found late', 'Redesign after the PCB is released; no sale in a market', 3, 3, [{ id: 'BRC-06', text: 'Applicability analysis in the requirements phase, read by a qualified person', requirements: ['BR-15'] }], 3, 1),
   R('BK-07', 'Cost', 'A critical part is not available or is near end of life', 'Redesign or a stalled build', 3, 3, [{ id: 'BRC-07', text: 'Lifecycle and sourcing evidence for every critical part before release', requirements: ['BR-16'] }], 3, 2),
   R('BK-08', 'Commercial', 'Sixty-four channels alone is not a reason to buy', 'A finished instrument with no buyer', 4, 3, [{ id: 'BRC-08', text: 'Customer interviews and design partners before the PCB is released', requirements: [] }], 4, 2),
-  R('BK-09', 'Commercial', 'Which company owns and sells the product is not settled', 'Contracts, grants and revenue booked in the wrong entity', 4, 3, [{ id: 'BRC-09', text: 'Decision ED-01 before any customer or funding agreement', requirements: [] }], 4, 1),
-  R('BK-10', 'Schedule', 'The same two engineers are planned on two programs', 'Both programs slip', 4, 4, [{ id: 'BRC-10', text: 'One shared capacity plan; decision ED-02 on the order of work', requirements: [] }], 4, 2),
+  { ...R('BK-09', 'Commercial', 'Which company owns and sells the product is not settled', 'Contracts, grants and revenue booked in the wrong entity', 4, 3, [{ id: 'BRC-09', text: 'Decision ED-01 before any customer or funding agreement', requirements: [] }], 4, 1), scope: 'shared' },
+  { ...R('BK-10', 'Schedule', 'The same two engineers are planned on two plans at once', 'Both plans slip', 4, 4, [{ id: 'BRC-10', text: 'One shared capacity plan; decision ED-02 on the order of work', requirements: [] }], 4, 2), scope: 'shared' },
   R('BK-11', 'Safety', 'A connected cell is shorted or over-driven by the instrument', 'Fire or injury', 5, 2, [{ id: 'BRC-11', text: 'Current limits, fusing and a hazard review of the cell connection before any customer use', requirements: ['BR-15'] }], 5, 1),
 ];
 
