@@ -1,8 +1,8 @@
 {
-  "imported_utc": "2026-11-19T16:02:44.008Z",
-  "research_commit": "ce26fe5",
+  "imported_utc": "2026-11-20T09:25:05.801Z",
+  "research_commit": "4190d18",
   "files": 125,
-  "bytes": 30505322,
+  "bytes": 30526294,
   "references_replaced": {
     "total": 63,
     "label": "internal study record",
@@ -15,26 +15,26 @@
   "leak_check": "passed",
   "list": [
     {
-      "path": "assets/SensorArea-CKX4NuIC.js",
-      "bytes": 142247,
-      "sha256": "3086227d40063b31116bff3a5bbc83d5082860096226c668fe18d961466b0ce7",
+      "path": "assets/SensorArea-BtrFmypG.css",
+      "bytes": 35113,
+      "sha256": "70e730859d8847ce3afe6fe3117accd17c64201edc29a00ec53bff02ea61b088"
+    },
+    {
+      "path": "assets/SensorArea-dsJXf1kx.js",
+      "bytes": 146740,
+      "sha256": "a00c2603cfd6a57cbdb4acb6a92930eb190886e650b4e1cc04b394411403b3f6",
       "references_replaced": 4
-    },
-    {
-      "path": "assets/SensorArea-DwNk0GB4.css",
-      "bytes": 34416,
-      "sha256": "ca6f1d77019829e5778742e1dbb9e60377a51a582c5f1df7671853348e8add27"
-    },
-    {
-      "path": "assets/index-6MTVwIDa.js",
-      "bytes": 1343680,
-      "sha256": "67188c1ced5f8627d682a55e44b69eadde8b74e9f91986edf7839c43193ca8fd",
-      "references_replaced": 1
     },
     {
       "path": "assets/index-ClGHkwXd.css",
       "bytes": 29853,
       "sha256": "b28c00f7b797baa569cb6625112771dca9fe74412aa8986b5a8e6e500bbd4023"
+    },
+    {
+      "path": "assets/index-CuTZ-F3Z.js",
+      "bytes": 1343680,
+      "sha256": "5fabdaab84423ebd0c3d77d262c7f4dd4685d702888ac21d4a49295d1c46243c",
+      "references_replaced": 1
     },
     {
       "path": "data/design/anatomy.json",
@@ -301,7 +301,7 @@
     {
       "path": "index.html",
       "bytes": 777,
-      "sha256": "809d722428dee69340b6321da7c3af22ec50cebe23dfbb4e30da748578fc5eb9"
+      "sha256": "bf7769d99142f5a9595d281929e688080936f633db4df818e6ecf27ea9d9d219"
     },
     {
       "path": "sensor-images/body__deepest_heart.webp",
@@ -496,8 +496,8 @@
     },
     {
       "path": "sensor-images/option-b__in-hand.webp",
-      "bytes": 141808,
-      "sha256": "4339d634e0b521b5de29fe80752cc24aa7d59f0ef7500cb2267ffbd2b88a2deb"
+      "bytes": 157590,
+      "sha256": "f9f1e4db92200f5edaa4928275a5023dae257c9fbdda887f0ed74e755a262cb8"
     },
     {
       "path": "sensor-images/option-b__patent-sheet.webp",

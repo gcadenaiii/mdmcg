@@ -221,3 +221,22 @@ Nothing on the server was changed apart from the new release folder and the `cur
 Back to the previous release:
 
     sudo ln -sfn /var/www/mdmcg/releases/20261119T164431Z /var/www/mdmcg/current
+
+## 2026-11-20 09:27 UTC
+
+Release `20261120T092510Z` is live (`/var/www/mdmcg/current`): one product, designed round option 2. The device is the TMR
+option (60 x 32 x 6 mm core, sky-blue ring) with thin clear arms and printed conductors in place of the woven wings; every
+device picture re-rendered from the 3D model; a new "In the hand" section on Device (the device on a palm, and a side view);
+reading figures for option 2 (Home says "Forty beats"; A reading gives 22 seconds for the main spike, 31 seconds to see the
+recovery wave and 5.7 minutes for the full ECG and MCG record, the sentence the owner approved by name, updated in
+`ALLOWED`). Company Plan: the battery plan is removed (two plans, ECG/MCG and Funding, plus Reference and history);
+`/plan/battery/` now answers 404. Research tools re-imported: option 2 is the chosen design, the options at a glance show
+the noise used, the noise the quick check needs, whether the part can be bought and why the time is what it is, with two
+times per option and no upper bound. Gates before upload, each on its own: 75 tests passed, content check "14 pages checked,
+0 problem(s).", tools import leak check passed. Live checks: 44 link destinations, 0 failures; the plan data file is the
+encrypted envelope; Device sections looked at in screenshots. Nothing on the server was changed apart from the new release
+folder and the `current` link. Previous release kept: `20261119T185349Z`.
+
+Back to the previous release:
+
+    sudo ln -sfn /var/www/mdmcg/releases/20261119T185349Z /var/www/mdmcg/current
