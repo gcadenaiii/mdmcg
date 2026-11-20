@@ -1,0 +1,33 @@
+---
+// The shell of a private plan page: the access code field, and an empty workspace that src/product-build/plan.js fills
+// from the encrypted data file after the code is entered. This file holds no internal figure.
+import Base from '../layouts/Base.astro';
+import '../styles/product-build.css';
+import '../styles/plan.css';
+interface Props { area: 'strategy' | 'battery' | 'funding'; title: string; line: string; }
+const { area, title, line } = Astro.props;
+const dev = import.meta.env.DEV && !(import.meta.env.PRODUCT_BUILD_CODE ?? process.env.PRODUCT_BUILD_CODE);
+---
+<Base title={title} description="An internal workspace for the team. Opens with an access code.">
+<section class="pb-top" aria-labelledby="h-page">
+  <div class="wrap">
+    <p class="chip">Company plan</p>
+    <h1 id="h-page" class="h2">{title}<span class="teal">{line}</span></h1>
+  </div>
+</section>
+<section class="pb-gate" id="pb-gate" aria-label="Access">
+  <div class="wrap">
+    <form class="pb-gate-form" id="pb-form" autocomplete="off">
+      <label for="pb-code">Access code</label>
+      <div class="pb-gate-row">
+        <input id="pb-code" name="code" type="password" autocomplete="off" spellcheck="false" required>
+        <button class="btn btn-primary" type="submit">Open</button>
+      </div>
+      <p class="pb-gate-msg" id="pb-msg" role="status" aria-live="polite">This workspace is for the team. Enter the access code to open it.</p>
+      {dev && <p class="pb-gate-dev">Development copy. The code here is <code>local-preview</code>.</p>}
+    </form>
+  </div>
+</section>
+<section class="pb-app" id="pb-app" data-area={area} hidden aria-label={title}></section>
+<script src="../product-build/plan.js"></script>
+</Base>

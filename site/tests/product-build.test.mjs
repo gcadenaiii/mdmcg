@@ -407,7 +407,9 @@ test('export: CSV quotes commas, quotes and line breaks', () => {
 /* ---------------------------------------------------------------- claims the page must not make */
 
 test('claims: no record starts approved, tested or supplier verified, and no evidence exists', () => {
-  const text = JSON.stringify({ ...seed, tools: [], parts: [], standards: [], classification: null, hipaa: [] });
+  // research files quote their sources word for word, so they are left out of the wording check
+  const research = ['tools', 'parts', 'standards', 'hipaa', 'equipment', 'marketFacts', 'bStandards', 'manufacturers', 'marketBenchmarks', 'marketNotFound', 'opportunities', 'fundingStatus', 'fundingRules', 'fundingBenchmarks', 'fundingNotFound', 'internalFacts', 'internalDocs', 'internalContradictions', 'internalMissing'];
+  const text = JSON.stringify({ ...seed, ...Object.fromEntries(research.map((k) => [k, []])), classification: null });
   for (const c of ['tasks', 'requirements', 'outputs', 'risks', 'tests', 'controls', 'lines']) for (const r of seed[c]) assert.ok(!['Approved', 'Tested', 'Supplier Verified'].includes(r.status || r.kind), `${c} ${r.id}`);
   assert.ok(seed.gates.every((g) => g.approval === null));
   assert.ok(seed.decisions.every((d) => d.decision === null));

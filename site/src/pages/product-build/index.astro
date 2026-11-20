@@ -3,6 +3,7 @@
 // code is entered comes from the encrypted file beside it (payload.json) and is drawn by src/product-build/app.js.
 import Base from '../../layouts/Base.astro';
 import '../../styles/product-build.css';
+import '../../styles/plan.css';
 const dev = import.meta.env.DEV && !(import.meta.env.PRODUCT_BUILD_CODE ?? process.env.PRODUCT_BUILD_CODE);
 ---
 <Base title="Product Build" description="The internal workspace for the device build program. Opens with an access code.">

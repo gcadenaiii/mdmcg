@@ -45,3 +45,19 @@ pnpm dev                           # http://127.0.0.1:5174/product-build/  code:
 pnpm build
 node scripts/check-content.mjs     # must end "11 pages checked, 0 problem(s)."
 ```
+
+## Company plan (added 2026-11-19)
+
+Three more private pages use the same encrypted data file, the same access code and the same store of changes:
+
+| Route | What it is | Code |
+|---|---|---|
+| `/plan/` | Company Strategy: overview, roadmap, financials, shared operations, decisions | `plan.js`, `plan-views.js`, `plan-viz.js` |
+| `/plan/battery/` | Execution Plan 1: battery product | same |
+| `/plan/funding/` | Execution Plan 3: funding and partnerships | same |
+| `/product-build/` | Execution Plan 2: ECG/MCG (unchanged; it gained the plan navigation) | `app.js`, `views.js` |
+
+- `portfolio.js` holds the cross-program calculations (shared capacity, budgets, months, pipeline, funnel, unit economics, readiness). Tests: `tests/company-plan.test.mjs`.
+- Data: `seed/battery.js`, `seed/company.js`, `seed/funding.js`, and research in `data/product-build/internal.json`, `funding.json`, `market.json`.
+- The two engineering roles exist once (`seed/program.js`) and are shared by every program. Never copy them into a program.
+- The content check must end "14 pages checked, 0 problem(s)."

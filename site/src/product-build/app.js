@@ -4,6 +4,7 @@
 import * as C from './calc.js';
 import { unlock, WrongCode } from './crypto.js';
 import { TABS, esc } from './views.js';
+import { planNav } from './plan-views.js';
 
 const KEY = 'pb:v1', CODE = 'pb:code';
 const $ = (s, r = document) => r.querySelector(s);
@@ -75,7 +76,7 @@ function render(keepScroll = true) {
   derive();
   const x = { m, d, ui, store, mine };
   const tab = TABS.find((t) => t[0] === ui.tab) || TABS[0];
-  app.innerHTML = `<div class="wrap">
+  app.innerHTML = `<div class="wrap">${planNav('ecg')}
     <nav class="pb-tabs" aria-label="Sections"><ul>${TABS.map(([k, n]) => `<li><a href="#${k}"${k === tab[0] ? ' aria-current="page"' : ''} data-tab="${k}"><b>${k}</b>${esc(n)}</a></li>`).join('')}</ul></nav>
     <div class="pb-head"><h2 class="pb-h2" tabindex="-1">${tab[0]}. ${esc(tab[1])}</h2><p class="pb-meta">${esc(m.program.name)} · data of ${esc(m.meta.dataDate)} · ${d.changes} change${d.changes === 1 ? '' : 's'} of yours</p></div>
     <div class="pb-body" data-tabbody="${tab[0]}">${tab[2](x)}</div>
@@ -111,9 +112,15 @@ function download(name, text, type) { const a = document.createElement('a'); a.h
 
 /* ------------------------------------------------------------------ change */
 
-async function record(action, collection, id, field, from, to) {
-  store.log = await C.appendEvent(store.log, { at: new Date().toISOString(), who: store.who || 'not stated', action, collection, id, field, from, to });
-  save(); checkLog();
+/* History entries are added one after another: each needs the hash of the one before, so two changes made close together
+   must not be hashed at the same time. The change itself is saved at once; its history entry follows in order. */
+let logQueue = Promise.resolve();
+function record(action, collection, id, field, from, to) {
+  const copy = (v) => (v === undefined ? null : JSON.parse(JSON.stringify(v)));   // a copy, so a later edit of the record cannot alter this entry
+  const event = { at: new Date().toISOString(), who: store.who || 'not stated', action, collection, id, field, from: copy(from), to: copy(to) };
+  save();
+  logQueue = logQueue.then(async () => { store.log = await C.appendEvent(store.log, event); save(); checkLog(); });
+  return logQueue;
 }
 async function checkLog() { const r = await C.verifyLog(store.log); if (d) { d.logOk = r; const b = app.querySelector('[data-tabbody="L"]'); if (b) render(); } }
 

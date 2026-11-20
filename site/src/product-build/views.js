@@ -4,11 +4,11 @@ import * as C from './calc.js';
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const $m = C.money;
-const list = (a) => (a && a.length ? a.map(esc).join(', ') : '<span class="pb-none">none</span>');
+export const list = (a) => (a && a.length ? a.map(esc).join(', ') : '<span class="pb-none">none</span>');
 const STATUS_CLASS = { 'Planning Estimate': 'est', 'Public List Price': 'list', 'Distributor Quote': 'ok', 'Supplier Verified': 'ok', 'Actual Paid': 'ok', 'Engineering Draft': 'draft', 'Review Required': 'warn', Approved: 'ok', Conditional: 'warn', Tested: 'ok', Blocked: 'bad', 'Not Applicable': 'na', Open: 'est', 'No-go': 'bad', 'Approval not valid': 'bad', Pass: 'ok', Fail: 'bad', 'Not run': 'est', High: 'bad', Medium: 'warn', Low: 'ok', 'In place': 'ok', Partly: 'warn', Missing: 'bad', Chosen: 'ok', 'Not chosen': 'na', Fallback: 'est', 'Decision gate': 'warn', Use: 'ok', 'Trial only': 'warn', Active: 'ok', 'not stated': 'warn', Preview: 'warn', NRND: 'bad', Obsolete: 'bad', verified: 'ok', 'not verified': 'warn', reject: 'bad', warn: 'warn', info: 'est', 'On plan': 'ok', 'At risk': 'warn', 'Not started': 'est' };
 export const badge = (s) => (s == null || s === '' ? '' : `<span class="pb-b pb-b-${STATUS_CLASS[s] || 'est'}">${esc(s)}</span>`);
 export const LABELS = ['Planning Estimate', 'Supplier Verified', 'Engineering Draft', 'Review Required', 'Approved', 'Tested', 'Blocked', 'Not Applicable'];
-const link = (url, text) => (url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(text || 'source')}</a>` : '<span class="pb-none">no source</span>');
+export const link = (url, text) => (url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(text || 'source')}</a>` : '<span class="pb-none">no source</span>');
 
 /** a value a person can change. c collection, id record, f field; o: { t: number|text|date|select|check, k: sub-key, opts, fmt } */
 export function ed(x, c, id, f, val, o = {}) {
@@ -26,25 +26,25 @@ export function tbl(id, cols, rows, o = {}) {
   const foot = o.foot ? `<tfoot><tr>${o.foot.map((c, i) => `<td${cols[i] && cols[i].n ? ' class="pb-n"' : ''}>${c ?? ''}</td>`).join('')}</tr></tfoot>` : '';
   return `<div class="pb-tw"><div class="pb-tools"><label class="sr" for="f-${id}">Filter ${esc(o.name || id)}</label><input class="pb-filter" id="f-${id}" data-filter="${id}" type="search" placeholder="Filter"><button type="button" class="pb-btn" data-csv="${id}">CSV</button></div><div class="pb-scroll"><table class="pb-t" id="t-${id}" data-name="${esc(o.name || id)}"><thead><tr>${head}</tr></thead><tbody>${body}</tbody>${foot}</table></div></div>`;
 }
-const tile = (n, label, sub = '') => `<div class="pb-tile"><b>${n}</b><span>${esc(label)}</span>${sub ? `<small>${sub}</small>` : ''}</div>`;
-const sec = (title, body, note = '') => `<section class="pb-sec"><h3>${esc(title)}</h3>${note ? `<p class="pb-note">${note}</p>` : ''}${body}</section>`;
-const ul = (items) => `<ul class="pb-ul">${items.map((i) => `<li>${i}</li>`).join('')}</ul>`;
+export const tile = (n, label, sub = '') => `<div class="pb-tile"><b>${n}</b><span>${esc(label)}</span>${sub ? `<small>${sub}</small>` : ''}</div>`;
+export const sec = (title, body, note = '') => `<section class="pb-sec"><h3>${esc(title)}</h3>${note ? `<p class="pb-note">${note}</p>` : ''}${body}</section>`;
+export const ul = (items) => `<ul class="pb-ul">${items.map((i) => `<li>${i}</li>`).join('')}</ul>`;
 const roleName = (x, id) => { const r = x.m.roles.find((q) => q.id === id); return r ? r.short : id; };
-const input = (name, label, o = {}) => `<label class="pb-f"><span>${esc(label)}</span>${o.opts ? `<select name="${name}"${o.req ? ' required' : ''}>${o.opts.map((v) => `<option value="${esc(Array.isArray(v) ? v[0] : v)}">${esc(Array.isArray(v) ? v[1] : v)}</option>`).join('')}</select>` : `<input name="${name}" type="${o.type || 'text'}"${o.req ? ' required' : ''}${o.val != null ? ` value="${esc(o.val)}"` : ''}${o.step ? ` step="${o.step}"` : ''}${o.min != null ? ` min="${o.min}"` : ''}${o.list ? ` list="${o.list}"` : ''}>`}</label>`;
+export const input = (name, label, o = {}) => `<label class="pb-f"><span>${esc(label)}</span>${o.opts ? `<select name="${name}"${o.req ? ' required' : ''}>${o.opts.map((v) => `<option value="${esc(Array.isArray(v) ? v[0] : v)}">${esc(Array.isArray(v) ? v[1] : v)}</option>`).join('')}</select>` : `<input name="${name}" type="${o.type || 'text'}"${o.req ? ' required' : ''}${o.val != null ? ` value="${esc(o.val)}"` : ''}${o.step ? ` step="${o.step}"` : ''}${o.min != null ? ` min="${o.min}"` : ''}${o.list ? ` list="${o.list}"` : ''}>`}</label>`;
 
 /* ---------------------------------------------------------------- charts (plain SVG) */
 
-export function gantt(x) {
-  const { sched } = x.d; const prog = x.m.program;
-  const order = x.m.phases.map((p) => p.id);
+export function gantt(x, o = {}) {
+  const sched = o.sched || x.d.sched; const prog = o.program || x.m.program;
+  const order = (o.phases || x.m.phases).map((p) => p.id); const nowWeek = o.nowWeek ?? x.d.nowWeek;
   const rows = [...sched.rows].sort((a, b) => order.indexOf(a.phase) - order.indexOf(b.phase) || a.start - b.start || a.id.localeCompare(b.id));
-  const n = Math.max(sched.endWeek, prog.durationWeeks), L = 232, W = 44, H = 26, T = 44;
+  const n = Math.max(sched.endWeek, prog.durationWeeks), L = 232, W = o.w || (n > 30 ? 24 : 44), H = 26, T = 44;
   const y = new Map(rows.map((r, i) => [r.id, T + i * H]));
   const xs = (w) => L + (w - 1) * W;
   let g = '';
   for (let w = 1; w <= n; w++) {
     g += `<rect x="${xs(w)}" y="0" width="${W}" height="${T + rows.length * H}" class="${w % 2 ? 'pb-g-a' : 'pb-g-b'}"/>`;
-    g += `<text x="${xs(w) + W / 2}" y="17" class="pb-g-wk" text-anchor="middle">${w}</text><text x="${xs(w) + W / 2}" y="33" class="pb-g-dt" text-anchor="middle">${C.weekStart(prog, w).slice(5)}</text>`;
+    g += `<text x="${xs(w) + W / 2}" y="17" class="pb-g-wk" text-anchor="middle">${w}</text><text x="${xs(w) + W / 2}" y="33" class="pb-g-dt" text-anchor="middle">${W < 40 ? (w % 4 === 1 ? C.weekStart(prog, w).slice(5) : '') : C.weekStart(prog, w).slice(5)}</text>`;
   }
   let phase = null;
   for (const r of rows) {
@@ -74,13 +74,13 @@ export function gantt(x) {
     g += `<rect x="${bx}" y="${yy + 6}" width="${bw}" height="13" rx="6.5" class="pb-g-bar pb-g-${cls}${r.overdue ? ' pb-g-over' : ''}${sel}" data-task="${esc(r.id)}" tabindex="0" role="button" aria-label="${esc(`${r.id} ${r.title}, ${r.startDate} to ${r.finishDate}, ${r.percent} percent complete`)}"><title>${esc(`${r.id} ${r.title} · ${r.startDate} to ${r.finishDate} · ${r.percent}%`)}</title></rect>`;
     if (r.percent > 0) g += `<rect x="${bx}" y="${yy + 6}" width="${Math.max(6, bw * Math.min(100, r.percent) / 100)}" height="13" rx="6.5" class="pb-g-done" pointer-events="none"/>`;
   }
-  if (x.d.nowWeek >= 1 && x.d.nowWeek <= n) { const tx = xs(x.d.nowWeek) + ((new Date(x.d.today).getUTCDay() + 6) % 7) * W / 7; g += `<line x1="${tx}" x2="${tx}" y1="${T - 6}" y2="${T + rows.length * H}" class="pb-g-now"/><text x="${tx + 4}" y="${T - 8}" class="pb-g-dt">today</text>`; }
+  if (nowWeek >= 1 && nowWeek <= n) { const tx = xs(nowWeek) + ((new Date(x.d.today).getUTCDay() + 6) % 7) * W / 7; g += `<line x1="${tx}" x2="${tx}" y1="${T - 6}" y2="${T + rows.length * H}" class="pb-g-now"/><text x="${tx + 4}" y="${T - 8}" class="pb-g-dt">today</text>`; }
   const w = L + n * W, h = T + rows.length * H + 6;
   return `<div class="pb-scroll pb-gantt"><svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="Schedule chart: ${rows.length} tasks and milestones over ${n} weeks">${g}</svg></div>
   <p class="pb-legend"><span><i class="pb-k pb-k-crit"></i>critical path</span><span><i class="pb-k pb-k-norm"></i>has slack</span><span><i class="pb-k pb-k-loe"></i>runs throughout</span><span><i class="pb-k pb-k-ms"></i>stop/go milestone</span><span><i class="pb-k pb-k-done"></i>complete</span><span><i class="pb-k pb-k-plan"></i>planned position when a task has slipped</span></p>`;
 }
 
-function bars(rows, o) {  // grouped vertical bars: rows [{ label, a, b }], plus an optional line (cumulative)
+export function bars(rows, o) {  // grouped vertical bars: rows [{ label, a, b }], plus an optional line (cumulative)
   const W = Math.max(520, rows.length * 44 + 60), H = 220, L = 54, B = 28, T = 12;
   const max = Math.max(1, ...rows.flatMap((r) => [r.a, r.b, o.cap || 0]));
   const sy = (v) => T + (H - T - B) * (1 - v / max), bw = (W - L - 8) / rows.length;
@@ -95,7 +95,7 @@ function bars(rows, o) {  // grouped vertical bars: rows [{ label, a, b }], plus
   if (o.cap) g += `<line x1="${L}" x2="${W}" y1="${sy(o.cap)}" y2="${sy(o.cap)}" class="pb-c-cap"/><text x="${W - 4}" y="${sy(o.cap) - 5}" text-anchor="end" class="pb-c-ax">${esc(o.capName)}</text>`;
   return `<div class="pb-scroll"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(o.label)}">${g}</svg></div><p class="pb-legend"><span><i class="pb-k pb-k-a"></i>${esc(o.aName)}</span><span><i class="pb-k pb-k-b"></i>${esc(o.bName)}</span>${o.cap ? `<span><i class="pb-k pb-k-cap"></i>${esc(o.capName)}</span>` : ''}</p>`;
 }
-const kfmt = (v) => (v >= 1000 ? '$' + (Math.round(v / 100) / 10) + 'k' : '$' + Math.round(v));
+export const kfmt = (v) => (v >= 1000 ? '$' + (Math.round(v / 100) / 10) + 'k' : '$' + Math.round(v));
 
 function stacked(rows) {  // horizontal stacked bars for the scenarios
   const max = Math.max(1, ...rows.map((r) => r.total)), W = 720, L = 150, bh = 30;
