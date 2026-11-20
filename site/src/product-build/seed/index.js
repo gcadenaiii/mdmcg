@@ -42,19 +42,17 @@ export const seed = {
 export { SENTINEL };
 
 /* ------------------------------------------------------------------ company plan (added 2026-11-19)
-   The three-program plan is added beside the ECG/MCG records above. Nothing above is changed: the ECG/MCG plan reads the
-   same collections as before. The new collections carry their own names (b... battery, f... funding). */
-import { bProgram, bSources, bFindings, bAgreement, bNeeds, bRequirements, bOutputs, bTests, bRisks, bPhases, bTasks, bGates, bLines, bScenarios } from './battery.js';
+   The company plan is added beside the ECG/MCG records above. Nothing above is changed: the ECG/MCG plan reads the same
+   collections as before. The funding plan's collections carry their own names (f...). The company has one product, the
+   wearable heart device; the battery plan and its records were removed on 2026-11-20. */
 import * as company from './company.js';
 import { fProgram, fPhases, fTasks, fLines, fRisks, channels, seedOpportunities, fDeliverables, investorChecklist, tractionRules } from './funding.js';
-import internalFile from '../../data/product-build/internal.json' with { type: 'json' };
 import fundingFile from '../../data/product-build/funding.json' with { type: 'json' };
-import marketFile from '../../data/product-build/market.json' with { type: 'json' };
 
 /* Grant and state programs from the research become pipeline records at the first stage. The research's amounts are the
    program's published range, not what the company could get, so "attainable" stays empty until a person enters it. */
 const researched = (fundingFile.opportunities || []).map((o) => ({
-  id: o.id, organisation: o.organisation, programme: o.programme, type: o.type, target: o.target === 'ecg-mcg' ? 'ecg' : o.target, stage: 'Identified',
+  id: o.id, organisation: o.organisation, programme: o.programme, type: o.type, stage: 'Identified',
   amountRequested: null, amountAttainable: null, amountText: o.amount_text || null, amountMax: o.amount_max_usd ?? null, probability: null, probabilityBasis: null,
   eligibility: o.eligibility || 'Not checked', eligibilityQuestions: o.eligibility_open_questions || [], openStatus: o.open_status || 'unclear', deadline: o.next_deadline || null, deadlineText: o.deadline_text || null,
   owner: 'C', partners: null, matching: o.match_required || null, restrictions: o.restrictions || null, expectedDecision: o.decision_time || null, expectedPayment: null, reporting: o.reporting || null,
@@ -62,12 +60,9 @@ const researched = (fundingFile.opportunities || []).map((o) => ({
 }));
 
 Object.assign(seed, {
-  bProgram, bSources, bFindings, bAgreement, bNeeds, bRequirements, bOutputs, bTests, bRisks, bPhases, bTasks, bGates, bLines, bScenarios,
   ...company,
   fProgram, fPhases, fTasks, fLines, fRisks, channels, fDeliverables, investorChecklist, tractionRules,
   opportunities: [...seedOpportunities, ...researched],
   fundingStatus: fundingFile.programme_status || [], fundingRules: fundingFile.rules || [], fundingBenchmarks: fundingFile.benchmarks || [], fundingNotFound: fundingFile.not_found || [],
-  equipment: marketFile.equipment || [], marketFacts: marketFile.market || [], bStandards: marketFile.standards || [], manufacturers: marketFile.manufacturers || [], marketBenchmarks: marketFile.benchmarks || [], marketNotFound: marketFile.not_found || [],
-  internalFacts: internalFile.facts || [], internalDocs: internalFile.documents || [], internalContradictions: internalFile.contradictions || [], internalMissing: internalFile.not_found || [],
 });
-seed.meta.researchReadOn = { ...seed.meta.researchReadOn, funding: fundingFile.read_on || null, market: marketFile.read_on || null, internal: internalFile.read_on || null };
+seed.meta.researchReadOn = { ...seed.meta.researchReadOn, funding: fundingFile.read_on || null };

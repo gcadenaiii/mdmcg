@@ -4,14 +4,14 @@ import * as C from './calc.js';
 import { esc, badge } from './views.js';
 
 const $m = (v) => C.money(v == null ? v : Math.round(Number(v)));
-export const PCOL = { battery: 'pl-c-b', ecg: 'pl-c-e', funding: 'pl-c-f', shared: 'pl-c-s' };
-export const PNAME = { battery: 'Battery product', ecg: 'ECG/MCG', funding: 'Funding and partnerships', shared: 'Shared' };
+export const PCOL = { ecg: 'pl-c-e', funding: 'pl-c-f', shared: 'pl-c-s' };
+export const PNAME = { ecg: 'ECG/MCG', funding: 'Funding and partnerships', shared: 'Shared' };
 const k$ = (v) => (Math.abs(v) >= 1e6 ? '$' + (Math.round(v / 1e4) / 100) + 'M' : Math.abs(v) >= 1000 ? '$' + Math.round(v / 1000) + 'k' : '$' + Math.round(v));
 export const legend = (items) => `<p class="pb-legend">${items.map(([cls, name]) => `<span><i class="pb-k ${cls}"></i>${esc(name)}</span>`).join('')}</p>`;
 
-/* ---- a chain of steps with arrows (business model, manufacturing, support). steps: [{ title, text, tag, cls, foot }] */
+/* ---- a chain of steps with arrows. steps: [{ title, big, text, cls, foot }] */
 export function chain(steps, o = {}) {
-  return `<ol class="pl-chain${o.wrap ? ' pl-chain-wrap' : ''}" aria-label="${esc(o.label || 'Steps in order')}">${steps.map((s, i) => `<li class="pl-step ${s.cls || ''}"${s.attr ? ' ' + s.attr : ''}><span class="pl-step-n">${i + 1}</span><b>${esc(s.title)}</b>${s.big != null ? `<strong>${s.big}</strong>` : ''}${s.text ? `<span>${esc(s.text)}</span>` : ''}${s.tag || ''}${s.foot ? `<small>${s.foot}</small>` : ''}</li>`).join('')}</ol>`;
+  return `<ol class="pl-chain${o.wrap ? ' pl-chain-wrap' : ''}" aria-label="${esc(o.label || 'Steps in order')}">${steps.map((s, i) => `<li class="pl-step ${s.cls || ''}"><span class="pl-step-n">${i + 1}</span><b>${esc(s.title)}</b>${s.big != null ? `<strong>${s.big}</strong>` : ''}${s.text ? `<span>${esc(s.text)}</span>` : ''}${s.foot ? `<small>${s.foot}</small>` : ''}</li>`).join('')}</ol>`;
 }
 
 /* ---- A. company strategy map */
@@ -20,15 +20,15 @@ export function strategyMap(x) {
   const card = (p) => { const s = d.byProgram[p.id]; const nx = s.next;
     return `<a class="pl-card ${PCOL[p.id]}" href="${p.href}"><span class="pl-card-n">Plan ${p.n}</span><b>${esc(p.name)}</b><em>${esc(p.role)}</em>
       <dl><div><dt>Next milestone</dt><dd>${nx ? `${esc(nx.title)}<br>${esc(nx.finishDate)}` : 'none'}</dd></div><div><dt>Finish, as planned</dt><dd>${esc(s.sched.endDate)}</dd></div></dl></a>`; };
-  const ps = [{ id: 'battery', n: 1, name: 'Battery Product', role: 'Sell first: the near-term priority', href: '/plan/battery/' }, { id: 'ecg', n: 2, name: 'ECG/MCG', role: 'Longer-horizon medical technology', href: '/product-build/' }, { id: 'funding', n: 3, name: 'Funding and Partnerships', role: 'Capital for both', href: '/plan/funding/' }];
-  const shared = ['Quality', 'Intellectual property', 'Finance', 'Security', 'Manufacturing partners', 'Management'];
+  const ps = [{ id: 'ecg', n: 1, name: 'ECG/MCG', role: 'The product: a wearable heart device', href: '/product-build/' }, { id: 'funding', n: 2, name: 'Funding and Partnerships', role: 'Capital for the product', href: '/plan/funding/' }];
+  const shared = ['Quality', 'Intellectual property', 'Finance', 'Security', 'Management'];
   return `<div class="pl-map" role="group" aria-label="Company strategy map">
-    <div class="pl-map-top"><b>MDMCG</b><span>One company, three coordinated plans, one set of shared systems</span></div>
-    <svg class="pl-map-wires" viewBox="0 0 900 44" preserveAspectRatio="none" aria-hidden="true"><path d="M450 0 V22 M150 22 H750 M150 22 V44 M450 22 V44 M750 22 V44"/></svg>
+    <div class="pl-map-top"><b>MDMCG</b><span>One company, one product, two coordinated plans, one set of shared systems</span></div>
+    <svg class="pl-map-wires" viewBox="0 0 900 44" preserveAspectRatio="none" aria-hidden="true"><path d="M450 0 V22 M225 22 H675 M225 22 V44 M675 22 V44"/></svg>
     <div class="pl-map-row">${ps.map(card).join('')}</div>
-    <div class="pl-map-flow" aria-label="How the programs feed each other"><span><i>→</i> Revenue from Plan 1 funds Plan 2</span><span><i>→</i> Plan 3 brings capital to Plans 1 and 2</span><span><i>→</i> Plans 1 and 2 share the engineers, the magnetic sensing and the acquisition electronics</span></div>
-    <svg class="pl-map-wires" viewBox="0 0 900 30" preserveAspectRatio="none" aria-hidden="true"><path d="M150 0 V15 M450 0 V15 M750 0 V15 M150 15 H750 M450 15 V30"/></svg>
-    <div class="pl-map-shared"><b>Shared operations</b><ul>${shared.map((s) => `<li>${esc(s)}</li>`).join('')}</ul><a href="/plan/#strategy">One set of procedures, people and records for all three</a></div>
+    <div class="pl-map-flow" aria-label="How the plans feed each other"><span><i>→</i> Plan 2 brings capital to Plan 1</span></div>
+    <svg class="pl-map-wires" viewBox="0 0 900 30" preserveAspectRatio="none" aria-hidden="true"><path d="M225 0 V15 M675 0 V15 M225 15 H675 M450 15 V30"/></svg>
+    <div class="pl-map-shared"><b>Shared operations</b><ul>${shared.map((s) => `<li>${esc(s)}</li>`).join('')}</ul><a href="/plan/#strategy">One set of procedures, people and records for both plans</a></div>
   </div>`;
 }
 
@@ -61,8 +61,8 @@ export function roadmap(x) {
   const tx = xs(d.today); if (tx >= L && tx <= L + n * W) g += `<line x1="${tx}" x2="${tx}" y1="${T - 8}" y2="${y}" class="pb-g-now"/><text x="${tx + 4}" y="${T - 2}" class="pb-g-dt">today</text>`;
   const width = L + n * W + 230;
   return `<div class="pb-controls"><span>Zoom</span>${[[8, 'Year'], [16, 'Quarter'], [30, 'Month']].map(([w, n2]) => `<button type="button" class="pb-btn${W === w ? ' pl-on' : ''}" data-zoom="${w}" aria-pressed="${W === w}">${n2}</button>`).join('')}</div>
-  <div class="pb-scroll pl-roadmap"><svg viewBox="0 0 ${width} ${y + 6}" width="${width}" height="${y + 6}" role="img" aria-label="Master roadmap of the three programs with milestones and overloaded weeks">${g}</svg></div>
-  ${legend([['pl-c-b', 'Battery product'], ['pl-c-e', 'ECG/MCG'], ['pl-c-f', 'Funding and partnerships'], ['pl-k-crit', 'thick outline: on the critical path'], ['pb-k-ms', 'gate'], ['pl-k-link', 'dashed: one program waits on another'], ['pl-k-over', '! a person is planned over their hours']])}`;
+  <div class="pb-scroll pl-roadmap"><svg viewBox="0 0 ${width} ${y + 6}" width="${width}" height="${y + 6}" role="img" aria-label="Master roadmap of the plans with milestones and overloaded weeks">${g}</svg></div>
+  ${legend([['pl-c-e', 'ECG/MCG'], ['pl-c-f', 'Funding and partnerships'], ['pl-k-crit', 'thick outline: on the critical path'], ['pb-k-ms', 'gate'], ['pl-k-link', 'dashed: one program waits on another'], ['pl-k-over', '! a person is planned over their hours']])}`;
 }
 
 /* ---- I. shared capacity: stacked weekly hours by program for one person, with the capacity line */
@@ -73,7 +73,7 @@ export function capacity(x, person) {
   let g = '';
   for (let i = 0; i <= 4; i++) { const v = max * i / 4; g += `<line x1="${L}" x2="${W}" y1="${sy(v)}" y2="${sy(v)}" class="pb-c-grid"/><text x="${L - 5}" y="${sy(v) + 4}" text-anchor="end" class="pb-c-ax">${Math.round(v)}</text>`; }
   d.load.weeks.forEach((w, i) => { let y0 = 0; const cell = w.by[person.id];
-    for (const pid of ['battery', 'ecg', 'funding']) { const h = cell[pid] || 0; if (!h) continue; g += `<rect x="${L + i * bw + 1}" y="${sy(y0 + h)}" width="${Math.max(1, bw - 2)}" height="${sy(y0) - sy(y0 + h)}" class="${PCOL[pid]}"><title>${esc(`Week of ${w.date}: ${PNAME[pid]} ${h} h`)}</title></rect>`; y0 += h; }
+    for (const pid of ['ecg', 'funding']) { const h = cell[pid] || 0; if (!h) continue; g += `<rect x="${L + i * bw + 1}" y="${sy(y0 + h)}" width="${Math.max(1, bw - 2)}" height="${sy(y0) - sy(y0 + h)}" class="${PCOL[pid]}"><title>${esc(`Week of ${w.date}: ${PNAME[pid]} ${h} h`)}</title></rect>`; y0 += h; }
     if (w.over[person.id]) g += `<text x="${L + i * bw + bw / 2}" y="${sy(y0) - 3}" text-anchor="middle" class="pl-r-x">!</text>`;
     if (w.date.slice(8) <= '07') g += `<text x="${L + i * bw}" y="${H - 8}" class="pb-c-ax">${w.date.slice(2, 7)}</text>`; });
   if (cap != null) g += `<line x1="${L}" x2="${W}" y1="${sy(cap)}" y2="${sy(cap)}" class="pb-c-cap"/><text x="${W - 4}" y="${sy(cap) - 5}" text-anchor="end" class="pb-c-ax">${cap} h a week available</text>`;
@@ -88,11 +88,11 @@ export function monthBars(rows, o) {
   let g = '';
   for (let i = 0; i <= 4; i++) { const v = max * i / 4; g += `<line x1="${L}" x2="${W}" y1="${sy(v)}" y2="${sy(v)}" class="pb-c-grid"/><text x="${L - 6}" y="${sy(v) + 4}" text-anchor="end" class="pb-c-ax">${k$(v)}</text>`; }
   rows.forEach((r, i) => { let y0 = 0; const x0 = L + i * bw;
-    for (const pid of ['battery', 'ecg', 'funding', 'shared']) { const v = r.planned[pid] || 0; if (!v) continue; g += `<rect x="${x0 + bw * 0.14}" y="${sy(y0 + v)}" width="${bw * 0.5}" height="${sy(y0) - sy(y0 + v)}" class="${PCOL[pid]}"><title>${esc(`${r.month}: ${PNAME[pid]} planned ${$m(v)}`)}</title></rect>`; y0 += v; }
+    for (const pid of ['ecg', 'funding', 'shared']) { const v = r.planned[pid] || 0; if (!v) continue; g += `<rect x="${x0 + bw * 0.14}" y="${sy(y0 + v)}" width="${bw * 0.5}" height="${sy(y0) - sy(y0 + v)}" class="${PCOL[pid]}"><title>${esc(`${r.month}: ${PNAME[pid]} planned ${$m(v)}`)}</title></rect>`; y0 += v; }
     g += `<rect x="${x0 + bw * 0.68}" y="${sy(r.actualTotal)}" width="${bw * 0.18}" height="${Math.max(0, sy(0) - sy(r.actualTotal))}" class="pl-c-act"><title>${esc(`${r.month}: actual ${$m(r.actualTotal)}`)}</title></rect>`;
     if (r.committedTotal > r.actualTotal) g += `<line x1="${x0 + bw * 0.64}" x2="${x0 + bw * 0.9}" y1="${sy(r.committedTotal)}" y2="${sy(r.committedTotal)}" class="pl-c-com"><title>${esc(`${r.month}: committed ${$m(r.committedTotal)}`)}</title></line>`;
     g += `<text x="${x0 + bw / 2}" y="${H - 10}" text-anchor="middle" class="pb-c-ax">${r.month.slice(2)}</text>`; });
-  return `<div class="pb-scroll"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(o.label)}">${g}</svg></div>${legend([['pl-c-b', 'Battery, planned'], ['pl-c-e', 'ECG/MCG, planned'], ['pl-c-f', 'Funding work, planned'], ['pl-c-act', 'Actual paid'], ['pl-k-com', 'Committed']])}`;
+  return `<div class="pb-scroll"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(o.label)}">${g}</svg></div>${legend([['pl-c-e', 'ECG/MCG, planned'], ['pl-c-f', 'Funding work, planned'], ['pl-c-act', 'Actual paid'], ['pl-k-com', 'Committed']])}`;
 }
 /** cash balance by month as a line; rows need .balance */
 export function balanceLine(rows) {
@@ -110,7 +110,7 @@ export function hbars(rows, o = {}) {
   const tot = (r) => (r.parts ? r.parts.reduce((s, p) => s + p.value, 0) : r.value);
   const max = Math.max(1, ...rows.map(tot), o.ref || 0);
   return `<div class="pl-hb" role="group" aria-label="${esc(o.label || 'Bar chart')}">${rows.map((r) => { const parts = r.parts || [{ value: r.value, cls: r.cls, name: r.label }]; const text = r.text != null ? r.text : (o.fmt ? o.fmt(tot(r)) : '');
-    return `<div class="pl-hb-row"><span class="pl-hb-l">${esc(r.label)}</span><span class="pl-hb-t">${parts.map((p) => `<i class="${p.cls || 'pl-c-b'}" style="width:${Math.max(0, p.value) / max * 100}%" title="${esc(`${p.name}: ${o.fmt ? o.fmt(p.value) : p.value}`)}"></i>`).join('')}</span><span class="pl-hb-v">${esc(text)}</span></div>`; }).join('')}</div>`;
+    return `<div class="pl-hb-row"><span class="pl-hb-l">${esc(r.label)}</span><span class="pl-hb-t">${parts.map((p) => `<i class="${p.cls || 'pl-c-e'}" style="width:${Math.max(0, p.value) / max * 100}%" title="${esc(`${p.name}: ${o.fmt ? o.fmt(p.value) : p.value}`)}"></i>`).join('')}</span><span class="pl-hb-v">${esc(text)}</span></div>`; }).join('')}</div>`;
 }
 
 /* ---- one bar per phase, with its dates and the gate that closes it. Brief depth; the task chart is in Working. */
@@ -126,27 +126,9 @@ export function phaseChart(s, today) {
   <p class="pb-legend"><span><i class="pb-k pl-ph-kc"></i>dark bar: no slack, a week lost here moves the finish</span><span><i class="pb-k pl-ph-kn"></i>lighter bar: has slack</span><span><i class="pb-k pb-k-ms"></i>gate</span></p>`;
 }
 
-/* ---- grouped bars: groups [{ label, values: [..] }], series [{ name, cls }] */
-export function groupBars(groups, series, o = {}) {
-  const W = Math.max(560, groups.length * 120 + 70), H = 230, L = 60, B = 30, T = 14;
-  const all = groups.flatMap((gp) => gp.values); const max = Math.max(1, ...all) * 1.08, min = Math.min(0, ...all) * 1.08;
-  const sy = (v) => T + (H - T - B) * (1 - (v - min) / (max - min)), gw = (W - L - 8) / groups.length, bw = gw * 0.8 / series.length;
-  let g = '';
-  for (let i = 0; i <= 4; i++) { const v = min + (max - min) * i / 4; g += `<line x1="${L}" x2="${W}" y1="${sy(v)}" y2="${sy(v)}" class="pb-c-grid"/><text x="${L - 6}" y="${sy(v) + 4}" text-anchor="end" class="pb-c-ax">${k$(v)}</text>`; }
-  g += `<line x1="${L}" x2="${W}" y1="${sy(0)}" y2="${sy(0)}" class="pl-c-zero"/>`;
-  groups.forEach((gp, i) => { gp.values.forEach((v, j) => { const x0 = L + i * gw + gw * 0.1 + j * bw; const y1 = sy(Math.max(0, v)), y2 = sy(Math.min(0, v)); g += `<rect x="${x0}" y="${y1}" width="${bw - 2}" height="${Math.max(1, y2 - y1)}" class="${series[j].cls}"><title>${esc(`${gp.label}: ${series[j].name} ${$m(v)}`)}</title></rect>`; }); g += `<text x="${L + i * gw + gw / 2}" y="${H - 10}" text-anchor="middle" class="pb-c-ax">${esc(gp.label)}</text>`; });
-  return `<div class="pb-scroll"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(o.label || 'Grouped bar chart')}">${g}</svg></div>${legend(series.map((s) => [s.cls, s.name]))}`;
-}
-
 /* ---- H. readiness meters: [{ label, done, of, note }] */
 export function meters(items) {
   return `<div class="pl-meters">${items.map((it) => { const pct = it.of ? Math.round(it.done / it.of * 100) : 0; return `<div class="pl-meter"><div class="pl-meter-h"><b>${esc(it.label)}</b><span>${it.done} of ${it.of}</span></div><div class="pl-meter-t" role="img" aria-label="${esc(`${it.label}: ${it.done} of ${it.of}`)}"><i style="width:${pct}%"></i></div><small>${esc(it.note || '')}</small></div>`; }).join('')}</div>`;
-}
-
-/* ---- E. funnel: reached against target, narrowing */
-export function funnelViz(f) {
-  const max = Math.max(1, ...f.rows.map((r) => Math.max(r.reached, r.target || 0)));
-  return `<ol class="pl-funnel" aria-label="Commercialization funnel">${f.rows.map((r, i) => `<li><span class="pl-funnel-n">${i + 1}</span><div class="pl-funnel-b"><b>${esc(r.name)}</b><div class="pl-funnel-t"><i class="pl-funnel-tg" style="width:${(r.target || 0) / max * 100}%"></i><i class="pl-funnel-r" style="width:${r.reached / max * 100}%"></i></div></div><div class="pl-funnel-v"><strong>${r.reached}</strong><span>${r.target != null ? `target ${r.target}` : 'no target set'}</span>${r.conversion != null ? `<small>${Math.round(r.conversion * 100)}% of the step before</small>` : ''}</div></li>`).join('')}</ol>`;
 }
 
 /* ---- J. decision timeline: one numbered mark per decision on its due date (the same numbers as the list beneath) */
@@ -166,17 +148,7 @@ export function decisionLine(list, today) {
   return `<div class="pb-scroll pl-dline"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Decisions on their due dates">${g}</svg></div>${legend([['pl-k-open', 'open circle: awaiting decision'], ['pl-k-tri', 'triangle: late'], ['pl-k-made', 'filled circle: decided']])}`;
 }
 
-/* ---- the timing ambiguity from the audit, as an illustration (not prototype data). Captions are HTML so they wrap. */
-export function timingFigure() {
-  const W = 620; const pts = (shift, y0, amp) => Array.from({ length: 241 }, (_, i) => { const t = i / 240 * 6; return `${20 + i * 2.4},${y0 - amp * Math.sin(2 * Math.PI * (t - shift))}`; }).join(' ');
-  const step = (x0, y0) => `M20 ${y0} H${x0} V${y0 - 24} H${20 + 240 * 2.4}`;
-  const svg = (inner, label) => `<div class="pb-scroll"><svg viewBox="0 0 ${W} 64" width="${W}" height="64" role="img" aria-label="${label}">${inner}</svg></div>`;
-  return `<div class="pl-fig"><p><b>A 1 kHz tone on both modules, with module B late by 2 ms.</b> Two milliseconds is two whole cycles, so the traces coincide and the phase reads 0 degrees.</p>${svg(`<polyline points="${pts(0, 32, 20)}" class="pl-t-a"/><polyline points="${pts(2, 32, 20)}" class="pl-t-b"/>`, 'Two identical tone traces lying on top of each other')}
-    <p><b>A shared step on both modules.</b> The same 2 ms now shows, as 125 samples at 62.5 kS/s.</p>${svg(`<path d="${step(190, 52)}" class="pl-t-a"/><path d="${step(190 + 2 / 6 * 240 * 2.4, 46)}" class="pl-t-b"/>`, 'Two step traces, the second one later than the first')}
-    <p class="pb-note">An illustration of the audit's point, drawn with made-up signals. It is not prototype data and does not show a fault.</p></div>`;
-}
-
-/* ---- the three plans on one month axis, one bar each, with the weeks that overload a person (Brief roadmap) */
+/* ---- the plans on one month axis, one bar each, with the weeks that overload a person (Brief roadmap) */
 export function planBars(x) {
   const { d, m } = x; const start = d.load.start; const end = d.scheds.map((s) => s.sched.endDate).sort().pop();
   const t0 = C.parseDate(start), t1 = C.parseDate(end) + 7 * C.DAY; const pct = (dt) => Math.max(0, Math.min(100, (C.parseDate(dt) - t0) / (t1 - t0) * 100));

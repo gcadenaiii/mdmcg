@@ -4,7 +4,7 @@ import { OPTIONS } from '../config';
 ---
 <ol class="opts">
   {OPTIONS.map((o) => (
-    <li class:list={['opt', o.n === 1 && 'opt-on']} data-r>
+    <li class:list={['opt', o.n === 2 && 'opt-on']} data-r>
       <div class="opt-art"><Pic name={o.img} alt={o.alt} sizes="(max-width: 560px) 90vw, (max-width: 1180px) 45vw, 22vw" widths={[320, 480, 640]} /><span class:list={['ring', o.ring]}>{o.n}</span></div>
       <p class="opt-flag">{o.flag}</p>
       <h3 class="opt-name">{o.name}</h3>

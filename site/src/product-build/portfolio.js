@@ -1,4 +1,4 @@
-/* Company plan: calculations across the three programs, as pure functions (tests: tests/company-plan.test.mjs).
+/* Company plan: calculations across the plans, as pure functions (tests: tests/company-plan.test.mjs).
    Public code, no figures. Money in US dollars, dates 'YYYY-MM-DD' (UTC), weeks start on Monday.
 
    One rule runs through all of it: a value that is not known stays null and is reported as missing. A total that leaves
@@ -13,21 +13,15 @@ export const monthOf = (date) => String(date).slice(0, 7);
 
 /* ------------------------------------------------------------------ programs and their schedules */
 
-/** the three programs, each with its own tasks and cost lines. The ECG/MCG program is the existing Product Build data, untouched. */
+/** the plans, each with its own tasks and cost lines. The ECG/MCG program is the existing Product Build data, untouched. */
 export function programs(m) {
   return [
-    { id: 'battery', n: 1, name: 'Battery product', program: m.bProgram, tasks: m.bTasks, lines: m.bLines, phases: m.bPhases, gates: m.bGates, href: '/plan/battery/' },
-    { id: 'ecg', n: 2, name: 'ECG/MCG', program: m.program, tasks: m.tasks, lines: m.lines, phases: m.phases, gates: m.gates, href: '/product-build/' },
-    { id: 'funding', n: 3, name: 'Funding and partnerships', program: m.fProgram, tasks: m.fTasks, lines: m.fLines, phases: m.fPhases, gates: [], href: '/plan/funding/' },
+    { id: 'ecg', n: 1, name: 'ECG/MCG', program: m.program, tasks: m.tasks, lines: m.lines, phases: m.phases, gates: m.gates, href: '/product-build/' },
+    { id: 'funding', n: 2, name: 'Funding and partnerships', program: m.fProgram, tasks: m.fTasks, lines: m.fLines, phases: m.fPhases, gates: [], href: '/plan/funding/' },
   ];
 }
-/** each program scheduled on its own dependencies. shift = { programId: weeks } moves a program's start (for what-if). */
-export function schedules(m, today = null, shift = {}) {
-  return programs(m).map((p) => {
-    const program = { ...p.program, startDate: C.addDays(p.program.startDate, 7 * (shift[p.id] || 0)) };
-    return { ...p, program, sched: C.schedule(program, p.tasks, today) };
-  });
-}
+/** each program scheduled on its own dependencies */
+export const schedules = (m, today = null) => programs(m).map((p) => ({ ...p, sched: C.schedule(p.program, p.tasks, today) }));
 /** everyone whose hours are planned: the two engineering roles (one record, shared by every program) and any other person */
 export const people = (m) => [...m.roles, ...(m.extraPeople || [])];
 
@@ -36,9 +30,8 @@ export const people = (m) => [...m.roles, ...(m.extraPeople || [])];
 /**
  * Hours by calendar week, person and program. A task's hours are spread evenly over the weeks it occupies.
  * A person has one weekly capacity for all programs together: that is what prevents an hour being counted twice.
- * extra = { personId: hours } adds weekly capacity (a second engineer, for a what-if).
  */
-export function portfolioLoad(m, scheds, extra = {}) {
+export function portfolioLoad(m, scheds) {
   const ppl = people(m);
   const start = monday(scheds.map((s) => s.program.startDate).sort()[0]);
   const end = scheds.map((s) => s.sched.endDate).sort().pop();
@@ -60,7 +53,7 @@ export function portfolioLoad(m, scheds, extra = {}) {
     w.over = {};
     for (const p of ppl) {
       const cell = w.by[p.id]; for (const k of Object.keys(cell)) cell[k] = r2(cell[k]);
-      const cap = p.weeklyHours == null ? null : p.weeklyHours + (extra[p.id] || 0);
+      const cap = p.weeklyHours;
       const over = cap == null ? 0 : r2(cell.total - cap);
       w.over[p.id] = over > 0.01 ? over : 0;
       const t = totals[p.id]; t.hours += cell.total; if (cap != null) t.capacity += cap;
@@ -70,18 +63,6 @@ export function portfolioLoad(m, scheds, extra = {}) {
   }
   for (const p of ppl) { const t = totals[p.id]; t.hours = r2(t.hours); t.over = r2(t.over); t.unallocated = t.unknownCapacity ? null : r2(t.capacity - t.hours); if (p.rate != null) t.cost = r2(t.hours * p.rate); }
   return { start, weeks, conflicts, totals, people: ppl, unpricedHours: r2(sum(ppl.filter((p) => p.rate == null).map((p) => totals[p.id].hours))) };
-}
-
-/**
- * What a change of plan does: move programs, add capacity. Returns the finish of each program, the overloaded weeks and
- * the cost of the added capacity. extraRate prices added hours; with no rate the cost is null.
- */
-export function reallocate(m, scenario, today = null) {
-  const scheds = schedules(m, today, scenario.shift || {});
-  const load = portfolioLoad(m, scheds, scenario.extra || {});
-  const ppl = people(m);
-  const extraCost = Object.entries(scenario.extra || {}).reduce((s, [id, h]) => { const p = ppl.find((q) => q.id === id); const rate = scenario.extraRate != null ? scenario.extraRate : p && p.rate; return rate == null || s == null ? null : s + rate * h * load.weeks.length; }, 0);
-  return { id: scenario.id, name: scenario.name, ends: Object.fromEntries(scheds.map((s) => [s.id, s.sched.endDate])), overWeeks: Object.fromEntries(ppl.map((p) => [p.id, load.totals[p.id].overWeeks])), overHours: Object.fromEntries(ppl.map((p) => [p.id, load.totals[p.id].over])), conflicts: load.conflicts.length, extraCost: extraCost == null ? null : r2(extraCost), lastEnd: scheds.map((s) => s.sched.endDate).sort().pop() };
 }
 
 /* ------------------------------------------------------------------ budgets */
@@ -102,7 +83,7 @@ export function programBudget(m, p) {
   return { id: p.id, hours, labour, unpricedHours, other, groups, notEstimated: p.lines.length - known.length, lines: p.lines.length, direct, contingencyPct: pct, contingency, total: r2(direct + contingency), isFloor: p.lines.length - known.length > 0 || unpricedHours > 0, rate };
 }
 /**
- * The three budgets side by side. The ECG/MCG figure is that plan's own total (its labour is by allocation: rate times
+ * The budgets side by side. The ECG/MCG figure is that plan's own total (its labour is by allocation: rate times
  * weekly hours times weeks), taken as it stands so that the two pages can never disagree.
  */
 export function portfolioBudget(m) {
@@ -124,13 +105,13 @@ export const EXPENSE_KINDS = ['Quote', 'Purchase order', 'Invoice', 'Paid'];
  *   planned   labour from the hours placed in tasks (people with a rate), and each cost line in its planned week
  *   committed expense records that are a purchase order, an invoice or paid
  *   actual    expense records that are paid, hours logged times rate, and amounts paid on the ECG/MCG cost lines
- *   cash in   funding recorded as received (by its date); revenue only when `includeRevenue` is set (it is a hypothesis)
+ *   cash in   funding recorded as received (by its date)
  * capital.cashOnHand null means the balance and the runway cannot be worked out, and the result says so.
  */
-export function monthly(m, scheds, load, opts = {}) {
+export function monthly(m, scheds, load) {
   const ppl = people(m); const rate = Object.fromEntries(ppl.map((p) => [p.id, p.rate]));
   const months = new Map();
-  const at = (mo) => { if (!months.has(mo)) months.set(mo, { month: mo, planned: {}, committed: {}, actual: {}, cashIn: 0, revenue: 0, funding: 0 }); return months.get(mo); };
+  const at = (mo) => { if (!months.has(mo)) months.set(mo, { month: mo, planned: {}, committed: {}, actual: {}, cashIn: 0, funding: 0 }); return months.get(mo); };
   const add = (o, k, v) => { o[k] = r2((o[k] || 0) + v); };
   for (const w of load.weeks) { const mo = at(monthOf(w.date)); for (const p of ppl) { if (p.rate == null) continue; for (const s of scheds) { const h = w.by[p.id][s.id]; if (h) add(mo.planned, s.id, h * p.rate); } } }
   for (const s of scheds) {
@@ -146,13 +127,12 @@ export function monthly(m, scheds, load, opts = {}) {
   for (const e of m.expenses || []) { if (!e.date || !Number(e.amount)) continue; const mo = at(monthOf(e.date)); const pid = e.program || 'shared'; if (['Purchase order', 'Invoice', 'Paid'].includes(e.kind)) add(mo.committed, pid, Number(e.amount)); if (e.kind === 'Paid') add(mo.actual, pid, Number(e.amount)); }
   for (const h of m.hoursLog || []) { const pid = h.program || 'ecg'; const s = scheds.find((q) => q.id === pid); if (!s || rate[h.role] == null) continue; add(at(monthOf(C.weekStart(s.program, Number(h.week)))).actual, pid, Number(h.hours || 0) * rate[h.role]); }
   for (const o of m.opportunities || []) if (o.stage === 'Cash received' && o.receivedDate && Number(o.amountReceived)) { const mo = at(monthOf(o.receivedDate)); mo.funding = r2(mo.funding + Number(o.amountReceived)); }
-  if (opts.includeRevenue) for (const rv of opts.revenue || []) { const mo = at(rv.month); mo.revenue = r2(mo.revenue + rv.amount); }
   const rows = [...months.values()].sort((a, b) => a.month.localeCompare(b.month));
   const cash0 = m.capital && m.capital.cashOnHand != null ? Number(m.capital.cashOnHand) : null;
   let bal = cash0, cumP = 0, cumA = 0, runwayMonth = null;
   for (const r of rows) {
     r.plannedTotal = r2(sum(Object.values(r.planned))); r.committedTotal = r2(sum(Object.values(r.committed))); r.actualTotal = r2(sum(Object.values(r.actual)));
-    r.cashIn = r2(r.funding + r.revenue); cumP += r.plannedTotal; cumA += r.actualTotal; r.cumPlanned = r2(cumP); r.cumActual = r2(cumA);
+    r.cashIn = r.funding; cumP += r.plannedTotal; cumA += r.actualTotal; r.cumPlanned = r2(cumP); r.cumActual = r2(cumA);
     if (bal != null) { bal = r2(bal + r.cashIn - r.plannedTotal); r.balance = bal; if (bal < 0 && !runwayMonth) runwayMonth = r.month; } else r.balance = null;
   }
   const totalPlanned = r2(cumP); const cashIn = r2(sum(rows.map((r) => r.cashIn)));
@@ -177,8 +157,7 @@ export function pipeline(opps) {
     committed: r2(sum(live.filter((o) => o.stage === 'Award or commitment').map((o) => o.amountAttainable))),
     prospective: r2(sum(prospect.map((o) => o.amountAttainable))),
     weighted: r2(sum(withP.map((o) => o.amountAttainable * o.probability / 100))),
-    weightedCovers: withP.length, noProbability: prospect.length - withP.length, noAmount: prospect.filter((o) => o.amountAttainable == null).length,
-    byTarget: ['battery', 'ecg', 'both'].map((t) => ({ target: t, count: live.filter((o) => o.target === t).length, attainable: r2(sum(live.filter((o) => o.target === t).map((o) => o.amountAttainable))) })) };
+    weightedCovers: withP.length, noProbability: prospect.length - withP.length, noAmount: prospect.filter((o) => o.amountAttainable == null).length };
 }
 /** deadlines in date order, with the days left from today; opportunities with no verified date are listed apart */
 export function deadlines(opps, today) {
@@ -199,58 +178,6 @@ export function allocationCheck(allocations, expenses, hoursLog) {
   for (const [k, list] of byPw) { const [person, week] = k.split('|'); const logged = r2(sum(hoursLog.filter((h) => h.role === person && String(h.week) === week).map((h) => h.hours))); const total = r2(sum(list.map((a) => a.amount)));
     if (total > logged + 0.005) problems.push({ kind: 'hours-over-allocated', ref: k, text: `${total} hours of ${person} in week ${week} are charged to ${[...new Set(list.map((a) => a.award))].join(', ')}; ${logged} were logged` }); }
   return { problems, ok: problems.length === 0 };
-}
-
-/* ------------------------------------------------------------------ sales funnel */
-
-export const FUNNEL_STAGES = ['Customer discovery', 'Qualified opportunity', 'Technical evaluation', 'Paid pilot', 'Customer acceptance', 'Purchase order', 'Delivery', 'Support and renewal'];
-/** how many customer records have reached each stage, the step-to-step conversion, and the target for the stage where one is set */
-export function funnel(customers, targets = {}) {
-  const idx = (c) => FUNNEL_STAGES.indexOf(c.stage);
-  const live = customers.filter((c) => idx(c) >= 0 && !c.lost);
-  const rows = FUNNEL_STAGES.map((name, i) => { const reached = live.filter((c) => idx(c) >= i); return { name, reached: reached.length, here: live.filter((c) => idx(c) === i).length, value: r2(sum(reached.map((c) => c.value))), target: targets[name] ?? null, ids: reached.map((c) => c.id) }; });
-  rows.forEach((r, i) => { r.conversion = i === 0 || !rows[i - 1].reached ? null : r2(r.reached / rows[i - 1].reached); r.met = r.target == null ? null : r.reached >= r.target; });
-  return { rows, total: live.length, lost: customers.filter((c) => c.lost).length };
-}
-
-/* ------------------------------------------------------------------ unit economics */
-
-export const VOLUMES = [10, 25, 50, 100, 250];
-const NEEDED = ['price', 'cogs'];
-/**
- * One year at a given number of systems. Inputs are assumptions (a = economics record); a missing price or unit cost gives
- * no result, only the list of what is missing. Revenue, gross profit, operating profit and cash received are kept apart.
- */
-export function unitEconomics(a, units) {
-  const missing = NEEDED.filter((k) => a[k] == null);
-  if (missing.length) return { units, missing, ok: false };
-  const v = (k) => Number(a[k]) || 0;
-  const viaDist = units * v('distributorSharePct') / 100;
-  const hardware = r2(units * v('price') - viaDist * v('price') * v('distributorMarginPct') / 100);
-  const recurringPerUnit = (v('softwarePerYear') + v('supportPerYear') + v('calibrationPerYear')) * v('attachPct') / 100;
-  const recurring = r2(units * recurringPerUnit);
-  const revenue = r2(hardware + recurring);
-  const cogs = r2(units * v('cogs'));
-  const warranty = r2(units * v('price') * v('warrantyPct') / 100);
-  const install = r2(units * v('installCost'));
-  const grossProfit = r2(revenue - cogs - warranty - install);
-  const acquisition = r2(units * v('cac'));
-  const fixed = r2(v('fixedOpex'));
-  const operatingProfit = r2(grossProfit - acquisition - fixed);
-  const oneTime = r2(v('nre') + v('cmSetup'));
-  const netPrice = v('price') * (1 - v('distributorSharePct') / 100 * v('distributorMarginPct') / 100);
-  const contribution = r2(netPrice + recurringPerUnit - v('cogs') - v('price') * v('warrantyPct') / 100 - v('installCost') - v('cac'));
-  const breakEvenUnits = contribution > 0 ? Math.ceil(fixed / contribution) : null;
-  const paybackUnits = contribution > 0 ? Math.ceil((fixed + oneTime) / contribution) : null;
-  const collected = r2(revenue * Math.max(0, 1 - v('paymentDays') / 365));
-  const workingCapital = r2(cogs * v('buildLeadDays') / 365 + revenue * v('paymentDays') / 365);
-  return { units, ok: true, missing: [], hardware, recurring, revenue, cogs, warranty, install, grossProfit, grossMarginPct: revenue ? r2(grossProfit / revenue * 100) : null, unitMargin: r2(v('price') - v('cogs')),
-    acquisition, fixed, operatingProfit, oneTime, contribution, breakEvenUnits, breakEvenRevenue: breakEvenUnits == null ? null : r2(breakEvenUnits * (netPrice + recurringPerUnit)), paybackUnits, cashReceived: collected, receivablesAtYearEnd: r2(revenue - collected), workingCapital };
-}
-/** the result with one input moved by a percentage, for the sensitivity view */
-export function sensitivity(a, units, keys = ['price', 'cogs', 'cac', 'fixedOpex'], pct = 20) {
-  const base = unitEconomics(a, units); if (!base.ok) return [];
-  return keys.filter((k) => a[k] != null).map((k) => { const lo = unitEconomics({ ...a, [k]: a[k] * (1 - pct / 100) }, units), hi = unitEconomics({ ...a, [k]: a[k] * (1 + pct / 100) }, units); return { key: k, low: lo.operatingProfit, high: hi.operatingProfit, base: base.operatingProfit, swing: r2(Math.abs(hi.operatingProfit - lo.operatingProfit)) }; }).sort((x, y) => y.swing - x.swing);
 }
 
 /* ------------------------------------------------------------------ readiness */
@@ -277,4 +204,37 @@ export function decisionQueue(decisions, today) {
   const rows = decisions.map((d) => ({ ...d, made: !!(d.decision && d.decidedBy && d.decidedOn), days: d.due ? Math.round((C.parseDate(d.due) - C.parseDate(today)) / C.DAY) : null }));
   rows.sort((a, b) => (a.made - b.made) || String(a.due || '9999').localeCompare(String(b.due || '9999')));
   return { rows, open: rows.filter((r) => !r.made).length, overdue: rows.filter((r) => !r.made && r.days != null && r.days < 0).length, next: rows.find((r) => !r.made) || null };
+}
+
+/* ------------------------------------------------------------------ everything the pages show */
+
+/**
+ * Every figure the pages show, worked out from the page data and one person's changes (store = { edits, added, removed }).
+ * A change to a collection or a record that the page data no longer holds is left out and not counted: it cannot crash a page.
+ * logOk is the last result of the history check, carried over between redraws.
+ */
+export function derive(seed, store, today, logOk = null) {
+  const added = {}; for (const [k, v] of Object.entries(store.added || {})) if (Array.isArray(seed[k])) added[k] = v.filter((r) => !((store.removed || {})[k] || []).includes(r.id));
+  const r = C.applyEdits(seed, store.edits || {}, added);
+  const log = r.model.hoursLog || [];
+  const tasks = r.model.tasks.map((t) => { const a = { A: 0, B: 0 }; for (const e of log) if (e.task === t.id) a[e.role] = (a[e.role] || 0) + Number(e.hours || 0); return { ...t, actualHours: a }; });
+  const m = { ...r.model, tasks };
+  const inForce = (c, id) => (Array.isArray(seed[c]) ? m[c].some((q) => q.id === id) : id === '_' && seed[c] != null && typeof seed[c] === 'object');
+  let changes = 0; for (const [c, recs] of Object.entries(store.edits || {})) for (const [id, rec] of Object.entries(recs)) if (inForce(c, id)) changes += Object.keys(rec).length; for (const a of Object.values(added)) changes += a.length;
+  // the ECG/MCG plan's own figures, exactly as its sections expect them
+  const sched = C.schedule(m.program, tasks, today); const eLoad = C.resourceLoad(m.program, m.roles, tasks, sched); const bud = C.budget(m.program, m.roles, m.lines); const spend = C.weeklySpend(m.program, m.roles, tasks, m.lines, sched, log);
+  const nowWeek = C.weekOf(m.program, today); const upto = Math.min(Math.max(nowWeek, 0), spend.length);
+  let status = 'On plan', statusWhy = 'no task is overdue or pushed later';
+  if (today < m.program.startDate) { status = 'Not started'; statusWhy = `the program starts on ${m.program.startDate}`; }
+  if (sched.overdue.length || sched.slipped.length || sched.errors.length || sched.endWeek > m.program.durationWeeks || eLoad.conflicts.length) { status = 'At risk'; statusWhy = [sched.overdue.length && `${sched.overdue.length} overdue`, sched.slipped.length && `${sched.slipped.length} pushed later`, eLoad.conflicts.length && `${eLoad.conflicts.length} overloaded weeks`, sched.endWeek > m.program.durationWeeks && 'the schedule runs past the program', sched.errors.length && 'schedule errors'].filter(Boolean).join(', '); }
+  const ecg = { today, nowWeek, sched, load: eLoad, bud, spend, status, statusWhy, gates: C.gates(m), trace: C.traceability(m), stack: C.stackCost(m.stack, m.tools), bom: C.bomHealth(m.parts), bomCost: [1, 10, 100, 1000].map((q) => C.bomCost(m.parts, q)),
+    scenarios: m.scenarios.map((s) => ({ ...s, b: C.budget(m.program, m.roles, m.lines, s), endDate: C.schedule({ ...m.program, durationWeeks: s.durationWeeks || m.program.durationWeeks }, tasks).endDate })),
+    spendActual: spend.length ? spend[spend.length - 1].cumActual : 0, spendPlanned: upto ? spend[upto - 1].cumPlanned : 0, conflicts: r.conflicts, orphans: r.orphans, changes, logOk };
+  // the company-wide figures
+  const scheds = schedules(m, today); const load = portfolioLoad(m, scheds);
+  const byProgram = Object.fromEntries(scheds.map((s) => [s.id, { ...s, next: s.sched.rows.filter((q) => q.milestone && q.percent < 100 && q.finishDate >= today)[0] || s.sched.rows.filter((q) => q.milestone)[0] || null }]));
+  const d = { today, ecg, scheds, byProgram, load, budget: portfolioBudget(m), monthly: monthly(m, scheds, load), pipe: pipeline(m.opportunities), dl: deadlines(m.opportunities, today),
+    readE: readiness({ needs: m.needs, requirements: m.requirements, outputs: m.outputs, risks: m.risks, tests: m.tests, evidence: m.evidence, reviews: m.reviews, gates: m.gates, tasks: m.tasks, anomalies: m.anomalies || [] }),
+    decisions: decisionQueue(m.execDecisions, today), alloc: allocationCheck(m.allocations, m.expenses, log), changes };
+  return { m, d };
 }

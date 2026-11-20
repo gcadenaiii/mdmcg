@@ -4,7 +4,7 @@
 import Base from '../layouts/Base.astro';
 import '../styles/product-build.css';
 import '../styles/plan.css';
-interface Props { area: 'hub' | 'battery' | 'ecg' | 'funding' | 'library'; title: string; line: string; }
+interface Props { area: 'hub' | 'ecg' | 'funding' | 'library'; title: string; line: string; }
 const { area, title, line } = Astro.props;
 const dev = import.meta.env.DEV && !(import.meta.env.PRODUCT_BUILD_CODE ?? process.env.PRODUCT_BUILD_CODE);
 ---

@@ -1,4 +1,6 @@
 /* The camera positions and layouts shared by the live stage and the rendered stills, so the two cannot disagree. */
+/** the option the site is built round: its place in specs.json (1 is option 2, the TMR chips) */
+export const LEAD = 1;
 export const VIEWS = {
   hero: { tx: -2, ty: 0, tz: 8, az: 0.31, el: 0.86, dist: 186, fov: 32, fit: 1.5 },
   open: { tx: 0, ty: 27, tz: 4, az: 2.56, el: 0.36, dist: 400, fit: 0.9 },

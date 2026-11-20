@@ -2,7 +2,7 @@
    Needs the dev server:  pnpm dev --port 5174   then:  node scripts/render-stills.mjs [name ...] [--out DIR] [--install]
    Without --install the pictures are only written to the output folder (default: ./.stills) as PNG.
    With --install the ones that have a master replace it in src/assets/img (WebP).
-   The hero has no master here: the home page keeps its own picture (device-hero), which is the look the studio is tuned to. */
+   The hero is the home page's opening picture (device-hero). */
 import { chromium } from 'playwright-core';
 import sharp from 'sharp';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -15,7 +15,7 @@ const out = path.resolve(flag('--out') ?? '.stills');
 const base = flag('--base') ?? 'http://127.0.0.1:5174';
 // name, function in src/three/stills.js, its arguments, master in src/assets/img, width in pixels, keep the whole frame (no cut to the picture's edge)
 const JOBS = [
-  ['hero', 'hero', [], null, 2400],
+  ['hero', 'hero', [], 'device-hero', 2400],
   ['open', 'open', [], 'device-open', 1500],
   ['wing', 'wing', [], 'device-wing', 2000, true],
   ['detail', 'detail', [], 'device-detail', 2000],
@@ -25,6 +25,8 @@ const JOBS = [
   ['option-3', 'option', [2], 'option-3', 1600], ['option-4', 'option', [3], 'option-4', 1600],
   ['row', 'row', [], 'options-row', 3000],
   ['family', 'family', [], null, 1800],
+  ['flat', 'flat', [], null, 2000, true],
+  ['edge', 'edge', [], null, 2400, true],
 ];
 const want = args.length ? JOBS.filter((j) => args.includes(j[0])) : JOBS;
 const SS = 2; // drawn at twice the size, then reduced, for clean edges

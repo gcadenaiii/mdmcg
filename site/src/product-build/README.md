@@ -48,16 +48,16 @@ node scripts/check-content.mjs     # must end "11 pages checked, 0 problem(s)."
 
 ## Company plan (added 2026-11-19)
 
-Three more private pages use the same encrypted data file, the same access code and the same store of changes:
+The company has one product, the wearable heart device (ECG with MCG). Its plan, the funding plan, the company page and the reference pages use the same encrypted data file, the same access code and the same store of changes. The battery plan was removed on 2026-11-20:
 
 | Route | What it is | Code |
 |---|---|---|
 | `/plan/` | Company Strategy: overview, roadmap, financials, shared operations, decisions | `plan.js`, `plan-views.js`, `plan-viz.js` |
-| `/plan/battery/` | Execution Plan 1: battery product | same |
-| `/plan/funding/` | Execution Plan 3: funding and partnerships | same |
-| `/product-build/` | Execution Plan 2: ECG/MCG (unchanged; it gained the plan navigation) | `app.js`, `views.js` |
+| `/product-build/` | Execution Plan 1: ECG/MCG | same, with `views.js` for its Working sections |
+| `/plan/funding/` | Execution Plan 2: funding and partnerships | same, with `plan-sections.js` |
+| `/plan/reference/` | Reference and history: parts, tools, standards, security, the record of changes | same |
 
-- `portfolio.js` holds the cross-program calculations (shared capacity, budgets, months, pipeline, funnel, unit economics, readiness). Tests: `tests/company-plan.test.mjs`.
-- Data: `seed/battery.js`, `seed/company.js`, `seed/funding.js`, and research in `data/product-build/internal.json`, `funding.json`, `market.json`.
+- `portfolio.js` holds the cross-program calculations (shared capacity, budgets, months, pipeline, readiness) and `derive()`, which works out every figure the pages show from the page data and one person's changes. A change kept in a browser for a record that no longer exists is left out, not shown and not counted. Tests: `tests/company-plan.test.mjs`.
+- Data: `seed/company.js`, `seed/funding.js`, and research in `data/product-build/funding.json`.
 - The two engineering roles exist once (`seed/program.js`) and are shared by every program. Never copy them into a program.
 - The content check must end "14 pages checked, 0 problem(s)."

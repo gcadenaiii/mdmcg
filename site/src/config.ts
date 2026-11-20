@@ -30,16 +30,16 @@ export const LAB = {
   electrodes: '/lab/#/electrodes',
   trust: '/lab/#/trust',
   sensors: '/lab/#/sensors',
-  explore: '/lab/#/sensors/explore?body=typical_man&place=sternum%7Cd10&option=a&room=1',
-  option1: '/lab/#/sensors/option/a/summary',
-  option1wear: '/lab/#/sensors/option/a/wear',
-  option1evidence: '/lab/#/sensors/option/a/evidence',
+  explore: '/lab/#/sensors/explore?body=typical_man&place=sternum%7Cd10&option=b&room=1',
+  device: '/lab/#/sensors/option/b/summary',
+  deviceWear: '/lab/#/sensors/option/b/wear',
+  deviceEvidence: '/lab/#/sensors/option/b/evidence',
   method: '/lab/#/sensors/method',
 };
 
 export const OPTIONS = [
-  { n: 1, ring: 'r1', img: 'option-1', flag: 'Recommended', name: 'Wire sensors in one piece', line: 'Wound wire sensors. The best published match to our job.', size: '60 x 32 x 9 mm', sensors: 6, colour: 'teal', alt: 'Option 1: a white core with a teal ring and two soft wings.' },
-  { n: 2, ring: 'r2', img: 'option-2', flag: 'Thinnest', name: 'TMR chips with flux concentrators', line: 'The slimmest core of the four, at 6 mm.', size: '60 x 32 x 6 mm', sensors: 6, colour: 'sky blue', alt: 'Option 2: a thinner white core with a sky-blue ring.' },
+  { n: 1, ring: 'r1', img: 'option-1', flag: 'Lowest published noise', name: 'Wire sensors in one piece', line: 'Wound wire sensors, standing upright in a 9 mm core.', size: '60 x 32 x 9 mm', sensors: 6, colour: 'teal', alt: 'Option 1: a white core with a teal ring and two clear arms.' },
+  { n: 2, ring: 'r2', img: 'option-2', flag: 'The device', name: 'TMR chips with flux concentrators', line: 'Six magnetic chips on edge in the slimmest core of the four, at 6 mm.', size: '60 x 32 x 6 mm', sensors: 6, colour: 'sky blue', alt: 'Option 2: a thinner white core with a sky-blue ring.' },
   { n: 3, ring: 'r3', img: 'option-3', flag: 'Bench plate', name: 'Ready-made boards', line: 'Boards that can be ordered now, for work on the bench.', size: '124 x 46 x 8 mm', sensors: 4, colour: 'navy', alt: 'Option 3: a longer white plate with a navy ring.' },
   { n: 4, ring: 'r4', img: 'option-4', flag: 'Largest battery', name: 'Small fluxgates', line: 'Two cells in a deeper core: the largest battery of the four.', size: '60 x 32 x 14 mm', sensors: 6, colour: 'gold', alt: 'Option 4: a thicker white core with a gold ring.' },
 ];

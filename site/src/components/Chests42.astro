@@ -1,6 +1,6 @@
 ---
 // Forty-two bodies, one device. Each scanned chest is cut across at the height where the device sits and laid over the others,
-// lined up on the skin at the front. The device (32 mm wide, 9 mm thick, drawn to the same scale) rests on all of them; the
+// lined up on the skin at the front. The device's core (32 mm wide, 6 mm thick, drawn to the same scale) rests on all of them; the
 // heart of each chest lies at its own depth beneath it. Data: src/data/sections42.json (from the CT scans; see its note).
 // The chests are drawn in one by one when the band is first seen.
 import data from '../data/sections42.json';
@@ -9,7 +9,7 @@ const d = (pts: number[][]) => pts.map((p, i) => `${i ? 'L' : 'M'}${p[0]} ${p[1]
 <svg class="chests" viewBox="-235 -24 470 330" role="img" data-n={data.n} aria-label={`${data.n} scanned chests cut across at the height of the device and laid over one another. The same small device rests on the front of every chest; each heart lies at a different depth beneath it.`}>
   <g class="chests-bodies">{data.chests.map((c, i) => <path d={d(c.body)} style={`--i:${i}`} />)}</g>
   <g class="chests-hearts">{data.chests.map((c, i) => c.heart && <path d={d(c.heart)} style={`--i:${i}`} />)}</g>
-  <rect class="chests-device" x="-16" y="-10" width="32" height="9" rx="2.5" />
+  <rect class="chests-device" x="-16" y="-7" width="32" height="6" rx="2.5" />
 </svg>
 
 <script>

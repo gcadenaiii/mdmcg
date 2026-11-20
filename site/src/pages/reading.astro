@@ -9,7 +9,7 @@ import WorkBand from '../components/WorkBand.astro';
 import LabLink from '../components/LabLink.astro';
 import { LAB } from '../config';
 ---
-<Base title="How a reading goes: sit still, thirty beats" description="How a reading goes: take it from its case, place it on the breastbone, sit still, and let it average the beats.">
+<Base title="How a reading goes: sit still, forty beats" description="How a reading goes: take it from its case, place it on the breastbone, sit still, and let it average the beats.">
 
 <section class="phero" aria-labelledby="h-page">
   <div class="wrap phero-in">
@@ -36,7 +36,7 @@ import { LAB } from '../config';
     <ol class="flow">
       <li data-r><b></b><h3>Take it from its case</h3><p>It lives there, charged, between readings.</p></li>
       <li data-r><b></b><h3>Place it on the breastbone</h3><p>Find where the bone stops. Centre it 2 cm above and 2 cm to your left.</p></li>
-      <li data-r><b></b><h3>Start</h3><p>The wings pick up the ECG while the core listens for the field.</p></li>
+      <li data-r><b></b><h3>Start</h3><p>The arms pick up the ECG while the core listens for the field.</p></li>
       <li data-r><b></b><h3>Sit still</h3><p>It lines up each beat on the ECG mark and adds them.</p></li>
       <li data-r><b></b><h3>Read the record</h3><p>Two signals from the same heartbeats, on one clock.</p></li>
     </ol>
@@ -70,7 +70,7 @@ import { LAB } from '../config';
         <h3>The main spike.</h3>
         <p>The tall, sharp part of each beat. In the virtual trial it clears after a handful of beats.</p>
         <div class="pair">
-          <div><b>5</b><span>beats, about, for a typical chest in the virtual trial with sensor noise only</span></div>
+          <div><b>3</b><span>beats, about, for a typical chest in the virtual trial with sensor noise only</span></div>
         </div>
       </article>
       <article class="tile" data-r>
@@ -78,11 +78,11 @@ import { LAB } from '../config';
         <h3>Adds the recovery wave.</h3>
         <p>The slower, smaller wave that follows the spike. In the virtual trial it asks for more beats.</p>
         <div class="pair">
-          <div><b>30</b><span>beats, about, for a typical chest in the virtual trial with sensor noise only</span></div>
+          <div><b>38</b><span>beats, about, for a typical chest in the virtual trial with sensor noise only</span></div>
         </div>
       </article>
     </div>
-    <p class="note" data-r>In an ordinary room, the virtual trial gives about 25 seconds for the main spike and about 5.7 minutes for the recovery wave on a typical chest.</p>
+    <p class="note" data-r>In an ordinary room, the virtual trial gives about 22 seconds for the main spike and about 5.7 minutes for the recovery wave on a typical chest.</p>
   </div>
 </section>
 
@@ -97,7 +97,7 @@ import { LAB } from '../config';
     <div class="split-media" data-r>
       <div class="panel">
         <p class="panel-k">Beats for the recovery wave, typical chest, by place worn</p>
-        <Bars class="bars-big" label="Beats needed by place worn: 28.3 at the breastbone (the tested spot), 99.5 at the left chest pocket, 106.9 under the left breast." rows={[{ label: 'Breastbone, tested spot', value: 28.3 }, { label: 'Chest pocket', value: 99.5 }, { label: 'Under left breast', value: 106.9 }]} />
+        <Bars class="bars-big" label="Beats needed by place worn: 37.6 at the breastbone (the tested spot), 131.8 at the left chest pocket, 149.8 under the left breast." rows={[{ label: 'Breastbone, tested spot', value: 37.6 }, { label: 'Chest pocket', value: 131.8 }, { label: 'Under left breast', value: 149.8 }]} />
       </div>
     </div>
   </div>

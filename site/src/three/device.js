@@ -2,9 +2,10 @@
    (copied from the research tool's design data: core size, corner radius, pad thickness, sensor places, ring colour, cell).
    Units are millimetres. X across the chest, Y out of the chest, -Z toward the head. The pad's underside is y = -pad_t.
    Only named parts are drawn: soft pad, shell, ring, sensor board with its sensors, the cell, the self-test coil,
-   the flexible sheet (two wings and the top tab, each with its electrode), and the lid with its coloured corner and light. */
+   the flexible sheet (two clear film arms and the top tab, each with its printed conductor and its electrode), and the lid
+   with its coloured corner and light. */
 import {
-  BufferGeometry, CanvasTexture, CatmullRomCurve3, Color, CylinderGeometry, DoubleSide, Float32BufferAttribute, Group,
+  BoxGeometry, BufferGeometry, CanvasTexture, CatmullRomCurve3, Color, CylinderGeometry, DoubleSide, Float32BufferAttribute, Group,
   LatheGeometry, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, RepeatWrapping, SRGBColorSpace, TubeGeometry, Vector2, Vector3,
 } from 'three';
 
@@ -81,13 +82,20 @@ function slab(w, l, r, y0, y1, e, out = 0) {
 export function wingPlan(core) {
   const dx = core.w / 2 - 16;
   const zr = 9 + (core.l - 60) / 4;
-  /* strap: the width of a wing; root: where its head-side edge leaves the core. Set to the look of the opening picture. */
-  return { dx, zr, strap: 8.6, root: zr - 2, lobe: { x: 52 + dx, z: zr + 23, r: 10.5 }, tab: { z: -(core.l / 2 + 15), r: 6.3 }, pad: 6.9, tabPad: 3.4 };
+  /* strap: the width of an arm; root: where its head-side edge leaves the core. */
+  return { dx, zr, strap: 12, root: zr - 2, lobe: { x: 52 + dx, z: zr + 23, r: 10.5 }, tab: { z: -(core.l / 2 + 15), r: 6.3 }, pad: 6.9, tabPad: 3.4 };
 }
 const bez = (p0, c1, c2, p3, t) => {
   const m = 1 - t;
   return [m * m * m * p0[0] + 3 * m * m * t * c1[0] + 3 * m * t * t * c2[0] + t * t * t * p3[0], m * m * m * p0[1] + 3 * m * m * t * c1[1] + 3 * m * t * t * c2[1] + t * t * t * p3[1]];
 };
+/** the centre line of an arm, from the core to its round end, and where the straight part stops */
+function armLine(plan) {
+  const { dx, lobe } = plan, hs = plan.strap / 2;
+  const endX = lobe.x - dx - Math.sqrt(lobe.r * lobe.r - hs * hs);
+  const zc = plan.root + hs;
+  return { endX, centre: (t) => bez([14, zc], [14 + (endX - 14) * 0.62, zc], [endX - (endX - 14) * 0.55, lobe.z], [endX, lobe.z], t) };
+}
 /** a soft sheet of thickness th draped over height(x, z), made of patches that share that one surface */
 function sheet(height, th) {
   const pos = [], nor = [], uv = [], idx = [];
@@ -167,12 +175,10 @@ function sheetGeometry(core, plan, height, th) {
   S.grid(1, line.length, (u, v) => { const p = line[Math.round(v * line.length) % line.length]; return [p[0] * u, p[1] * u]; });
   S.edge(line, () => [0, 0], true);
   /* the wings: each edge is a curve from the core to the round end */
-  const { dx, zr, lobe } = plan;
+  const { dx, lobe } = plan;
   /* each wing is a strap of one width along an S-shaped centre line, level where it leaves the core and where it meets its round end */
   const hs = plan.strap / 2;
-  const endX = lobe.x - dx - Math.sqrt(lobe.r * lobe.r - hs * hs);
-  const zc = plan.root + hs;
-  const centre = (t) => bez([14, zc], [14 + (endX - 14) * 0.62, zc], [endX - (endX - 14) * 0.55, lobe.z], [endX, lobe.z], t);
+  const { centre } = armLine(plan);
   for (const sgn of [-1, 1]) {
     const X = (x) => sgn * (x + dx);
     const cx = sgn * lobe.x;
@@ -201,6 +207,25 @@ function sheetGeometry(core, plan, height, th) {
   S.disc(0, tz, tr, 40);
   return S.done();
 }
+/** the conductors printed on the film: one fine line from the core to the middle of each electrode */
+function traceGeometry(core, plan, height) {
+  const S = sheet(height, 0.1);
+  const { dx, lobe } = plan, hw = 0.55;
+  const { centre, endX } = armLine(plan);
+  for (const sgn of [-1, 1]) {
+    const X = (x) => sgn * (x + dx);
+    const edge = (t, s) => {
+      const a = centre(Math.max(0, t - 0.002)), b = centre(Math.min(1, t + 0.002)), c = centre(t);
+      const L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+      return [X(c[0] - s * hw * (b[1] - a[1]) / L), c[1] + s * hw * (b[0] - a[0]) / L];
+    };
+    S.grid(44, 1, (u, v) => { const a = edge(u, -1), b = edge(u, 1); return [a[0] + (b[0] - a[0]) * v, a[1] + (b[1] - a[1]) * v]; });
+    S.grid(4, 1, (u, v) => [X(endX + (lobe.x - dx - plan.pad * 0.6 - endX) * u), lobe.z - hw + 2 * hw * v]);
+  }
+  const z0 = -(core.l / 2 - 2.2);
+  S.grid(8, 1, (u, v) => [-hw + 2 * hw * v, z0 + (plan.tab.z + plan.tabPad * 0.6 - z0) * u]);
+  return S.done();
+}
 
 /* ---------- surfaces ---------- */
 
@@ -218,36 +243,6 @@ const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
 
 /** the materials every option shares; the ring is made per option */
 export function makeMaterials() {
-  /* a fine rib with a little fuzz, as a height map: 4 mm of cloth per repeat */
-  const knit = canvasTexture(256, (x, s) => {
-    x.fillStyle = '#808080'; x.fillRect(0, 0, s, s);
-    for (let y = 0; y < s; y += 16) {
-      const g = x.createLinearGradient(0, y, 0, y + 16);
-      g.addColorStop(0, '#5c5c5c'); g.addColorStop(0.5, '#a6a6a6'); g.addColorStop(1, '#5c5c5c');
-      x.fillStyle = g; x.fillRect(0, y, s, 16);
-    }
-    x.globalAlpha = 0.3;
-    for (let c = 0; c < s; c += 16) {
-      const g = x.createLinearGradient(c, 0, c + 16, 0);
-      g.addColorStop(0, '#545454'); g.addColorStop(0.5, '#acacac'); g.addColorStop(1, '#545454');
-      x.fillStyle = g; x.fillRect(c, 0, 16, s);
-    }
-    x.globalAlpha = 1;
-    for (let i = 0; i < 3000; i++) { const v = 128 + Math.round((rnd() - 0.5) * 120); x.fillStyle = `rgba(${v},${v},${v},0.3)`; x.fillRect(rnd() * s, rnd() * s, 2, 2); }
-  });
-  const fuzz = canvasTexture(256, (x, s) => {
-    x.fillStyle = '#ffffff'; x.fillRect(0, 0, s, s);
-    for (let i = 0; i < 5200; i++) { const v = 214 + Math.round(rnd() * 40); x.fillStyle = `rgb(${v},${v},${v})`; x.fillRect(rnd() * s, rnd() * s, 3, 3); }
-  });
-  fuzz.colorSpace = SRGBColorSpace;
-  knit.repeat.set(0.46, 0.46);
-  /* the foam ring round each electrode: white, with a fine dark speckle */
-  const speck = canvasTexture(256, (x, s) => {
-    x.fillStyle = '#ffffff'; x.fillRect(0, 0, s, s);
-    for (let i = 0; i < 300; i++) { const v = 176 + Math.round(rnd() * 60); x.fillStyle = `rgb(${v},${v},${v})`; x.fillRect(rnd() * s, rnd() * s, 3, 3); }
-  });
-  speck.colorSpace = SRGBColorSpace;
-  speck.repeat.set(0.5, 0.5);
   const turns = canvasTexture(64, (x, s) => {
     x.fillStyle = '#ffffff'; x.fillRect(0, 0, s, s);
     x.fillStyle = '#9a9a9a'; for (let y = 0; y < s; y += 8) x.fillRect(0, y, s, 3);
@@ -256,9 +251,12 @@ export function makeMaterials() {
   turns.repeat.set(1, 3);
   return {
     shell: new MeshPhysicalMaterial({ color: new Color('#f4f4f3'), roughness: 0.42, metalness: 0, clearcoat: 0.25, clearcoatRoughness: 0.45 }),
-    cloth: new MeshPhysicalMaterial({ color: new Color('#ebe8e8'), roughness: 1, metalness: 0, sheen: 0.5, sheenRoughness: 0.7, sheenColor: new Color('#ffffff'), map: fuzz, bumpMap: knit, bumpScale: 4, side: DoubleSide }),
-    rim: new MeshStandardMaterial({ color: new Color('#eeecec'), roughness: 1, map: speck, bumpMap: speck, bumpScale: 0.5 }),
-    gel: new MeshPhysicalMaterial({ color: new Color('#d2d2d1'), roughness: 0.3, metalness: 0, clearcoat: 0.6, clearcoatRoughness: 0.18 }),
+    /* the arms: a thin clear film, as on a long-wear skin patch */
+    film: new MeshPhysicalMaterial({ color: new Color('#f3f6f7'), roughness: 0.16, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.12, transparent: true, opacity: 0.5, depthWrite: false, side: DoubleSide }),
+    trace: new MeshStandardMaterial({ color: new Color('#9aa1a8'), roughness: 0.4, metalness: 0.75 }),
+    silver: new MeshStandardMaterial({ color: new Color('#c9cdd1'), roughness: 0.42, metalness: 0.7 }),
+    gel: new MeshPhysicalMaterial({ color: new Color('#eef2f3'), roughness: 0.12, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.1, transparent: true, opacity: 0.45, depthWrite: false }),
+    chip: new MeshPhysicalMaterial({ color: new Color('#23272d'), roughness: 0.35, metalness: 0.1, clearcoat: 0.6, clearcoatRoughness: 0.25 }),
     foam: new MeshStandardMaterial({ color: new Color('#d9dee3'), roughness: 1 }),
     board: new MeshPhysicalMaterial({ color: new Color('#1f6a55'), roughness: 0.42, clearcoat: 0.5, clearcoatRoughness: 0.3 }),
     copper: new MeshStandardMaterial({ color: new Color('#c87b4a'), roughness: 0.38, metalness: 0.85 }),
@@ -340,8 +338,8 @@ export function buildDevice(spec, M, { inside = false } = {}) {
 
   /* The charging pads (spec.contacts) are not drawn: they are not on the lid, and the model has no other face to show them on. */
 
-  /* the flexible sheet: clamped in the core, two wings and the top tab draped to the surface it lies on */
-  const th = 1.7;
+  /* the flexible sheet: clamped in the core, two clear arms and the top tab lying on the surface under it */
+  const th = 0.5;
   const yS = t - 3.0 - th / 2 - 0.05; // the sheet leaves through the wall below the ring
   const ground = -padT + th / 2 + 0.06;
   const height = (x, z) => {
@@ -349,24 +347,25 @@ export function buildDevice(spec, M, { inside = false } = {}) {
     return yS + (ground - yS) * k;
   };
   const flex = new Group();
-  flex.add(mesh(sheetGeometry(spec.core, plan, height, th), M.cloth));
+  flex.add(mesh(traceGeometry(spec.core, plan, height), M.trace, false));
+  /* the electrode, seen through the film: a silver disc with a low clear cap over it */
   const electrode = (x, z, lobeR, padR) => {
-    const y = height(x, z) + th / 2;
-    const rimP = [];
-    const span = lobeR - padR + 0.5;
-    for (let k = 0; k <= 12; k++) { const f = k / 12; rimP.push(new Vector2(padR - 0.5 + span * f, Math.sin(f * Math.PI) ** 0.35 * Math.min(1.0, span * 0.6))); }
-    const rim = new LatheGeometry(rimP.reverse(), 56);
-    const uv = rim.attributes.uv, p = rim.attributes.position;
-    for (let i = 0; i < uv.count; i++) uv.setXY(i, p.getX(i) / 4, p.getZ(i) / 4);
-    rim.translate(x, y - 0.05, z);
-    flex.add(mesh(rim, M.rim));
+    const y = height(x, z);
+    const disc = new CylinderGeometry(padR, padR, 0.14, 56);
+    disc.translate(x, y, z);
+    flex.add(mesh(disc, M.silver, false));
     const domeP = [];
-    const dh = padR * 0.26;
-    for (let k = 0; k <= 14; k++) { const a = (k / 14) * H; domeP.push(new Vector2(padR * Math.sin(a), dh * Math.cos(a))); }
+    const dh = padR * 0.13;
+    for (let k = 0; k <= 14; k++) { const a = (k / 14) * H; domeP.push(new Vector2((padR + 0.6) * Math.sin(a), dh * Math.cos(a))); }
     const dome = new LatheGeometry(domeP.reverse(), 56);
-    dome.translate(x, y + 0.2, z);
-    flex.add(mesh(dome, M.gel));
+    dome.translate(x, y + th / 2, z);
+    const cap = mesh(dome, M.gel, false);
+    cap.userData.clear = true; cap.renderOrder = 4;
+    flex.add(cap);
   };
+  const film = mesh(sheetGeometry(spec.core, plan, height, th), M.film, false);
+  film.userData.clear = true; film.renderOrder = 3;
+  flex.add(film);
   electrode(-plan.lobe.x, plan.lobe.z, plan.lobe.r, plan.pad);
   electrode(plan.lobe.x, plan.lobe.z, plan.lobe.r, plan.pad);
   electrode(0, plan.tab.z, plan.tab.r, plan.tabPad);
@@ -382,6 +381,15 @@ export function buildDevice(spec, M, { inside = false } = {}) {
       for (const [x, z] of E.places) {
         const c = new CylinderGeometry(rad, rad, h, 28, 1); c.translate(x, 1.8 + h / 2, z); sensors.add(mesh(c, M.wound));
         const wgl = new CylinderGeometry(0.34, 0.34, h + 0.7, 14, 1); wgl.translate(x, 1.8 + (h + 0.7) / 2, z); sensors.add(mesh(wgl, M.glass));
+      }
+      tall = h;
+    }
+    if (E.kind === 'chip') {
+      /* each chip stands on its long edge, on a pair of gold pads */
+      const h = E.height ?? 2.2, len = E.length ?? 4.2, tk = E.thick ?? 0.625;
+      for (const [x, z] of E.places) {
+        const c = new BoxGeometry(tk, h, len); c.translate(x, 1.8 + h / 2, z); sensors.add(mesh(c, M.chip));
+        const f = new BoxGeometry(tk + 1.1, 0.18, len + 0.5); f.translate(x, 1.8 + 0.09, z); sensors.add(mesh(f, M.gold));
       }
       tall = h;
     }

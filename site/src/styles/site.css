@@ -582,3 +582,5 @@ html.reveal .chests.drawn .chests-device { opacity: 1; }
   #why .scene-text { display: contents; }
   #why .chip { order: 1; align-self: flex-start; } #why .h2 { order: 2; } #why .lead { order: 3; } #why .fig { order: 4; } #why .pull { order: 5; } #why .scene-text > p:last-child { order: 6; align-self: flex-start; }
 }
+
+.edge-view { margin: 1.5rem 0 0; } .edge-view img { width: 100%; height: auto; display: block; }

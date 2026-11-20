@@ -1,6 +1,6 @@
 /* The still pictures, drawn from the same model and cameras as the live stage. Called by scripts/render-stills.mjs. */
 import { Studio, SPECS } from './studio.js';
-import { VIEWS, FAMILY, FRAME_ONE, FRAME_FAMILY, sizeLines } from './shots.js';
+import { VIEWS, FAMILY, FRAME_ONE, FRAME_FAMILY, LEAD, sizeLines } from './shots.js';
 
 /* Cameras used only by the stills (the live stage has its own wing view in shots.js). */
 const WING_STILL = { tx: -25, ty: 2, tz: 19, az: -0.85, el: 0.5, dist: 112, fit: 1.43 };
@@ -31,22 +31,38 @@ const lines = (s, core) => sizeLines(core).map((d) => {
 });
 
 export const STILLS = {
-  hero(k = 1) { const s = one(0, 2400 * k, 1600 * k, VIEWS.hero); return { png: s.png(), lines: lines(s, SPECS[0].core) }; },
-  open(k = 1) { const s = one(0, 1500 * k, 1700 * k, VIEWS.open, { explode: 1 }); return { png: s.png() }; },
-  wing(k = 1) { const s = one(0, 2000 * k, 1400 * k, WING_STILL); return { png: s.png() }; },
-  detail(k = 1) { const s = one(0, 2000 * k, 1500 * k, DETAIL_STILL); return { png: s.png() }; },
-  wide(k = 1) { const s = one(0, 2800 * k, 1575 * k, WIDE_STILL, { frame: { cx: 0, cz: 0, w: 260, d: 230 } }); return { png: s.png() }; },
-  /** option 1 with its lid (the coil is on the lid's underside) and the flexible sheet lifted clear, so the board and the cell are seen in the shell */
+  hero(k = 1) { const s = one(LEAD, 2400 * k, 1600 * k, VIEWS.hero); return { png: s.png(), lines: lines(s, SPECS[LEAD].core) }; },
+  open(k = 1) { const s = one(LEAD, 1500 * k, 1700 * k, VIEWS.open, { explode: 1 }); return { png: s.png() }; },
+  wing(k = 1) { const s = one(LEAD, 2000 * k, 1400 * k, WING_STILL); return { png: s.png() }; },
+  detail(k = 1) { const s = one(LEAD, 2000 * k, 1500 * k, DETAIL_STILL); return { png: s.png() }; },
+  wide(k = 1) { const s = one(LEAD, 2800 * k, 1575 * k, WIDE_STILL, { frame: { cx: 0, cz: 0, w: 260, d: 230 } }); return { png: s.png() }; },
+  /** the device with its lid (the coil is on the lid's underside) and the flexible sheet lifted clear, so the board and the cell are seen in the shell */
   inside(k = 1, view = INSIDE_STILL, lift = [42, 56]) {
-    const s = one(0, 2000 * k, 1500 * k, view, { frame: { cx: 0, cz: 0, w: 260, d: 230 } });
-    const p = s.device(0).parts;
+    const s = one(LEAD, 2000 * k, 1500 * k, view, { frame: { cx: 0, cz: 0, w: 260, d: 230 } });
+    const p = s.device(LEAD).parts;
     p.flex.position.y = lift[0]; p.lid.position.y = lift[1]; p.coil.position.y = lift[1];
     s.catcher.material.opacity = 0.07;
     s.touch(); s.draw(view);
     return { png: s.png() };
   },
-  /** any view of option 1, for trying a camera: STILLS.at(k, width, height, view, explode) */
-  at(k = 1, w = 1600, h = 1200, view = VIEWS.hero, explode = 0) { const s = one(0, w * k, h * k, view, { explode }); return { png: s.png() }; },
+  /** any view of the device, for trying a camera: STILLS.at(k, width, height, view, explode) */
+  at(k = 1, w = 1600, h = 1200, view = VIEWS.hero, explode = 0) { const s = one(LEAD, w * k, h * k, view, { explode }); return { png: s.png() }; },
+  /** straight down on the device, with no ground shadow and no haze: for laying it into a photograph */
+  flat(k = 1) {
+    const view = { tx: 0, ty: 0, tz: -4, az: 0, el: 1.5607, dist: 620, fit: 1 };
+    const s = one(LEAD, 2000 * k, 2000 * k, view, { frame: { cx: 0, cz: 0, w: 260, d: 230 } });
+    const haze = s.haze;
+    s.catcher.material.opacity = 0; s.contact.visible = false; s.haze = 0;
+    s.draw(view);
+    const png = s.png();
+    s.contact.visible = true; s.haze = haze;
+    return { png };
+  },
+  /** from the side, almost level with the table: how thin it is */
+  edge(k = 1) {
+    const s = one(LEAD, 2400 * k, 800 * k, { tx: 0, ty: 1.5, tz: 2, az: Math.PI / 2, el: 0.07, dist: 150, fit: 3 });
+    return { png: s.png() };
+  },
   option(k = 1, i = 0) {
     const c = SPECS[i].core;
     const reach = Math.max(1, (c.l + 70) / 130);

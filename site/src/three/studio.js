@@ -8,6 +8,7 @@ import {
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { buildDevice, makeMaterials } from './device.js';
 import SPECS from './specs.json';
+import { LEAD } from './shots.js';
 
 const DEPTH = {
   vertexShader: 'varying float vD; void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); vD = -mv.z; gl_Position = projectionMatrix * mv; }',
@@ -107,7 +108,7 @@ export class Studio {
   /** the device of option i (0 to 3), built the first time it is asked for */
   device(i) {
     if (!this.devices[i]) {
-      const d = this.devices[i] = buildDevice(SPECS[i], this.M, { inside: i === 0 });
+      const d = this.devices[i] = buildDevice(SPECS[i], this.M, { inside: i === LEAD });
       d.group.visible = false;
       this.scene.add(d.group);
       this.ground = -SPECS[i].core.pad_t;
@@ -152,6 +153,8 @@ export class Studio {
   bake() {
     const r = this.renderer, s = this.scene;
     const hide = [this.catcher, this.contact];
+    /* clear film throws no contact shadow */
+    s.traverse((o) => { if (o.userData.clear && o.visible) hide.push(o); });
     hide.forEach((o) => { o.visible = false; });
     s.overrideMaterial = this.depthMat;
     const alpha = r.getClearAlpha();

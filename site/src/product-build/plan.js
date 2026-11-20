@@ -1,4 +1,4 @@
-/* Company plan: the one controller for the company page, the three plans and the library (reorganized 2026-11-20).
+/* Company plan: the one controller for the company page, the two plans and the library (reorganized 2026-11-20).
    It opens the encrypted data with the access code, keeps a person's changes apart from that data in this browser (the
    same store as before, so nothing entered earlier is lost), works every figure out again after each change, and draws
    the screen in view at the chosen depth. Public code, no figures. */
@@ -14,7 +14,7 @@ const gate = $('#pb-gate'), app = $('#pb-app'), msg = $('#pb-msg'), form = $('#p
 const AREA = app.dataset.area; const DEF = AREAS[AREA];
 let seed = null, envelope = null, d = null, m = null;
 let store = { edits: {}, added: {}, removed: {}, log: [], who: '' };
-const ui = { tab: DEF.tabs[0].k, working: !!DEF.library, unified: true, wsub: 0, sub: '', panel: null, task: null, part: null, partFn: '', toolCat: '', stdTopic: '', riskKind: '', reportWeek: null, zoom: 16, revenue: false, volume: 25, decPlan: '', riskPlan: '', sort: {}, filter: {} };
+const ui = { tab: DEF.tabs[0].k, working: !!DEF.library, unified: true, wsub: 0, sub: '', panel: null, task: null, part: null, partFn: '', toolCat: '', stdTopic: '', riskKind: '', reportWeek: null, zoom: 16, decPlan: '', riskPlan: '', sort: {}, filter: {} };
 mode.quiet = true;                                   // default states are stated once, not badged on every row
 
 const read = (k, w = localStorage) => { try { return w.getItem(k); } catch { return null; } };
@@ -22,7 +22,7 @@ const write = (k, v, w = localStorage) => { try { v == null ? w.removeItem(k) : 
 function load() { try { const s = JSON.parse(read(KEY) || 'null'); if (s && typeof s === 'object') store = { edits: s.edits || {}, added: s.added || {}, removed: s.removed || {}, log: s.log || [], who: s.who || '' }; } catch { /* a damaged store is ignored, never guessed at */ } }
 function save() { if (!write(KEY, JSON.stringify(store))) note('Your change is shown but could not be stored in this browser. Save your changes to a file in the Library.'); }
 function note(text) { const n = $('#pb-toast'); if (!n) return; n.textContent = text; n.hidden = false; clearTimeout(note.t); note.t = setTimeout(() => { n.hidden = true; }, 7000); }
-const OLD = { hub: { 1: 'today', 2: 'roadmap', 3: 'money', 4: 'strategy', 5: 'decisions' }, battery: { 1: 'now', 2: 'plan', 3: 'plan', 4: 'plan', 5: 'plan', 6: 'money', 7: 'proof' }, funding: { 1: 'now', 2: 'plan', 3: 'plan', 4: 'plan', 5: 'proof', 6: 'plan', 7: 'money' }, ecg: { A: 'now', B: 'plan', C: 'plan', K: 'money', F: 'proof', H: 'proof', J: 'proof' } };
+const OLD = { hub: { 1: 'today', 2: 'roadmap', 3: 'money', 4: 'strategy', 5: 'decisions' }, funding: { 1: 'now', 2: 'plan', 3: 'plan', 4: 'plan', 5: 'proof', 6: 'plan', 7: 'money' }, ecg: { A: 'now', B: 'plan', C: 'plan', K: 'money', F: 'proof', H: 'proof', J: 'proof' } };
 function fromHash() { let h = location.hash.slice(1); if (h.startsWith('dec-')) { ui.panel = { kind: 'decision', coll: 'execDecisions', id: h.slice(4) }; h = 'decisions'; } const o = (OLD[AREA] || {})[h]; if (o) h = o; if (DEF.tabs.some((t) => t.k === h)) { ui.tab = h; return true; } return false; }
 
 async function open(code, quiet) {
@@ -47,35 +47,7 @@ form.addEventListener('submit', (e) => { e.preventDefault(); const c = $('#pb-co
 
 /* ------------------------------------------------------------------ work everything out */
 
-function derive() {
-  const added = {}; for (const [k, v] of Object.entries(store.added)) added[k] = v.filter((r) => !(store.removed[k] || []).includes(r.id));
-  const r = C.applyEdits(seed, store.edits, added);
-  const today = new Date().toISOString().slice(0, 10);
-  const log = r.model.hoursLog || [];
-  const tasks = r.model.tasks.map((t) => { const a = { A: 0, B: 0 }; for (const e of log) if (e.task === t.id) a[e.role] = (a[e.role] || 0) + Number(e.hours || 0); return { ...t, actualHours: a }; });
-  m = { ...r.model, tasks };
-  let changes = 0; for (const c of Object.values(store.edits)) for (const rec of Object.values(c)) changes += Object.keys(rec).length; for (const a of Object.values(added)) changes += a.length;
-  // the ECG/MCG plan's own figures, exactly as its sections expect them
-  const sched = C.schedule(m.program, tasks, today); const eLoad = C.resourceLoad(m.program, m.roles, tasks, sched); const bud = C.budget(m.program, m.roles, m.lines); const spend = C.weeklySpend(m.program, m.roles, tasks, m.lines, sched, log);
-  const nowWeek = C.weekOf(m.program, today); const upto = Math.min(Math.max(nowWeek, 0), spend.length);
-  let status = 'On plan', statusWhy = 'no task is overdue or pushed later';
-  if (today < m.program.startDate) { status = 'Not started'; statusWhy = `the program starts on ${m.program.startDate}`; }
-  if (sched.overdue.length || sched.slipped.length || sched.errors.length || sched.endWeek > m.program.durationWeeks || eLoad.conflicts.length) { status = 'At risk'; statusWhy = [sched.overdue.length && `${sched.overdue.length} overdue`, sched.slipped.length && `${sched.slipped.length} pushed later`, eLoad.conflicts.length && `${eLoad.conflicts.length} overloaded weeks`, sched.endWeek > m.program.durationWeeks && 'the schedule runs past the program', sched.errors.length && 'schedule errors'].filter(Boolean).join(', '); }
-  const ecg = { today, nowWeek, sched, load: eLoad, bud, spend, status, statusWhy, gates: C.gates(m), trace: C.traceability(m), stack: C.stackCost(m.stack, m.tools), bom: C.bomHealth(m.parts), bomCost: [1, 10, 100, 1000].map((q) => C.bomCost(m.parts, q)),
-    scenarios: m.scenarios.map((s) => ({ ...s, b: C.budget(m.program, m.roles, m.lines, s), endDate: C.schedule({ ...m.program, durationWeeks: s.durationWeeks || m.program.durationWeeks }, tasks).endDate })),
-    spendActual: spend.length ? spend[spend.length - 1].cumActual : 0, spendPlanned: upto ? spend[upto - 1].cumPlanned : 0, conflicts: r.conflicts, orphans: r.orphans, changes, logOk: d && d.ecg ? d.ecg.logOk : null };
-  // the company-wide figures
-  const scheds = P.schedules(m, today); const loadAll = P.portfolioLoad(m, scheds);
-  const byProgram = Object.fromEntries(scheds.map((s) => [s.id, { ...s, next: s.sched.rows.filter((q) => q.milestone && q.percent < 100 && q.finishDate >= today)[0] || s.sched.rows.filter((q) => q.milestone)[0] || null }]));
-  const bat = scheds.find((s) => s.id === 'battery');
-  const bPart = { needs: m.bNeeds, requirements: m.bRequirements, outputs: m.bOutputs, risks: m.bRisks, tests: m.bTests, evidence: m.evidence, reviews: m.reviews, gates: m.bGates, tasks: m.bTasks, anomalies: (m.anomalies || []).filter((a) => a.program === 'battery') };
-  d = { today, ecg, scheds, byProgram, load: loadAll, budget: P.portfolioBudget(m), bBudget: P.programBudget(m, bat),
-    bScen: m.bScenarios.map((sc) => { const prog = { ...m.bProgram, durationWeeks: sc.durationWeeks || m.bProgram.durationWeeks, contingencyPct: sc.contingencyPct ?? m.bProgram.contingencyPct }; const s = C.schedule(prog, m.bTasks); const b = P.programBudget(m, { ...bat, program: prog }); return { ...sc, weeks: s.endWeek, endDate: s.endDate, labour: b.labour, total: b.total }; }),
-    monthly: P.monthly(m, scheds, loadAll), pipe: P.pipeline(m.opportunities), dl: P.deadlines(m.opportunities, today), funnel: P.funnel(m.customers, m.funnelTargets),
-    econ: P.VOLUMES.map((v) => P.unitEconomics(m.bEconomics, v)), econUnset: (m.bEconomics.unset || []).filter((k) => !Number(m.bEconomics[k])).length, sens: P.sensitivity(m.bEconomics, 25),
-    readB: P.readiness(bPart), readE: P.readiness({ needs: m.needs, requirements: m.requirements, outputs: m.outputs, risks: m.risks, tests: m.tests, evidence: m.evidence, reviews: m.reviews, gates: m.gates, tasks: m.tasks, anomalies: (m.anomalies || []).filter((a) => a.program !== 'battery') }),
-    bTrace: C.traceability(bPart), decisions: P.decisionQueue(m.execDecisions, today), realloc: m.reallocations.map((s) => P.reallocate(m, s, today)), alloc: P.allocationCheck(m.allocations, m.expenses, log), changes };
-}
+function derive() { const r = P.derive(seed, store, new Date().toISOString().slice(0, 10), d && d.ecg ? d.ecg.logOk : null); m = r.m; d = r.d; }
 const mine = (c, id, f, k) => { const e = store.edits[c] && store.edits[c][id]; if (!e || !e[f]) return false; if (k == null) return true; const b = e[f].base || {}, v = e[f].value || {}; return JSON.stringify(c === 'scenarios' && f === 'lines' ? (b[k] || null) : b[k]) !== JSON.stringify(v[k]); };
 
 /* ------------------------------------------------------------------ draw */
@@ -153,8 +125,8 @@ function setField(c, id, f, value, k) {
   if (inAdded) inAdded[f] = next; else store.edits = C.setEdit(store.edits, seed, c, isList ? id : '_', f, next, new Date().toISOString());
   record('changed', c, id, k != null ? `${f}.${k}` : f, from, value); render();
 }
-const LIMITS = { durationWeeks: [1, 156], contingencyPct: [0, 100], percent: [0, 100], week: [1, 156], weeks: [1, 156], actualWeek: [1, 156], weeklyHours: [0, 80], months: [0, 60], severity: [1, 5], residualSeverity: [1, 5], residualProbability: [1, 5], distributorSharePct: [0, 100], distributorMarginPct: [0, 100], warrantyPct: [0, 100], attachPct: [0, 100] };
-const MAY_BE_EMPTY = /Lines$|^lines$|^opportunities$|^capital$|^bEconomics$|^customers$/;
+const LIMITS = { durationWeeks: [1, 156], contingencyPct: [0, 100], percent: [0, 100], week: [1, 156], weeks: [1, 156], actualWeek: [1, 156], weeklyHours: [0, 80], months: [0, 60], severity: [1, 5], residualSeverity: [1, 5], residualProbability: [1, 5] };
+const MAY_BE_EMPTY = /Lines$|^lines$|^opportunities$|^capital$/;
 function commit(b, raw) {
   const { c, i, f, t, k } = b.dataset;
   try {
@@ -183,7 +155,7 @@ function editCell(b) {
   el.addEventListener('blur', () => finish(true)); if (t === 'select') el.addEventListener('change', () => finish(true));
   b.replaceWith(el); el.focus(); if (el.select) el.select();
 }
-const PREFIX = { expenses: 'EX', customers: 'CU', partners: 'PA', allocations: 'AL', opportunities: 'FO-U', anomalies: 'AN' };
+const PREFIX = { expenses: 'EX', partners: 'PA', allocations: 'AL', opportunities: 'FO-U', anomalies: 'AN' };
 function addRecord(c, data) {
   const now = new Date().toISOString();
   if (!store.who.trim() && c !== 'hoursLog') throw new Error('Enter your name first: "Your changes" at the top right.');
@@ -198,14 +170,13 @@ function addRecord(c, data) {
     const known = new Set(m.evidence.map((e) => e.id)); const bad = rec.evidence.filter((e) => !known.has(e)); if (bad.length) throw new Error(`Not on record as evidence: ${bad.join(', ')}.`);
     if (rec.approvedBy) { const a = { by: rec.approvedBy, date: rec.date, decision: 'Approved' }; const ok = C.validApproval(a); if (!ok.ok) throw new Error('Approval: ' + ok.problems.join('; ') + '.'); rec.approval = a; } delete rec.approvedBy;
   }
-  if (c === 'customers') rec.lost = false;
   if (c === 'opportunities') Object.assign(rec, { stage: 'Identified', amountRequested: null, amountAttainable: null, probability: null, probabilityBasis: null, eligibility: 'Not checked', owner: 'C', amountReceived: null, receivedDate: null, verified: false, status: 'Planning Estimate', deadline: rec.deadline || null, sourceUrl: rec.sourceUrl || null, note: 'Added by ' + store.who });
   if (c === 'allocations') { const chk = P.allocationCheck([...m.allocations, rec], m.expenses, m.hoursLog || []); if (!chk.ok) throw new Error('Not added. ' + chk.problems[chk.problems.length - 1].text + '.'); }
   store.added[c] = [...(store.added[c] || []), rec];
   if (store.removed[c]) store.removed[c] = store.removed[c].filter((id) => id !== rec.id);
   record('added', c, rec.id, null, null, rec); render();
 }
-const taskColl = (id) => ['tasks', 'bTasks', 'fTasks'].find((c) => m[c].some((t) => t.id === id));
+const taskColl = (id) => ['tasks', 'fTasks'].find((c) => m[c].some((t) => t.id === id));
 function go(k) { ui.tab = k; ui.task = null; ui.wsub = 0; ui.sub = ''; ui.panel = null; history.replaceState(null, '', '#' + k); render(false); scrollTo(0, Math.max(0, app.offsetTop - 80)); const h = $('.pb-h2', app); if (h) h.focus({ preventScroll: true }); }
 
 /* ------------------------------------------------------------------ events */
@@ -262,7 +233,7 @@ app.addEventListener('submit', (e) => {
     if (f.dataset.cash !== undefined) { const v = Number(data.cash); if (!(v >= 0) || data.cash === '') throw new Error('An amount of zero or more is needed.'); ui.panel = null; return setField('capital', '_', 'cashOnHand', v); }
     if (f.dataset.add) return addRecord(f.dataset.add, data);
     if (f.dataset.approve) {
-      const coll = f.dataset.coll || 'gates'; const g = C.gates({ tasks: coll === 'gates' ? m.tasks : m.bTasks, evidence: m.evidence, gates: m[coll] }).rows.find((q) => q.id === f.dataset.approve);
+      const coll = f.dataset.coll || 'gates'; const g = C.gates({ tasks: m.tasks, evidence: m.evidence, gates: m[coll] }).rows.find((q) => q.id === f.dataset.approve);
       const a = { by: data.by.trim(), date: data.date, decision: data.decision, note: (data.note || '').trim() };
       const ok = C.validApproval(a); if (!ok.ok) throw new Error(ok.problems.join('; ') + '.');
       if (a.decision !== 'No-go' && !g.canApprove) throw new Error(`${g.id} cannot be given a go yet: ${g.missing.map((q) => q.text).join('; ')}.`);

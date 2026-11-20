@@ -2,7 +2,7 @@
    Each scene has a camera position and a state of the parts; scrolling blends between neighbours.
    Nothing is drawn unless something changed. The stills stay in the page underneath and return if this is removed. */
 import { Studio, SPECS } from './studio.js';
-import { VIEWS, FAMILY, FRAME_ONE, FRAME_FAMILY, sizeLines } from './shots.js';
+import { VIEWS, FAMILY, FRAME_ONE, FRAME_FAMILY, LEAD, sizeLines } from './shots.js';
 
 /* The first two scenes keep their own pictures. The live model first appears at the third scene ("It opens").
    A picture and the model are never seen together: the one on the stage fades to nothing, then the other fades in. */
@@ -41,7 +41,7 @@ export function mount(spine) {
   wrap.className = 'stage-gl';
   const canvas = document.createElement('canvas');
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', 'The option 1 device in three dimensions. It turns, opens and closes as the page scrolls.');
+  canvas.setAttribute('aria-label', 'The device in three dimensions. It turns, opens and closes as the page scrolls.');
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('class', 'dims stage-lines');
   svg.setAttribute('aria-hidden', 'true');
@@ -55,11 +55,11 @@ export function mount(spine) {
   performance.mark('gl-a');
   try { S = new Studio(canvas, { pixelRatio: Math.min(window.devicePixelRatio || 1, 2), deferEnv: true }); } catch { wrap.remove(); return null; }
   performance.mark('gl-b');
-  S.arrange([{ i: 0, x: 0, z: 0 }], FRAME_ONE);
+  S.arrange([{ i: LEAD, x: 0, z: 0 }], FRAME_ONE);
   performance.mark('gl-c');
 
   /* the three size lines, drawn over the canvas so the type matches the page */
-  const lines = sizeLines(SPECS[0].core).map((d) => {
+  const lines = sizeLines(SPECS[LEAD].core).map((d) => {
     const g = document.createElementNS(NS, 'g');
     const path = document.createElementNS(NS, 'path');
     path.setAttribute('pathLength', '1');
@@ -116,7 +116,7 @@ export function mount(spine) {
   }
   function draw() {
     S.resize(wrap.clientWidth, wrap.clientHeight);
-    const A = S.device(0);
+    const A = S.device(LEAD);
     if (A.parts.lid.position.y !== A.lift.lid * cur.explode) { A.explode(cur.explode); S.touch(); }
     S.catcher.material.opacity = 0.2 * (1 - cur.explode);
     const fam = family ? cur.family : 0;
@@ -196,7 +196,7 @@ export function mount(spine) {
       if (cur.gl * veil > 0.02) veil = Math.max(0, veil - dt / 0.18);
       else {
         family = want;
-        if (family) S.arrange(FAMILY, FRAME_FAMILY); else S.arrange([{ i: 0, x: 0, z: 0 }], FRAME_ONE);
+        if (family) S.arrange(FAMILY, FRAME_FAMILY); else S.arrange([{ i: LEAD, x: 0, z: 0 }], FRAME_ONE);
       }
       moving = true;
     } else if (veil < 1) { veil = Math.min(1, veil + dt / 0.3); moving = true; }
@@ -276,10 +276,10 @@ export function mount(spine) {
     kick();
     /* the other three options are built when the browser is idle, well before the last scene */
     const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 600));
-    if (FAMILY_AT >= 0) [1, 2, 3].forEach((i, n) => idle(() => { if (!dead) S.device(i); }, { timeout: 2500 + n * 600 }));
+    if (FAMILY_AT >= 0) [0, 1, 2, 3].filter((i) => i !== LEAD).forEach((i, n) => idle(() => { if (!dead) S.device(i); }, { timeout: 2500 + n * 600 }));
   };
   S.resize(wrap.clientWidth, wrap.clientHeight);
-  S.device(0).group.visible = true;
+  S.device(LEAD).group.visible = true;
   setTimeout(() => {
     if (dead) return;
     performance.mark('gl-env0');
